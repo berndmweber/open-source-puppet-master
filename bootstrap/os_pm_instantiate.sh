@@ -402,7 +402,7 @@ cd $SCRIPTDIR
 
 # Configure Puppetlabs repo
 echo -e " ${cc_blue}Downloading Puppetlabs repository information...${cc_normal}"
-${CURL} -o ${REPOFILE} http://${REPOPATH}/${REPOFILE} >> ${LOG}
+${CURL} -s -S -o ${REPOFILE} http://${REPOPATH}/${REPOFILE} >> ${LOG}
 ${REPOINSTALL} ${REPOFILE} >> ${LOG}
 echo " ${cc_green}Done.${cc_normal}"
 echo
@@ -414,14 +414,14 @@ echo " ${cc_green}Done.${cc_normal}"
 echo
 
 # Install a basic puppet master configuration
-echo " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES} ${cc_blue}...${cc_normal}"
+echo " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES}${cc_blue}...${cc_normal}"
 ${PKGINSTALL} ${BASEPACKAGES} >> ${LOG}
 echo " ${cc_green}Done.${cc_normal}"
 echo
 
 # Grab the GitHub puppet configuration
 echo " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}"
-git clone ${GITHUBREPO} ${TEMPPUPPETDIR} >> ${LOG}
+git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress &>> ${LOG}
 echo " ${cc_green}Done.${cc_normal}"
 echo
 
