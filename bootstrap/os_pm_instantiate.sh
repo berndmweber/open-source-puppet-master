@@ -26,7 +26,7 @@ echo " ${cc_green}Done.${cc_normal}"
 echo
 
 # Install a basic puppet master configuration
-echo " ${cc_blue}Installing ${cc_yellow}puppet-common{cc_blue} and ${cc_yellow}git-core${cc_normal}"
+echo " ${cc_blue}Installing ${cc_yellow}puppet-common${cc_blue} and ${cc_yellow}git-core${cc_normal}"
 apt-get install -y puppet-common git-core
 echo " ${cc_green}Done.${cc_normal}"
 echo
