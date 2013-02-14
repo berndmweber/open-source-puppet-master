@@ -15,6 +15,8 @@ cc_normal=`echo -en "${esc}[m\017"`
 # Find executables
 CAT=`which cat`
 CURL=`which curl`
+TEE="`which tee` -a"
+ECHO="echo -e"
 
 # Some global system variables
 ISSUE="/etc/issue" # For OS and version detection
@@ -32,18 +34,18 @@ DATE=`date`
 # Define correct usage
 usage ()
 {
-  echo "${cc_blue}${0}${cc_normal} [options]"
-  echo
-  echo "  --verbose [0|1|2]"
-  echo "  --logdir  <some writable directory>"
-  echo "  --logfile <log file name>"
-  echo
-  echo " ${cc_blue}Auto-detected options. These do not normally have to be provided.${cc_normal}"
-  echo "  --os    [${cc_yellow}Ubuntu${cc_blue}|${cc_yellow}CentOS${cc_normal}]"
-  echo "  --osversion [${cc_yellow}12.04${cc_blue}|${cc_yellow}6${cc_normal}]"
-  echo
-  echo " e.g. ${0} --os Ubuntu --osversion 12.04 --logdir /tmp --logfile mylog.txt"
-  echo
+  ${ECHO} "${cc_blue}${0}${cc_normal} [options]"
+  ${ECHO}
+  ${ECHO} "  --verbose [0|1|2]"
+  ${ECHO} "  --logdir  <some writable directory>"
+  ${ECHO} "  --logfile <log file name>"
+  ${ECHO}
+  ${ECHO} " ${cc_blue}Auto-detected options. These do not normally have to be provided.${cc_normal}"
+  ${ECHO} "  --os    [${cc_yellow}Ubuntu${cc_blue}|${cc_yellow}CentOS${cc_normal}]"
+  ${ECHO} "  --osversion [${cc_yellow}12.04${cc_blue}|${cc_yellow}6${cc_normal}]"
+  ${ECHO}
+  ${ECHO} " e.g. ${0} --os Ubuntu --osversion 12.04 --logdir /tmp --logfile mylog.txt"
+  ${ECHO}
   exit 1
 }
 
@@ -99,14 +101,14 @@ done
 
 # Initialize log
 touch ${LOG}
-echo "${DATE}" > ${LOG}
-echo >> ${LOG}
+${ECHO} "${DATE}" > ${LOG}
+${ECHO} >> ${LOG}
 
 # Evaluate the /etc/issue file to automatically extract OS
 eval_issue_os ()
 {
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}eval_issue_os \$1: ${1}${cc_normal}"
+    ${ECHO} "${cc_yellow}eval_issue_os \$1: ${1}${cc_normal}"
   fi
   if [ -n "${1}" ]; then
     case "${1}" in
@@ -127,21 +129,21 @@ eval_issue_os ()
 eval_issue_osversion ()
 {
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}eval_issue_osversion \$1: ${1}${cc_normal}"
+    ${ECHO} "${cc_yellow}eval_issue_osversion \$1: ${1}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -n "${1}" ]; then
     case "${1}" in
       Ubuntu)
         OSVERSION="${2:0:5}"
         if [ ${VERBOSE} -gt 2 ]; then
-      echo "${cc_yellow}version \$2: ${2}${cc_normal}"
-    fi
+          ${ECHO} "${cc_yellow}version \$2: ${2}${cc_normal}" | ${TEE} ${LOG}
+        fi
         ;;
       CentOS)
         OSVERSION="${3:0:1}"
         if [ ${VERBOSE} -gt 2 ]; then
-      echo "${cc_yellow}version \$3: ${3}${cc_normal}"
-    fi
+          ${ECHO} "${cc_yellow}version \$3: ${3}${cc_normal}" | ${TEE} ${LOG}
+        fi
         ;;
       *)
         exit 0
@@ -156,7 +158,7 @@ eval_issue_osversion ()
 eval_os ()
 {
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}eval_os \$1: ${1}${cc_normal}"
+    ${ECHO} "${cc_yellow}eval_os \$1: ${1}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -n "${1}" ]; then
   case "${OS}" in
@@ -184,7 +186,7 @@ eval_os ()
 eval_osversion ()
 {
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}eval_osversion${cc_normal}"
+    ${ECHO} "${cc_yellow}eval_osversion${cc_normal}" | ${TEE} ${LOG}
   fi
   case "${OS}" in
     ubuntu)
@@ -219,16 +221,16 @@ if [ ! -z "$CAT}" ]; then
   if [ -e "${ISSUE}" ]; then
     TEMPOS=`${CAT} ${ISSUE}`
     if [ ${VERBOSE} -gt 1 ]; then
-    echo "${cc_yellow}TEMPOS:${cc_green}${TEMPOS}${cc_normal}"
+      ${ECHO} "${cc_yellow}TEMPOS:${cc_green}${TEMPOS}${cc_normal}" | ${TEE} ${LOG}
     fi
   else
     if [ ${VERBOSE} -gt 0 ]; then
-      echo "${cc_red}Could not find '${cc_yellow}${ISSUE}${cc_red}' file${cc_normal}"
-  fi
+      ${ECHO} "${cc_red}Could not find '${cc_yellow}${ISSUE}${cc_red}' file${cc_normal}" | ${TEE} ${LOG}
+    fi
   fi
 else
   if [ ${VERBOSE} -gt 0 ]; then
-    echo "${cc_red}Could not find '${cc_yellow}cat${cc_red}' executable${cc_normal}"
+    ${ECHO} "${cc_red}Could not find '${cc_yellow}cat${cc_red}' executable${cc_normal}" | ${TEE} ${LOG}
   fi
 fi
 
@@ -236,46 +238,46 @@ fi
 if [ -z "${OS}" ]; then
   foundos=0
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}OS not found${cc_normal}"
+    ${ECHO} "${cc_yellow}OS not found${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_issue_os ${TEMPOS}
   foundos=$?
   if [ ${VERBOSE} -gt 1 ]; then
-  echo "${cc_yellow}foundos:${cc_green}${foundos}${cc_normal}"
+    ${ECHO} "${cc_yellow}foundos:${cc_green}${foundos}${cc_normal}" | ${TEE} ${LOG}
   fi
 else
   foundos=1
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_green}OS found${cc_normal}"
+    ${ECHO} "${cc_green}OS found${cc_normal}" | ${TEE} ${LOG}
   fi
 fi
 if [ ${foundos} -eq 1 ]; then
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_green}foundos is true${cc_normal}"
+    ${ECHO} "${cc_green}foundos is true${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_os ${OS}
   validos=$?
   if [ ${validos} -eq 0 ]; then
     if [ ${VERBOSE} -gt 2 ]; then
-      echo "${cc_red}invalid OS found: ${cc_yellow}${OS}${cc_normal}"
+      ${ECHO} "${cc_red}invalid OS found: ${cc_yellow}${OS}${cc_normal}" | ${TEE} ${LOG}
     fi
     foundos=0
   fi
 fi
 if [ ${foundos} -eq 0 ]; then
-  echo " ${cc_blue}Please provide a valid OS (Distribution) for this script."
-  echo " Valid Distributions are:"
-  echo
-  echo "  * ${cc_yellow}Ubuntu${cc_blue}"
-  echo "  * ${cc_yellow}CentOS${cc_normal}"
-  echo
-  echo -n " > "
+  ${ECHO} " ${cc_blue}Please provide a valid OS (Distribution) for this script." | ${TEE} ${LOG}
+  ${ECHO} " Valid Distributions are:" | ${TEE} ${LOG}
+  ${ECHO} | ${TEE} ${LOG}
+  ${ECHO} "  * ${cc_yellow}Ubuntu${cc_blue}" | ${TEE} ${LOG}
+  ${ECHO} "  * ${cc_yellow}CentOS${cc_normal}" | ${TEE} ${LOG}
+  ${ECHO} | ${TEE} ${LOG}
+  ${ECHO} -n " > " | ${TEE} ${LOG}
   read replyos
   if [ ${VERBOSE} -gt 1 ]; then
-  echo "${cc_yellow}replyos: ${cc_green}${replyos}${cc_normal}"
+    ${ECHO} "${cc_yellow}replyos: ${cc_green}${replyos}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -z "${replyos}" ]; then
-    echo "${cc_red}No valid OS was given. Exiting now.${cc_normal}"
+    ${ECHO} "${cc_red}No valid OS was given. Exiting now.${cc_normal}" | ${TEE} ${LOG}
     exit 1
   else
     OS=${replyos}
@@ -283,59 +285,59 @@ if [ ${foundos} -eq 0 ]; then
   eval_os ${OS}
   validos=$?
   if [ ${validos} -eq 0 ]; then
-    echo "${cc_red}No valid OS was given. Exiting now.${cc_normal}"
+    ${ECHO} "${cc_red}No valid OS was given. Exiting now.${cc_normal}" | ${TEE} ${LOG}
     exit 1
   fi
 fi
 if [ -z "${OSVERSION}" ]; then
   foundosversion=0
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_yellow}OS version not found${cc_normal}"
+    ${ECHO} "${cc_yellow}OS version not found${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_issue_osversion ${TEMPOS}
   foundosversion=$?
   if [ ${VERBOSE} -gt 1 ]; then
-  echo "${cc_yellow}foundosversion: ${cc_green}${foundosversion}${cc_normal}"
+    ${ECHO} "${cc_yellow}foundosversion: ${cc_green}${foundosversion}${cc_normal}" | ${TEE} ${LOG}
   fi
 else
   foundosversion=1
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_green}OS version found: ${foundosversion}${cc_normal}"
+    ${ECHO} "${cc_green}OS version found: ${foundosversion}${cc_normal}" | ${TEE} ${LOG}
   fi
 fi
 if [ ${foundosversion} -eq 1 ]; then
   if [ ${VERBOSE} -gt 2 ]; then
-  echo "${cc_green}foundosversion is true${cc_normal}"
+    ${ECHO} "${cc_green}foundosversion is true${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_osversion ${OS}
   validosversion=$?
   if [ ${validosversion} -eq 0 ]; then
     if [ ${VERBOSE} -gt 2 ]; then
-      echo "${cc_red}invalid OS found: ${cc_yellow}${OSVERSION}${cc_normal}"
+      ${ECHO} "${cc_red}invalid OS found: ${cc_yellow}${OSVERSION}${cc_normal}" | ${TEE} ${LOG}
     fi
     foundosversion=0
   fi
 fi
 if [ ${foundosversion} -eq 0 ]; then
-  echo " ${cc_blue}Please provide a valid OS Version for ${OS} for this script."
-  echo " Valid Versions are:"
-  echo
+  ${ECHO} " ${cc_blue}Please provide a valid OS Version for ${OS} for this script." | ${TEE} ${LOG}
+  ${ECHO} " Valid Versions are:" | ${TEE} ${LOG}
+  ${ECHO} | ${TEE} ${LOG}
   case ${OS} in
     ubuntu)
-      echo "  * ${cc_yellow}12.04${cc_blue}"
+      ${ECHO} "  * ${cc_yellow}12.04${cc_blue}" | ${TEE} ${LOG}
       ;;
     centos)
-      echo "  * ${cc_yellow}6${cc_normal}"
+      ${ECHO} "  * ${cc_yellow}6${cc_normal}" | ${TEE} ${LOG}
       ;;
   esac
-  echo
-  echo -n " > "
+  ${ECHO} | ${TEE} ${LOG}
+  ${ECHO} -n " > " | ${TEE} ${LOG}
   read replyosversion
   if [ ${VERBOSE} -gt 1 ]; then
-  echo "${cc_yellow}replyosversion: ${cc_green}${replyosversion}${cc_normal}"
+    ${ECHO} "${cc_yellow}replyosversion: ${cc_green}${replyosversion}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -z "${replyosversion}" ]; then
-    echo "${cc_red}No valid OS version was given. Exiting now.${cc_normal}"
+    ${ECHO} "${cc_red}No valid OS version was given. Exiting now.${cc_normal}" | ${TEE} ${LOG}
     exit 1
   else
     OSVERSION=${replyosversion}
@@ -343,7 +345,7 @@ if [ ${foundosversion} -eq 0 ]; then
   eval_osversion ${OSVERSION}
   validosversion=$?
   if [ ${validosversion} -eq 0 ]; then
-    echo "${cc_red}No valid OS version was given. Exiting now.${cc_normal}"
+    ${ECHO} "${cc_red}No valid OS version was given. Exiting now.${cc_normal}" | ${TEE} ${LOG}
     exit 1
   fi
 fi
@@ -361,7 +363,7 @@ case ${OS} in
     ;;
   *)
     # Final fallback
-    echo "${cc_red}${OS} not supported. Exiting!${cc_normal}"
+    ${ECHO} "${cc_red}${OS} not supported. Exiting!${cc_normal}" | ${TEE} ${LOG}
     exit 1
   ;;
 esac
@@ -369,64 +371,120 @@ esac
 # Some debug output
 print_params ()
 {
-  echo " ${cc_blue}Configured Params" >> ${LOG}
-  echo " OS:      ${cc_green}${OS}${cc_blue}" >> ${LOG}
-  echo " OSVERSION:   ${cc_green}${OSVERSION}${cc_blue}" >> ${LOG}
-  echo " VERBOSE:   ${cc_green}${VERBOSE}${cc_blue}" >> ${LOG}
-  echo >> ${LOG}
-  echo " SCRIPTDIR:   ${cc_green}${SCRIPTDIR}${cc_blue}" >> ${LOG}
-  echo " GITHUBREPO:    ${cc_green}${GITHUBREPO}${cc_blue}" >> ${LOG}
-  echo " TEMPPUPPETDIR:   ${cc_green}${TEMPPUPPETDIR}${cc_blue}" >> ${LOG}
-  echo >> ${LOG}
-  echo " REPOPATH:    ${cc_green}${REPOPATH}${cc_blue}" >> ${LOG}
-  echo " REPOFILE:    ${cc_green}${REPOFILE}${cc_blue}" >> ${LOG}
-  echo " REPOINSTALL:   ${cc_green}${REPOINSTALL}${cc_blue}" >> ${LOG}
-  echo " REPOSEXEC:   ${cc_green}${REPOSEXEC}${cc_blue}" >> ${LOG}
-  echo " REPOUPDATE:    ${cc_green}${REPOUPDATE}${cc_blue}" >> ${LOG}
-  echo " PKGINSTALL:    ${cc_green}${PKGINSTALL}${cc_blue}" >> ${LOG}
-  echo " BASEPACKAGES:    ${cc_green}${BASEPACKAGES}${cc_blue}" >> ${LOG}
-  echo >> ${LOG}
-  echo " CAT:     ${cc_green}${CAT}${cc_blue}" >> ${LOG}
-  echo " CURL:      ${cc_green}${CURL}${cc_normal}" >> ${LOG}
-  echo >> ${LOG}
+  OP=" ${cc_blue}Configured Params\n"
+  OP=${OP}" OS:\t\t           ${cc_green}${OS}${cc_blue}\n"
+  OP=${OP}" OSVERSION:\t      ${cc_green}${OSVERSION}${cc_blue}\n"
+  OP=${OP}" VERBOSE:\t        ${cc_green}${VERBOSE}${cc_blue}\n"
+  OP=${OP}"\n"
+  OP=${OP}" SCRIPTDIR:\t      ${cc_green}${SCRIPTDIR}${cc_blue}\n"
+  OP=${OP}" GITHUBREPO:\t     ${cc_green}${GITHUBREPO}${cc_blue}\n"
+  OP=${OP}" TEMPPUPPETDIR:\t  ${cc_green}${TEMPPUPPETDIR}${cc_blue}\n"
+  OP=${OP}"\n"
+  OP=${OP}" REPOPATH:\t       ${cc_green}${REPOPATH}${cc_blue}\n"
+  OP=${OP}" REPOFILE:\t       ${cc_green}${REPOFILE}${cc_blue}\n"
+  OP=${OP}" REPOINSTALL:\t    ${cc_green}${REPOINSTALL}${cc_blue}\n"
+  OP=${OP}" REPOSEXEC:\t      ${cc_green}${REPOSEXEC}${cc_blue}\n"
+  OP=${OP}" REPOUPDATE:\t     ${cc_green}${REPOUPDATE}${cc_blue}\n"
+  OP=${OP}" PKGINSTALL:\t     ${cc_green}${PKGINSTALL}${cc_blue}\n"
+  OP=${OP}" BASEPACKAGES:\t   ${cc_green}${BASEPACKAGES}${cc_blue}\n"
+  OP=${OP}"\n"
+  OP=${OP}" CAT:\t\t          ${cc_green}${CAT}${cc_blue}\n"
+  OP=${OP}" CURL:\t\t         ${cc_green}${CURL}${cc_blue}\n"
+  OP=${OP}" TEE:\t\t          ${cc_green}${TEE}${cc_normal}\n"
+    
+  if [ -n "${1}" ]; then
+    ${ECHO} ${OP} >> ${1}
+  else
+    ${ECHO} ${OP}
+  fi
 }
 
-print_params
+print_params ${LOG}
 
 if [ ${VERBOSE} -gt 0 ]; then
-  cat ${LOG}
+  print_params
 fi
 
 # Enter the required directory and get started
 cd $SCRIPTDIR
 
 # Configure Puppetlabs repo
-echo -e " ${cc_blue}Downloading Puppetlabs repository information...${cc_normal}"
-${CURL} -s -S -o ${REPOFILE} http://${REPOPATH}/${REPOFILE} >> ${LOG}
-${REPOINSTALL} ${REPOFILE} >> ${LOG}
-echo " ${cc_green}Done.${cc_normal}"
-echo
+${ECHO} " ${cc_blue}Downloading Puppetlabs repository information...${cc_normal}" | ${TEE} ${LOG}
+if [ ${VERBOSE} -lt 1 ]; then
+  silent="-s -S"
+fi
+configure="${CURL} ${silent} -o ${REPOFILE} http://${REPOPATH}/${REPOFILE}"
+if [ ${VERBOSE} -gt 2 ]; then
+  ${ECHO} "${configure}" | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${configure} &>1 | ${TEE} ${LOG}
+else
+  ${configure} >> ${LOG}
+fi
+rinstall="${REPOINSTALL} ${REPOFILE}"
+if [ ${VERBOSE} -gt 2 ]; then
+  ${ECHO} "${rinstall}" | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${rinstall} &>1 | ${TEE} ${LOG}
+else
+  ${rinstall} >> ${LOG}
+fi
+${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
 
 # Update the repository information
-echo " ${cc_blue}Updaing APT with new information...${cc_normal}"
-${REPOUPDATE} >> ${LOG}
-echo " ${cc_green}Done.${cc_normal}"
-echo
+${ECHO} " ${cc_blue}Updaing APT with new information...${cc_normal}" | ${TEE} ${LOG}
+if [ ${VERBOSE} -gt 2 ]; then
+  ${ECHO} "${REPOUPDATE}" | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${REPOUPDATE} &>1 | ${TEE} ${LOG}
+else
+  ${REPOUPDATE} >> ${LOG}
+fi
+${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
 
 # Install a basic puppet master configuration
-echo " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES}${cc_blue}...${cc_normal}"
-${PKGINSTALL} ${BASEPACKAGES} >> ${LOG}
-echo " ${cc_green}Done.${cc_normal}"
-echo
+${ECHO} " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES}${cc_blue}...${cc_normal}" | ${TEE} ${LOG}
+pkginst="${PKGINSTALL} ${BASEPACKAGES}"
+if [ ${VERBOSE} -gt 2 ]; then
+  ${ECHO} "${pkginst}" | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${pkginst} &>1 | ${TEE} ${LOG}
+else
+  ${pkginst} >> ${LOG}
+fi
+${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
 
 # Grab the GitHub puppet configuration
-echo " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}"
-git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress &>> ${LOG}
-echo " ${cc_green}Done.${cc_normal}"
-echo
+${ECHO} " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}" | ${TEE} ${LOG}
+if [ ${VERBOSE} -gt 2 ]; then
+dlghrepo="git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress"
+${ECHO} "${dlghrepo}"  | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${dlghrepo} &>1 | ${TEE} ${LOG}
+else
+  ${dlghrepo} >> ${LOG}
+fi
+${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
 
 # Install Puppet master through puppet base installation
-echo " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}"
-puppet apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules -e "include puppet" >> ${LOG}
-echo " ${cc_green}Done.${cc_normal}"
-echo
+${ECHO} " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
+puppetize="puppet apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules -e \"include puppet\""
+if [ ${VERBOSE} -gt 2 ]; then
+  ${ECHO} "${puppetize}" | ${TEE} ${LOG}
+fi
+if [ ${VERBOSE} -gt 0 ]; then
+  ${puppetize} &>1 | ${TEE} ${LOG}
+else
+  ${puppetize} >> ${LOG}
+fi
+${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
