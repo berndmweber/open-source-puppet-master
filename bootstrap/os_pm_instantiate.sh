@@ -16,6 +16,7 @@ cc_normal=`echo -en "${esc}[m\017"`
 CAT=`which cat`
 CURL=`which curl`
 TEE="`which tee` -a"
+GREP=`which grep`
 ECHO="echo -e"
 
 # Some global system variables
@@ -354,12 +355,15 @@ fi
 case ${OS} in
   ubuntu)
     REPOPATH="apt.puppetlabs.com"
-    REPOFILE="puppetlabs-release-precise.deb"
+    REPOFILEBASE="puppetlabs-release-precise"
+    REPOFILE="${REPOFILEBASE}.deb"
+    REPOFILECEHCK="ii  ${REPOFILEBASE}"
     REPOINSTALL="dpkg -i"
+    REPOCHECK="dpkg --list | ${GREP} 'ii  "
     REPOSEXEC="apt-get"
     REPOUPDATE="${REPOSEXEC} update"
     PKGINSTALL="${REPOSEXEC} install -y"
-    BASEPACKAGES="puppet-common git-core"
+    BASEPACKAGES=("puppet-common" "git-core")
     ;;
   *)
     # Final fallback
@@ -381,8 +385,11 @@ print_params ()
   OP=${OP}" TEMPPUPPETDIR:\t  ${cc_green}${TEMPPUPPETDIR}${cc_blue}\n"
   OP=${OP}"\n"
   OP=${OP}" REPOPATH:\t       ${cc_green}${REPOPATH}${cc_blue}\n"
+  OP=${OP}" REPOFILEBASE:\t   ${cc_green}${REPOFILEBASE}${cc_blue}\n"
   OP=${OP}" REPOFILE:\t       ${cc_green}${REPOFILE}${cc_blue}\n"
+  OP=${OP}" REPOFILECEHCK:\t  ${cc_green}${REPOFILECEHCK}${cc_blue}\n"
   OP=${OP}" REPOINSTALL:\t    ${cc_green}${REPOINSTALL}${cc_blue}\n"
+  OP=${OP}" REPOCHECK:\t      ${cc_green}${REPOCHECK}${cc_blue}\n"
   OP=${OP}" REPOSEXEC:\t      ${cc_green}${REPOSEXEC}${cc_blue}\n"
   OP=${OP}" REPOUPDATE:\t     ${cc_green}${REPOUPDATE}${cc_blue}\n"
   OP=${OP}" PKGINSTALL:\t     ${cc_green}${PKGINSTALL}${cc_blue}\n"
@@ -413,23 +420,37 @@ ${ECHO} " ${cc_blue}Downloading Puppetlabs repository information...${cc_normal}
 if [ ${VERBOSE} -lt 1 ]; then
   silent="-s -S"
 fi
-configure="${CURL} ${silent} -o ${REPOFILE} http://${REPOPATH}/${REPOFILE}"
-if [ ${VERBOSE} -gt 2 ]; then
-  ${ECHO} "${configure}" | ${TEE} ${LOG}
-fi
-if [ ${VERBOSE} -gt 0 ]; then
-  ${configure} &>1 | ${TEE} ${LOG}
+if [ ! -e "${REPOFILE}" ]; then
+	dl="${CURL} ${silent} -o ${REPOFILE} http://${REPOPATH}/${REPOFILE}"
+	if [ ${VERBOSE} -gt 2 ]; then
+	  ${ECHO} "${dl}" | ${TEE} ${LOG}
+	fi
+	if [ ${VERBOSE} -gt 0 ]; then
+	  ${dl} &>1 | ${TEE} ${LOG}
+	else
+	  ${dl} >> ${LOG}
+	fi
 else
-  ${configure} >> ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${REPOFILE} already exists${cc_normal}" | ${TEE} ${LOG}
 fi
-rinstall="${REPOINSTALL} ${REPOFILE}"
-if [ ${VERBOSE} -gt 2 ]; then
-  ${ECHO} "${rinstall}" | ${TEE} ${LOG}
-fi
+rchk="${REPOCHECK} ${REPOFILEBASE}'"
 if [ ${VERBOSE} -gt 0 ]; then
-  ${rinstall} &>1 | ${TEE} ${LOG}
+  ${rchk} &>1 | ${TEE} ${LOG}
 else
-  ${rinstall} >> ${LOG}
+  ${rchk} >> ${LOG}
+fi
+if [ "$?" -gt 0 ]; then
+	rinstall="${REPOINSTALL} ${REPOFILE}"
+	if [ ${VERBOSE} -gt 2 ]; then
+	  ${ECHO} "${rinstall}" | ${TEE} ${LOG}
+	fi
+	if [ ${VERBOSE} -gt 0 ]; then
+	  ${rinstall} &>1 | ${TEE} ${LOG}
+	else
+	  ${rinstall} >> ${LOG}
+	fi
+else
+  ${ECHO} " ${cc_green}Skipping since ${REPOBASE} is already installed${cc_normal}" | ${TEE} ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
@@ -448,36 +469,55 @@ ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
 
 # Install a basic puppet master configuration
-${ECHO} " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES}${cc_blue}...${cc_normal}" | ${TEE} ${LOG}
-pkginst="${PKGINSTALL} ${BASEPACKAGES}"
-if [ ${VERBOSE} -gt 2 ]; then
-  ${ECHO} "${pkginst}" | ${TEE} ${LOG}
-fi
-if [ ${VERBOSE} -gt 0 ]; then
-  ${pkginst} &>1 | ${TEE} ${LOG}
-else
-  ${pkginst} >> ${LOG}
-fi
+${ECHO} " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES[@]}${cc_blue}...${cc_normal}" | ${TEE} ${LOG}
+bpc=${#BACKPACKAGES[@]}
+pbi=0
+while [ "${bpi}" -lt "${bpc}" ]; do
+	bpchk="${REPOCHECK} ${BASEPACKAGES[${bpi}]}'"
+	if [ ${VERBOSE} -gt 0 ]; then
+	  ${bpchk} &>1 | ${TEE} ${LOG}
+	else
+	  ${bpchk} >> ${LOG}
+	fi
+  if [ "$?" -gt 0 ]; then
+		pkginst="${PKGINSTALL} ${BASEPACKAGES[${bpi}]}"
+		if [ ${VERBOSE} -gt 2 ]; then
+		  ${ECHO} "${pkginst}" | ${TEE} ${LOG}
+		fi
+		if [ ${VERBOSE} -gt 0 ]; then
+		  ${pkginst} &>1 | ${TEE} ${LOG}
+		else
+		  ${pkginst} >> ${LOG}
+		fi
+  else
+    ${ECHO} " ${cc_green}Skipping since ${BASEPACKAGES[${bpi}]} is already installed${cc_normal}" | ${TEE} ${LOG}
+	fi
+	((bpi++))
+done
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
 
 # Grab the GitHub puppet configuration
 ${ECHO} " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}" | ${TEE} ${LOG}
-if [ ${VERBOSE} -gt 2 ]; then
-dlghrepo="git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress"
-${ECHO} "${dlghrepo}"  | ${TEE} ${LOG}
-fi
-if [ ${VERBOSE} -gt 0 ]; then
-  ${dlghrepo} &>1 | ${TEE} ${LOG}
+if [ ! -d "${TEMPPUPPETDIR}" ]; then
+	dlghrepo="git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress"
+	if [ ${VERBOSE} -gt 2 ]; then
+	  ${ECHO} "${dlghrepo}"  | ${TEE} ${LOG}
+	fi
+	if [ ${VERBOSE} -gt 0 ]; then
+	  ${dlghrepo} &>1 | ${TEE} ${LOG}
+	else
+	  ${dlghrepo} >> ${LOG}
+	fi
 else
-  ${dlghrepo} >> ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${GITHUBREPO} is already installed${cc_normal}" | ${TEE} ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
 
 # Install Puppet master through puppet base installation
 ${ECHO} " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
-puppetize="puppet apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules -e \"include puppet\""
+puppetize="puppet apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules -e 'include puppet'"
 if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${puppetize}" | ${TEE} ${LOG}
 fi
