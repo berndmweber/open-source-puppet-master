@@ -503,14 +503,14 @@ ${ECHO} | ${TEE} ${LOG}
 # Grab the GitHub puppet configuration
 ${ECHO} " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}" | ${TEE} ${LOG}
 if [ ! -d "${TEMPPUPPETDIR}" ]; then
-	dlghrepo="git clone ${GITHUBREPO} ${TEMPPUPPETDIR} --progress"
+	dlghrepo="git clone --progress ${GITHUBREPO} ${TEMPPUPPETDIR}"
 	if [ ${VERBOSE} -gt 2 ]; then
-	  ${ECHO} "${dlghrepo}"  | ${TEE} ${LOG}
+	  ${ECHO} "${dlghrepo}" | ${TEE} ${LOG}
 	fi
 	if [ ${VERBOSE} -gt 0 ]; then
 	  ${dlghrepo} &>1 | ${TEE} ${LOG}
 	else
-	  ${dlghrepo} >> ${LOG}
+	  ${dlghrepo} &>> ${LOG}
 	fi
 else
   ${ECHO} " ${cc_green}Skipping since ${GITHUBREPO} is already installed${cc_normal}" | ${TEE} ${LOG}
