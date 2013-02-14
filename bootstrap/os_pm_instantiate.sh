@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 # This has been tested on Ubuntu 12.04 LTS - Precise Pangolin only
 #
 
@@ -355,11 +355,11 @@ fi
 case ${OS} in
   ubuntu)
     REPOPATH="apt.puppetlabs.com"
-    REPOFILEBASE="puppetlabs-release-precise"
-    REPOFILE="${REPOFILEBASE}.deb"
-    REPOFILECEHCK="ii  ${REPOFILEBASE}"
+    REPOFILEBASE="puppetlabs-release"
+    REPOFILE="${REPOFILEBASE}-precise.deb"
     REPOINSTALL="dpkg -i"
-    REPOCHECK="dpkg --list | ${GREP} 'ii  "
+    REPOCHECK="dpkg --list"
+    REPOINSTCHECK="ii  "
     REPOSEXEC="apt-get"
     REPOUPDATE="${REPOSEXEC} update"
     PKGINSTALL="${REPOSEXEC} install -y"
@@ -371,6 +371,18 @@ case ${OS} in
     exit 1
   ;;
 esac
+
+repo_check ()
+{
+  if [ ${VERBOSE} -gt 0 ]; then
+    rc=`${REPOCHECK} | ${GREP} "${REPOINSTCHECK}${1} "`
+    rv=$?
+    else
+    ${REPOCHECK} | ${GREP} "${REPOINSTCHECK}${1} " >> ${LOG}
+    rv=$?
+  fi
+  return ${rv}
+}
 
 # Some debug output
 print_params ()
@@ -387,9 +399,9 @@ print_params ()
   OP=${OP}" REPOPATH:\t       ${cc_green}${REPOPATH}${cc_blue}\n"
   OP=${OP}" REPOFILEBASE:\t   ${cc_green}${REPOFILEBASE}${cc_blue}\n"
   OP=${OP}" REPOFILE:\t       ${cc_green}${REPOFILE}${cc_blue}\n"
-  OP=${OP}" REPOFILECEHCK:\t  ${cc_green}${REPOFILECEHCK}${cc_blue}\n"
   OP=${OP}" REPOINSTALL:\t    ${cc_green}${REPOINSTALL}${cc_blue}\n"
   OP=${OP}" REPOCHECK:\t      ${cc_green}${REPOCHECK}${cc_blue}\n"
+  OP=${OP}" REPOINSTCHECK:\t  ${cc_green}${REPOINSTCHECK}${cc_blue}\n"
   OP=${OP}" REPOSEXEC:\t      ${cc_green}${REPOSEXEC}${cc_blue}\n"
   OP=${OP}" REPOUPDATE:\t     ${cc_green}${REPOUPDATE}${cc_blue}\n"
   OP=${OP}" PKGINSTALL:\t     ${cc_green}${PKGINSTALL}${cc_blue}\n"
@@ -433,12 +445,7 @@ if [ ! -e "${REPOFILE}" ]; then
 else
   ${ECHO} " ${cc_green}Skipping since ${REPOFILE} already exists${cc_normal}" | ${TEE} ${LOG}
 fi
-rchk="${REPOCHECK} ${REPOFILEBASE}'"
-if [ ${VERBOSE} -gt 0 ]; then
-  ${rchk} &>1 | ${TEE} ${LOG}
-else
-  ${rchk} >> ${LOG}
-fi
+repo_check ${REPOFILEBASE}
 if [ "$?" -gt 0 ]; then
 	rinstall="${REPOINSTALL} ${REPOFILE}"
 	if [ ${VERBOSE} -gt 2 ]; then
@@ -450,7 +457,7 @@ if [ "$?" -gt 0 ]; then
 	  ${rinstall} >> ${LOG}
 	fi
 else
-  ${ECHO} " ${cc_green}Skipping since ${REPOBASE} is already installed${cc_normal}" | ${TEE} ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${REPOFILEBASE} is already installed${cc_normal}" | ${TEE} ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
@@ -461,7 +468,8 @@ if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${REPOUPDATE}" | ${TEE} ${LOG}
 fi
 if [ ${VERBOSE} -gt 0 ]; then
-  ${REPOUPDATE} &>1 | ${TEE} ${LOG}
+  echo
+  #  ${REPOUPDATE} &>1 | ${TEE} ${LOG}
 else
   ${REPOUPDATE} >> ${LOG}
 fi
@@ -470,15 +478,10 @@ ${ECHO} | ${TEE} ${LOG}
 
 # Install a basic puppet master configuration
 ${ECHO} " ${cc_blue}Installing ${cc_yellow}${BASEPACKAGES[@]}${cc_blue}...${cc_normal}" | ${TEE} ${LOG}
-bpc=${#BACKPACKAGES[@]}
-pbi=0
-while [ "${bpi}" -lt "${bpc}" ]; do
-	bpchk="${REPOCHECK} ${BASEPACKAGES[${bpi}]}'"
-	if [ ${VERBOSE} -gt 0 ]; then
-	  ${bpchk} &>1 | ${TEE} ${LOG}
-	else
-	  ${bpchk} >> ${LOG}
-	fi
+bpc=${#BASEPACKAGES[@]}
+bpi=0
+while [ ${bpi} -lt ${bpc} ]; do
+	repo_check ${BASEPACKAGES[${bpi}]}
   if [ "$?" -gt 0 ]; then
 		pkginst="${PKGINSTALL} ${BASEPACKAGES[${bpi}]}"
 		if [ ${VERBOSE} -gt 2 ]; then
@@ -517,7 +520,8 @@ ${ECHO} | ${TEE} ${LOG}
 
 # Install Puppet master through puppet base installation
 ${ECHO} " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
-puppetize="puppet apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules -e 'include puppet'"
+PUPPET=`which puppet`
+puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/modules/puppet/tests/init.pp"
 if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${puppetize}" | ${TEE} ${LOG}
 fi
