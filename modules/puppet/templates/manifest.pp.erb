@@ -1,0 +1,23 @@
+<%
+  hn = scope.lookupvar( "::hostname" )
+  fhn = scope.lookupvar( "::fqdn" )
+-%>
+# This file is controlled by puppet. Do NOT edit! #
+# Define filebucket 'main':
+filebucket { 'main':
+  server => '<%= fhn %>',
+  path   => false,
+}
+
+# Make filebucket 'main' the default backup location for all File resources:
+File { backup => 'main' }
+
+node default {
+  # This is where you can declare classes for all nodes.
+  # Example:
+  #   class { 'my_class': }
+}
+
+node /<%= fhn %>/ {
+  class { 'apache' : }
+}

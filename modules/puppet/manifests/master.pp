@@ -40,6 +40,17 @@ class puppet::master::configure {
     owner  => 'puppet',
     group  => 'root',
   }
+  exec { 'install-apache-module' :
+    path => "/bin:/sbin:/usr/bin:/usr/sbin",
+    command => "puppet module install puppetlabs/apache",
+    creates => "/etc/puppet/modules/apache",
+    require => Class [ "puppet::configure" ],
+  }
+  file { "/etc/puppet/manifests/site.pp" :
+    ensure  => directory,
+    content => template ( "puppet/site.pp.erb" ),
+    require => Exec [ "install-apache-module" ],
+  }
 }
 
 class puppet::master {
