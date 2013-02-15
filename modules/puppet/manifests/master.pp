@@ -29,11 +29,14 @@ class puppet::master::install {
   }
 }
 
-class puppet::master::configure inherits puppet::configure {
+class puppet::master::configure {
   $is_master = true
+  class { "puppet::configure" :
+    is_master =>$is_master,
+  }
 }
 
-class puppet::master inherits puppet {
+class puppet::master {
   class { "puppet::master::preinstall" : }
   class { "puppet::master::install" : }
   class { "puppet::master::configure" : }
