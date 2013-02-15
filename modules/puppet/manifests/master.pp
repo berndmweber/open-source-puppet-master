@@ -2,7 +2,7 @@ class puppet::master::install {
   case $::operatingsystem {
     'Ubuntu' : {
       $packages = [
-        "puppetmaster-passenger",
+        "puppetmaster",
       ]
     }
     default : {
