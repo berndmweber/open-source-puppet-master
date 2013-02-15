@@ -37,7 +37,8 @@ ${ECHO}
 ISSUE="/etc/issue" # For OS and version detection
 
 # Set some global variables
-SCRIPTDIR="/root"
+SCRIPTDIR="/etc"
+PUPPETDIR="/etc/puppet"
 LOGDIR="/var/log"
 LOGFILE="pm_instantiate.log"
 LOG="${LOGDIR}/${LOGFILE}"
@@ -468,7 +469,7 @@ if [ ${VERBOSE} -lt 1 ]; then
   silent="-s -S"
 fi
 if [ ! -e "${REPOFILE}" ]; then
-	dl="${CURL} ${silent} -o ${REPOFILE} http://${REPOPATH}/${REPOFILE}"
+	dl="${CURL} ${silent} -o /tmp/${REPOFILE} http://${REPOPATH}/${REPOFILE}"
 	if [ ${VERBOSE} -gt 2 ]; then
 	  ${ECHO} "${dl}" | ${TEE} ${LOG}
 	fi
@@ -482,7 +483,7 @@ else
 fi
 repo_check ${REPOFILEBASE}
 if [ "$?" -gt 0 ]; then
-	rinstall="${REPOINSTALL} ${REPOFILE}"
+	rinstall="${REPOINSTALL} /tmp/${REPOFILE}"
 	if [ ${VERBOSE} -gt 2 ]; then
 	  ${ECHO} "${rinstall}" | ${TEE} ${LOG}
 	fi
@@ -503,8 +504,7 @@ if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${REPOUPDATE}" | ${TEE} ${LOG}
 fi
 if [ ${VERBOSE} -gt 0 ]; then
-  echo
-  #  ${REPOUPDATE} &>1 | ${TEE} ${LOG}
+  ${REPOUPDATE} &>1 | ${TEE} ${LOG}
 else
   ${REPOUPDATE} >> ${LOG}
 fi
@@ -537,6 +537,14 @@ ${ECHO} | ${TEE} ${LOG}
 
 # Grab the GitHub puppet configuration
 ${ECHO} " ${cc_blue}Downloading puppet master configuration from ${cc_yellow}GitHub${cc_blue} for final provisioning...${cc_normal}" | ${TEE} ${LOG}
+if [ "${PUPPETDIR}" == "${SCRIPTDIR}/${TEMPPUPPETDIR}" ]; then
+  if [ ! -e "${PUPPETDIR}/.git" ]; then
+	  if [ ${VERBOSE} -gt 0 ]; then
+	    ${ECHO} " ${cc_blue}Puppet dir ${cc_yellow}${PUPPETDIR}${cc_blue} already exists. Removing now.${cc_normal}" | ${TEE} ${LOG}
+	  fi
+	  rm -rvf ${PUPPETDIR} >> ${LOG}
+  fi
+fi
 if [ ! -d "${TEMPPUPPETDIR}" ]; then
 	dlghrepo="git clone --progress ${GITHUBREPO} ${TEMPPUPPETDIR}"
 	if [ ${VERBOSE} -gt 2 ]; then
