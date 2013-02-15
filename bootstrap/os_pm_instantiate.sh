@@ -17,7 +17,21 @@ CAT=`which cat`
 CURL=`which curl`
 TEE="`which tee` -a"
 GREP=`which grep`
+DATE=`which date`
 ECHO="echo -e"
+
+# Some usage feedback
+${ECHO}
+${ECHO} "${cc_blue}#####################################################${cc_normal}"
+${ECHO} "${cc_blue} Open source ${cc_yellow}PUPPET MASTER${cc_blue} auto-instantiation script${cc_normal}"
+${ECHO} "${cc_blue}#####################################################${cc_normal}"
+${ECHO} "${cc_blue} This script will download and install a basic${cc_normal}"
+${ECHO} "${cc_blue} puppet master and uses puppet to self instantiate.${cc_normal}"
+${ECHO}
+${ECHO} "${cc_blue} This code is licensed under ${cc_yellow}GPL v2${cc_normal}"
+${ECHO} "${cc_blue} Please contribute!${cc_normal}"
+${ECHO} "${cc_blue}#####################################################${cc_normal}"
+${ECHO}
 
 # Some global system variables
 ISSUE="/etc/issue" # For OS and version detection
@@ -30,22 +44,27 @@ LOG="${LOGDIR}/${LOGFILE}"
 GITHUBREPO="https://github.com/bernd-copperfroghosting/open-source-puppet-master.git"
 TEMPPUPPETDIR="puppet"
 VERBOSE=0
-DATE=`date`
+CURRENT_DATE=`${DATE}`
+INITIAL_TIME=`${DATE} +"%s"`
 
 # Define correct usage
 usage ()
 {
-  ${ECHO} "${cc_blue}${0}${cc_normal} [options]"
+  ${ECHO} " ${cc_blue}Usage:${cc_normal}"
   ${ECHO}
-  ${ECHO} "  --verbose [0|1|2]"
-  ${ECHO} "  --logdir  <some writable directory>"
-  ${ECHO} "  --logfile <log file name>"
+  ${ECHO} " ${0} [options]"
+  ${ECHO}
+  ${ECHO} " ${cc_blue}Options:${cc_normal}"
+  ${ECHO} "  --verbose [${cc_yellow}0${cc_normal}|${cc_yellow}1${cc_normal}|${cc_yellow}2${cc_normal}]                   Choose a verbose level"
+  ${ECHO} "  --logdir <some writable directory>  Define a log directory"
+  ${ECHO} "  --logfile <log file name>           Define a log file name"
+  ${ECHO} "  --help                              This usage information"
   ${ECHO}
   ${ECHO} " ${cc_blue}Auto-detected options. These do not normally have to be provided.${cc_normal}"
-  ${ECHO} "  --os    [${cc_yellow}Ubuntu${cc_blue}|${cc_yellow}CentOS${cc_normal}]"
-  ${ECHO} "  --osversion [${cc_yellow}12.04${cc_blue}|${cc_yellow}6${cc_normal}]"
+  ${ECHO} "  --os [${cc_yellow}Ubuntu${cc_normal}|${cc_yellow}CentOS${cc_normal}]"
+  ${ECHO} "  --osversion [${cc_yellow}12.04${cc_normal}|${cc_yellow}6${cc_normal}]"
   ${ECHO}
-  ${ECHO} " e.g. ${0} --os Ubuntu --osversion 12.04 --logdir /tmp --logfile mylog.txt"
+  ${ECHO} " e.g. ${0} --os Ubuntu --osversion 12.04 --logdir /tmp --logfile mylog.txt --verbose 2"
   ${ECHO}
   exit 1
 }
@@ -93,6 +112,10 @@ while [ $# -gt 0 ]; do
         usage
       fi
       ;;
+    --help)
+      usage
+      exit 0
+      ;;
     *)
       usage
       ;;
@@ -102,8 +125,20 @@ done
 
 # Initialize log
 touch ${LOG}
-${ECHO} "${DATE}" > ${LOG}
+${ECHO} "${CURRENT_DATE}" > ${LOG}
 ${ECHO} >> ${LOG}
+
+calculate_exec_time ()
+{
+  now=`${DATE} +"%s"`
+  
+  let etime=${now}-${INITIAL_TIME}
+  let ehours=${etime}/60/60
+  let eminutes=${etime}/60
+  let eseconds=${etime}%60
+    
+  ${ECHO} " ${cc_blue}Execution time was: ${cc_yellow}${ehours}${cc_blue} hours, ${cc_yellow}${eminutes}${cc_blue} minutes, ${cc_yellow}${eseconds}${cc_blue} seconds" >> ${LOG}
+}
 
 # Evaluate the /etc/issue file to automatically extract OS
 eval_issue_os ()
@@ -428,7 +463,7 @@ fi
 cd $SCRIPTDIR
 
 # Configure Puppetlabs repo
-${ECHO} " ${cc_blue}Downloading Puppetlabs repository information...${cc_normal}" | ${TEE} ${LOG}
+${ECHO} " ${cc_blue}Downloading ${cc_yellow}Puppetlabs${cc_blue} repository information...${cc_normal}" | ${TEE} ${LOG}
 if [ ${VERBOSE} -lt 1 ]; then
   silent="-s -S"
 fi
@@ -443,7 +478,7 @@ if [ ! -e "${REPOFILE}" ]; then
 	  ${dl} >> ${LOG}
 	fi
 else
-  ${ECHO} " ${cc_green}Skipping since ${REPOFILE} already exists${cc_normal}" | ${TEE} ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${cc_yellow}${REPOFILE}${cc_green} already exists${cc_normal}" | ${TEE} ${LOG}
 fi
 repo_check ${REPOFILEBASE}
 if [ "$?" -gt 0 ]; then
@@ -457,13 +492,13 @@ if [ "$?" -gt 0 ]; then
 	  ${rinstall} >> ${LOG}
 	fi
 else
-  ${ECHO} " ${cc_green}Skipping since ${REPOFILEBASE} is already installed${cc_normal}" | ${TEE} ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${cc_yellow}${REPOFILEBASE}${cc_green} is already installed${cc_normal}" | ${TEE} ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
 
 # Update the repository information
-${ECHO} " ${cc_blue}Updaing APT with new information...${cc_normal}" | ${TEE} ${LOG}
+${ECHO} " ${cc_blue}Updaing ${cc_yellow}APT${cc_blue} with new information...${cc_normal}" | ${TEE} ${LOG}
 if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${REPOUPDATE}" | ${TEE} ${LOG}
 fi
@@ -493,7 +528,7 @@ while [ ${bpi} -lt ${bpc} ]; do
 		  ${pkginst} >> ${LOG}
 		fi
   else
-    ${ECHO} " ${cc_green}Skipping since ${BASEPACKAGES[${bpi}]} is already installed${cc_normal}" | ${TEE} ${LOG}
+    ${ECHO} " ${cc_green}Skipping since ${cc_yellow}${BASEPACKAGES[${bpi}]}${cc_green} is already installed${cc_normal}" | ${TEE} ${LOG}
 	fi
 	((bpi++))
 done
@@ -513,13 +548,13 @@ if [ ! -d "${TEMPPUPPETDIR}" ]; then
 	  ${dlghrepo} &>> ${LOG}
 	fi
 else
-  ${ECHO} " ${cc_green}Skipping since ${GITHUBREPO} is already installed${cc_normal}" | ${TEE} ${LOG}
+  ${ECHO} " ${cc_green}Skipping since ${cc_yellow}${GITHUBREPO}${cc_green} is already installed${cc_normal}" | ${TEE} ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
 
 # Install Puppet master through puppet base installation
-${ECHO} " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
+${ECHO} " ${cc_blue}Install ${cc_yellow}puppet master${cc_blue} through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
 PUPPET=`which puppet`
 puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/modules/puppet/tests/master.pp"
 if [ ${VERBOSE} -gt 2 ]; then
@@ -531,4 +566,12 @@ else
   ${puppetize} >> ${LOG}
 fi
 ${ECHO} " ${cc_green}Done.${cc_normal}" | ${TEE} ${LOG}
+${ECHO} | ${TEE} ${LOG}
+
+calculate_exec_time
+
+${ECHO} "${cc_blue}#####################################################${cc_normal}" | ${TEE} ${LOG}
+${ECHO} "${cc_blue} The install log can be found here: ${cc_yellow}${LOG}${cc_normal}"
+${ECHO} "${cc_blue} Execution ${cc_green}finished${cc_blue}!${cc_normal}" | ${TEE} ${LOG}
+${ECHO} "${cc_blue}#####################################################${cc_normal}" | ${TEE} ${LOG}
 ${ECHO} | ${TEE} ${LOG}
