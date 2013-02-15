@@ -46,10 +46,14 @@ class puppet::master::configure {
     creates => "/etc/puppet/modules/apache",
     require => Class [ "puppet::configure" ],
   }
-  file { "/etc/puppet/manifests/site.pp" :
+  file { "/etc/puppet/manifests" :
     ensure  => directory,
-    content => template ( "puppet/site.pp.erb" ),
     require => Exec [ "install-apache-module" ],
+  }
+  file { "/etc/puppet/manifests/site.pp" :
+    ensure  => file,
+    content => template ( "puppet/site.pp.erb" ),
+    require => File [ "/etc/puppet/manifests" ],
   }
 }
 
