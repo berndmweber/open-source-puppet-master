@@ -1,0 +1,33 @@
+<%
+  hn = scope.lookup ( "::hostname" )
+  fhn = scope.lookup ( "::fqdn" )
+  domain = scope.lookup ( "::domain" )
+-%>
+# This file is controlled by puppet. Do NOT edit! #
+[main]
+    vardir = /var/lib/puppet
+    logdir = /var/log/puppet
+    rundir = /var/run/puppet
+    ssldir = /var/lib/puppet/ssl
+    modulepath = /etc/puppet/modules
+    user = puppet
+    group = puppet
+    archive_files = true
+    archive_file_server = <%= fhn %>
+
+<% if @is_master == true -%>
+[master]
+    certname = <%= fhn %>
+    dns_alt_names = puppet,puppet.<%= domain %>,<%= hn %>,<%= fhn %>
+    node_terminus = exec
+    ssl_client_header = SSL_CLIENT_S_DN
+    ssl_client_verify_header = SSL_CLIENT_VERIFY
+<% end -%>
+[agent]
+    certname = <%= fhn %>
+    server = <%= fhn %>
+    report = true
+    classfile = $vardir/classes.txt
+    localconfig = $vardir/localconfig
+    graph = true
+    pluginsync = true
