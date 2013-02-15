@@ -4,9 +4,9 @@ class puppet::master::preinstall {
     lens => 'Hosts.lns',
     incl => '/etc/hosts',
     changes => [
-      "set 01\ipaddr ${::ipaddress}",
-      "set 01\canonical ${::fqdn}",
-      "set 01\alias ${::hostname}",
+      "set 01/ipaddr ${::ipaddress}",
+      "set 01/canonical ${::fqdn}",
+      "set 01/alias ${::hostname}",
     ],
     onlyif => "match *[ipaddr=\"${::ipaddress}\"] size == 0",
   }
