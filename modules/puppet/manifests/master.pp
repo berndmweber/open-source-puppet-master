@@ -30,5 +30,6 @@ class puppet::master::install {
 }
 
 class puppet::master {
+  class { "puppet::master::preinstall" : }
   class { "puppet::master::install" : }
 }
