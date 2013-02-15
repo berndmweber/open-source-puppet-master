@@ -38,7 +38,7 @@ class puppet::master::configure {
   file { "/var/lib/puppet/reports" :
     ensure => directory,
     owner  => 'puppet',
-    group  => 'puppet',
+    group  => 'root',
   }
 }
 

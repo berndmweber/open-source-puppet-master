@@ -8,6 +8,11 @@ class puppet::configure (
     ensure => file,
     content => template ( "puppet/puppet.conf.erb" ),
   }
+  file { "/etc/puppet" :
+    ensure => directory,
+    owner => 'puppet',
+    group => 'root',
+  }
 }
 
 class puppet {
