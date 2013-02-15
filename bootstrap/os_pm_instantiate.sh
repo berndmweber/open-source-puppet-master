@@ -521,7 +521,7 @@ ${ECHO} | ${TEE} ${LOG}
 # Install Puppet master through puppet base installation
 ${ECHO} " ${cc_blue}Install Puppet master through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
 PUPPET=`which puppet`
-puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/modules/puppet/tests/init.pp"
+puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/modules/puppet/tests/master.pp"
 if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${puppetize}" | ${TEE} ${LOG}
 fi
