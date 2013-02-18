@@ -1,3 +1,2 @@
 *.conf
 manifests/site.pp
-modules/apache
