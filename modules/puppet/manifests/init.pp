@@ -4,14 +4,15 @@ class puppet::install {
 class puppet::configure (
   $is_master = false,
 ) {
-  file { "/etc/puppet/puppet.conf" :
-    ensure => file,
-    content => template ( "puppet/puppet.conf.erb" ),
-  }
-  file { "/etc/puppet" :
+  file { $puppet::params::etcmaindir :
     ensure => directory,
-    owner => 'puppet',
-    group => 'root',
+    owner  => $puppet::params::user,
+    group  => 'root',
+  }
+  file { $puppet::params::puppetconf :
+    ensure  => file,
+    content => template ( "puppet/puppet.conf.erb" ),
+    require => File [ $puppet::params::etcmaindir ],
   }
 }
 

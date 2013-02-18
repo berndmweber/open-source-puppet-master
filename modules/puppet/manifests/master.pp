@@ -13,17 +13,7 @@ class puppet::master::preinstall {
 }
 
 class puppet::master::install {
-  case $::operatingsystem {
-    'Ubuntu' : {
-      $packages = [
-        "puppetmaster-passenger",
-      ]
-    }
-    default : {
-      fail ( "Your Operating system $::operatingsystem is currently not supported by this class!")
-    }
-  }
-  package { $packages :
+  package { $puppet::params::master_packages :
     ensure  => present,
     require => Class [ "puppet::master::preinstall" ],
   }
@@ -34,25 +24,25 @@ class puppet::master::configure {
   class { "puppet::configure" :
     is_master => $is_master,
   }
-  file { "/var/lib/puppet/reports" :
+  file { "${puppet::params::vardir}/reports" :
     ensure => directory,
-    owner  => 'puppet',
+    owner  => $puppet::params::user,
     group  => 'root',
   }
   exec { 'install-apache-module' :
     path => "/bin:/sbin:/usr/bin:/usr/sbin",
     command => "puppet module install puppetlabs/apache",
-    creates => "/etc/puppet/modules/apache",
+    creates => "${puppet::params::modulepath}/apache",
     require => Class [ "puppet::configure" ],
   }
-  file { "/etc/puppet/manifests" :
+  file { $puppet::params::manifestpath :
     ensure  => directory,
-    require => File [ "/etc/puppet" ],
+    require => File [ $puppet::params::etcmaindir ],
   }
-  file { "/etc/puppet/manifests/site.pp" :
+  file { "${puppet::params::manifestpath}/site.pp" :
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
-    require => File [ "/etc/puppet/manifests" ],
+    require => File [ $puppet::params::manifestpath ],
   }
 }
 

@@ -5,13 +5,13 @@
 -%>
 # This file is controlled by puppet. Do NOT edit! #
 [main]
-    vardir = /var/lib/puppet
-    logdir = /var/log/puppet
-    rundir = /var/run/puppet
-    ssldir = /var/lib/puppet/ssl
-    modulepath = /etc/puppet/modules
-    user = puppet
-    group = puppet
+    vardir = <%= scope.lookupvar( "puppet::params::vardir" ) %>
+    logdir = <%= scope.lookupvar( "puppet::params::logdir" ) %>
+    rundir = <%= scope.lookupvar( "puppet::params::rundir" ) %>
+    ssldir = <%= scope.lookupvar( "puppet::params::ssldir" ) %>
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" ) %>
+    user = <%= scope.lookupvar( "puppet::params::user" ) %>
+    group = <%= scope.lookupvar( "puppet::params::group" ) %>
     archive_files = true
     archive_file_server = <%= fhn %>
 
