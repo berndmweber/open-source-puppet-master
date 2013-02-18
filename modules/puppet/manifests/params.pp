@@ -4,7 +4,7 @@ class puppet::params {
   $rundir       = "/var/run/puppet"
   $logdir       = "/var/log/puppet"
   $ssldir       = "${vardir}/ssl"
-  $rackdir      = "/usr/shar/puppet/rack"
+  $rackdir      = "/usr/share/puppet/rack"
   $modulepath   = "${etcmaindir}/modules"
   $manifestpath = "${etcmaindir}/manifests"
   $user         = 'puppet'
