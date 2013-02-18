@@ -33,7 +33,6 @@ class puppet::master::configure {
   $is_master = true
   class { "puppet::configure" :
     is_master => $is_master,
-    require   => Class [ "puppet::master::configure" ],
   }
   file { "/var/lib/puppet/reports" :
     ensure => directory,
@@ -48,7 +47,7 @@ class puppet::master::configure {
   }
   file { "/etc/puppet/manifests" :
     ensure  => directory,
-    require => Exec [ "install-apache-module" ],
+    require => File [ "/etc/puppet" ],
   }
   file { "/etc/puppet/manifests/site.pp" :
     ensure  => file,
