@@ -48,12 +48,12 @@ class puppet::master::configure {
     require => File [ $puppet::params::manifestpath ],
   }
   file { [
-    "${puppet::params::modulepath}/environments",
+    "${puppet::params::modulepath}/${puppet::params::environmentspath}",
     "${puppet::params::modulepath}/${puppet::params::environment_testing}",
     "${puppet::params::modulepath}/${puppet::params::environment_development}",
   ] :
     ensure  => directory,
-    require => File [ $puppet::params::modulepath ],
+    require => File [ $puppet::params::etcmaindir ],
   }
 }
 
