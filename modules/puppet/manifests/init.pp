@@ -14,6 +14,11 @@ class puppet::configure (
     content => template ( "puppet/puppet.conf.erb" ),
     require => File [ $puppet::params::etcmaindir ],
   }
+  file { "${puppet::params::etcmaindir}/auth.conf" :
+    ensure  => file,
+    content => template ( "puppet/auth.conf.erb" ),
+    require => File [ $puppet::params::etcmaindir ],
+  }
 }
 
 class puppet {
