@@ -10,6 +10,7 @@ class puppet::params {
   $user         = 'puppet'
   $group        = 'puppet'
   $puppetconf   = "${etcmaindir}/puppet.conf"
+  $masterport   = '8140'
 
   case $::operatingsystem {
     'Ubuntu' : {
