@@ -1,2 +1,6 @@
 *.conf
 manifests/site.pp
+modules/apache
+modules/stdlib
+modules/firewall
+environments
