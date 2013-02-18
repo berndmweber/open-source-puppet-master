@@ -29,6 +29,12 @@ class puppet::master::configure {
     owner  => $puppet::params::user,
     group  => 'root',
   }
+  exec { 'install-apache-module' :
+    path => "/bin:/sbin:/usr/bin:/usr/sbin",
+    command => "puppet module install puppetlabs/apache",
+    creates => "${puppet::params::modulepath}/apache",
+    require => Class [ "puppet::configure" ],
+  }
   file { $puppet::params::manifestpath :
     ensure  => directory,
     require => File [ $puppet::params::etcmaindir ],
