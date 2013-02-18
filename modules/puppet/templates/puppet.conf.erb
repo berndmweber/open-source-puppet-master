@@ -22,6 +22,14 @@
     ssl_client_header = SSL_CLIENT_S_DN
     ssl_client_verify_header = SSL_CLIENT_VERIFY
     
+[testing]
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath_testing" ) %>
+    manifest = <%= scope.lookupvar( "puppet::params::manifestpath_testing" ) %>/site.pp
+    
+[development]
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath_development" ) %>
+    manifest = <%= scope.lookupvar( "puppet::params::manifestpath_development" ) %>/site.pp
+
 <% end -%>
 [agent]
     certname = <%= fhn %>

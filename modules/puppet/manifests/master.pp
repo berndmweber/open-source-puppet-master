@@ -35,7 +35,10 @@ class puppet::master::configure {
     creates => "${puppet::params::modulepath}/apache",
     require => Class [ "puppet::configure" ],
   }
-  file { $puppet::params::manifestpath :
+  file { [
+    $puppet::params::manifestpath,
+    $puppet::params::modulepath,
+  ] :
     ensure  => directory,
     require => File [ $puppet::params::etcmaindir ],
   }
@@ -43,6 +46,14 @@ class puppet::master::configure {
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
     require => File [ $puppet::params::manifestpath ],
+  }
+  file { [
+    "${puppet::params::modulepath}/environments",
+    "${puppet::params::modulepath}/${puppet::params::environment_testing}",
+    "${puppet::params::modulepath}/${puppet::params::environment_development}",
+  ] :
+    ensure  => directory,
+    require => File [ $puppet::params::modulepath ],
   }
 }
 

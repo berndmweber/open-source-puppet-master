@@ -12,6 +12,14 @@ class puppet::params {
   $puppetconf   = "${etcmaindir}/puppet.conf"
   $masterport   = '8140'
 
+  $environment_testing = "environments/testing"
+  $modulepath_testing   = "${etcmaindir}/${environment_testing}/modules"
+  $manifestpath_testing = "${etcmaindir}/${environment_testing}/manifests"
+
+  $environment_development  = "environments/development"
+  $modulepath_development   = "${etcmaindir}/${environment_development}/modules"
+  $manifestpath_development = "${etcmaindir}/${environment_development}/manifests"
+
   case $::operatingsystem {
     'Ubuntu' : {
       $master_packages = [ "puppetmaster-passenger" ]
