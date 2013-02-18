@@ -2,6 +2,7 @@
   hn = scope.lookupvar( "::hostname" )
   fhn = scope.lookupvar( "::fqdn" )
   domain = scope.lookupvar( "::domain" )
+  
 -%>
 # This file is controlled by puppet. Do NOT edit! #
 PassengerHighPerformance on
@@ -36,9 +37,9 @@ Listen <%= port %>
         RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
         RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
 
-        DocumentRoot <%= scope.lookupvar( "puppet::params::rackdir" ) %>/puppetmasterd/public/
+        DocumentRoot <%= docroot %>/public
         RackBaseURI /
-        <Directory <%= scope.lookupvar( "puppet::params::rackdir" ) %>/puppetmasterd/>
+        <Directory <%= docroot %>>
                 Options None
                 AllowOverride None
                 Order allow,deny
