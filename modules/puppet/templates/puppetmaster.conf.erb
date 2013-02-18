@@ -1,0 +1,48 @@
+<%
+  hn = scope.lookupvar( "::hostname" )
+  fhn = scope.lookupvar( "::fqdn" )
+  domain = scope.lookupvar( "::domain" )
+-%>
+# This file is controlled by puppet. Do NOT edit! #
+PassengerHighPerformance on
+PassengerMaxPoolSize 12
+PassengerPoolIdleTime 1500
+# PassengerMaxRequests 1000
+PassengerStatThrottleRate 120
+RackAutoDetect Off
+RailsAutoDetect Off
+
+Listen 8140
+
+<VirtualHost *:8140>
+        SSLEngine on
+        SSLProtocol -ALL +SSLv3 +TLSv1
+        SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+
+        SSLCertificateFile      <%= scope.lookupvar( "puppet::params::ssldir" ) %>/certs/<%= fhn %>.pem
+        SSLCertificateKeyFile   <%= scope.lookupvar( "puppet::params::ssldir" ) %>/private_keys/<%= fhn %>.pem
+        SSLCertificateChainFile <%= scope.lookupvar( "puppet::params::ssldir" ) %>/certs/ca.pem
+        SSLCACertificateFile    <%= scope.lookupvar( "puppet::params::ssldir" ) %>/certs/ca.pem
+        SSLCARevocationFile     <%= scope.lookupvar( "puppet::params::ssldir" ) %>/ca/ca_crl.pem
+        SSLVerifyClient optional
+        SSLVerifyDepth  1
+        # The `ExportCertData` option is needed for agent certificate expiration warnings
+        SSLOptions +StdEnvVars +ExportCertData
+
+        # This header needs to be set if using a loadbalancer or proxy
+        RequestHeader unset X-Forwarded-For
+
+        RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+
+        DocumentRoot <%= scope.lookupvar( "puppet::params::rackdir" ) %>/puppetmasterd/public/
+        RackBaseURI /
+        <Directory <%= scope.lookupvar( "puppet::params::rackdir" ) %>/puppetmasterd/>
+                Options None
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+
