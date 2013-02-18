@@ -17,6 +17,7 @@ class puppet::configure (
 }
 
 class puppet {
+  class { "puppet::params" : }
   class { "puppet::install" : }
   class { "puppet::configure" : }
 }
