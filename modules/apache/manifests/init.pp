@@ -39,7 +39,7 @@ class apache (
     ensure  => directory,
     path    => $apache::params::vdir,
     recurse => true,
-    #purge   => true,
+    purge   => true,
     notify  => Service['httpd'],
     require => Package['httpd'],
   }
