@@ -40,7 +40,6 @@ class puppet::master::configure inherits puppet::configure {
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
   }
-
   file { "${puppet::params::vardir}/reports" :
     ensure => directory,
     owner  => $puppet::params::user,
@@ -57,6 +56,9 @@ class puppet::master::configure inherits puppet::configure {
     $puppet::params::modulepath['production'],
   ] :
     ensure  => directory,
+    owner  => 'root',
+    group  => 'root',
+    recurse => true,
     require => File [ $puppet::params::etcmaindir ],
   }
   # This will install some basic modules we need
@@ -64,7 +66,7 @@ class puppet::master::configure inherits puppet::configure {
   file { "${puppet::params::manifestpath['production']}/site.pp" :
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
-    require => File [ $puppet::params::manifestpath ],
+    require => File [ $puppet::params::manifestpath['production'] ],
   }
   file { [
     $puppet::params::environmentspath['base'],
