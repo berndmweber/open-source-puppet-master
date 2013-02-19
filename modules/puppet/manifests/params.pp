@@ -12,7 +12,7 @@ class puppet::params {
   $group            = 'puppet'
   $puppetconf       = "${etcmaindir}/puppet.conf"
   $masterport       = '8140'
-  $puppet_modules   = [ 'apache', 'mysql', 'ruby', 'dashboard' ]
+  $puppet_modules   = [ 'apache', 'mysql', 'ruby' ]
 
   $environment_testing = "${environmentspath}/testing"
   $modulepath_testing   = "${environment_testing}/modules"
