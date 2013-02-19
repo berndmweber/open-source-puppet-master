@@ -5,22 +5,26 @@ class puppet::params {
   $logdir           = "/var/log/puppet"
   $ssldir           = "${vardir}/ssl"
   $rackdir          = "/usr/share/puppet/rack"
-  $modulepath       = "${etcmaindir}/modules"
-  $manifestpath     = "${etcmaindir}/manifests"
-  $environmentspath = "${etcmaindir}/environments"
+  $environmentspath = {
+    "base"        => "${etcmaindir}/environments",
+    "testing"     => "${etcmaindir}/environments/testing",
+    "development" => "${etcmaindir}/environments/development",
+  }
+  $modulepath       = {
+    "production"  => "${etcmaindir}/modules",
+    "testing"     => "${$environmentspath["testing"]}/modules",
+    "development" => "${$environmentspath["development"]}/modules",
+  }
+  $manifestpath     = {
+    "production"  => "${etcmaindir}/manifests",
+    "testing"     => "${$environmentspath["testing"]}/manifests",
+    "development" => "${$environmentspath["development"]}/manifests",
+  }
   $user             = 'puppet'
   $group            = 'puppet'
   $puppetconf       = "${etcmaindir}/puppet.conf"
   $masterport       = '8140'
   $puppet_modules   = [ 'apache', 'mysql', 'ruby' ]
-
-  $environment_testing = "${environmentspath}/testing"
-  $modulepath_testing   = "${environment_testing}/modules"
-  $manifestpath_testing = "${environment_testing}/manifests"
-
-  $environment_development  = "${environmentspath}/development"
-  $modulepath_development   = "${environment_development}/modules"
-  $manifestpath_development = "${environment_development}/manifests"
 
   case $::operatingsystem {
     'Ubuntu' : {

@@ -9,7 +9,7 @@
     logdir = <%= scope.lookupvar( "puppet::params::logdir" ) %>
     rundir = <%= scope.lookupvar( "puppet::params::rundir" ) %>
     ssldir = <%= scope.lookupvar( "puppet::params::ssldir" ) %>
-    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" ) %>
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath['production']" ) %>
     user = <%= scope.lookupvar( "puppet::params::user" ) %>
     group = <%= scope.lookupvar( "puppet::params::group" ) %>
     archive_files = true
@@ -23,12 +23,12 @@
     ssl_client_verify_header = SSL_CLIENT_VERIFY
     
 [testing]
-    modulepath = <%= scope.lookupvar( "puppet::params::modulepath_testing" ) %>
-    manifest = <%= scope.lookupvar( "puppet::params::manifestpath_testing" ) %>/site.pp
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath['testing']" ) %>
+    manifest = <%= scope.lookupvar( "puppet::params::manifestpath['testing']" ) %>/site.pp
     
 [development]
-    modulepath = <%= scope.lookupvar( "puppet::params::modulepath_development" ) %>
-    manifest = <%= scope.lookupvar( "puppet::params::manifestpath_development" ) %>/site.pp
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath['development']" ) %>
+    manifest = <%= scope.lookupvar( "puppet::params::manifestpath['development']" ) %>/site.pp
 
 <% end -%>
 [agent]

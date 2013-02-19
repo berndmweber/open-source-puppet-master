@@ -29,7 +29,7 @@ define puppet::master::install_module (
   exec { "install-${name}-module" :
     path => "/bin:/sbin:/usr/bin:/usr/sbin",
     command => "puppet module install ${contributer}/${name} ${params}",
-    creates => "${puppet::params::modulepath}/${name}",
+    creates => "${puppet::params::modulepath['production']}/${name}",
     require => Class [ "puppet::configure" ],
   }
 }
@@ -53,23 +53,27 @@ class puppet::master::configure inherits puppet::configure {
     require => File [ $puppet::params::etcmaindir ],
   }
   file { [
-    $puppet::params::manifestpath,
-    $puppet::params::modulepath,
+    $puppet::params::manifestpath['production'],
+    $puppet::params::modulepath['production'],
   ] :
     ensure  => directory,
     require => File [ $puppet::params::etcmaindir ],
   }
   # This will install some basic modules we need
   puppet::master::install_module { $puppet::params::puppet_modules : }
-  file { "${puppet::params::manifestpath}/site.pp" :
+  file { "${puppet::params::manifestpath['production']}/site.pp" :
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
     require => File [ $puppet::params::manifestpath ],
   }
   file { [
-    "${puppet::params::environmentspath}",
-    "${puppet::params::environment_testing}",
-    "${puppet::params::environment_development}",
+    $puppet::params::environmentspath['base'],
+    $puppet::params::environmentspath['testing'],
+    $puppet::params::modulepath['testing'],
+    $puppet::params::manifestpath['testing'],
+    $puppet::params::environmentspath['development'],
+    $puppet::params::modulepath['development'],
+    $puppet::params::manifestpath['development'],
   ] :
     ensure  => directory,
     require => File [ $puppet::params::etcmaindir ],
