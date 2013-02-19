@@ -23,7 +23,12 @@ class puppet::params {
 
   case $::operatingsystem {
     'Ubuntu' : {
-      $master_packages = [ "puppetmaster-passenger" ]
+      $puppet_packages    = [ "puppet" ]
+      $master_packages    = [ "puppetmaster-passenger" ]
+      $dashboard_packages = [ "puppet-dashboard" ]
+
+      $puppet_default   = "/etc/default/puppet"
+      $puppet_service   = "puppet"
     }
     default : {
       fail ( "Your Operating system $::operatingsystem is currently not supported by this class!")

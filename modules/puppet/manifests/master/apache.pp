@@ -1,6 +1,6 @@
-
 class puppet::master::apache {
   require ( 'puppet::params' )
+
   apache::vhost { 'puppetmaster' :
     priority   => '1',
     vhost_name => "*",

@@ -1,13 +1,17 @@
 class puppet::install {
+  package { $puppet::params::puppet_packages :
+    ensure => present,
+  }
 }
 
 class puppet::configure (
   $is_master = false,
 ) {
   file { $puppet::params::etcmaindir :
-    ensure => directory,
-    owner  => $puppet::params::user,
-    group  => 'root',
+    ensure  => directory,
+    owner   => $puppet::params::user,
+    group   => 'root',
+    require => Class [ "puppet::install" ]
   }
   file { $puppet::params::puppetconf :
     ensure  => file,
@@ -18,6 +22,27 @@ class puppet::configure (
     ensure  => file,
     content => template ( "puppet/auth.conf.erb" ),
     require => File [ $puppet::params::etcmaindir ],
+  }
+  file { $puppet::params::puppet_default :
+    ensure => file,
+    require => Class [ "puppet::install" ]
+  }
+  augeas { $puppet::params::puppet_default :
+    context => "/files/${puppet::params::puppet_default}",
+    changes => [
+      "set START \"yes\"",
+    ],
+    require => File [ "$puppet::params::puppet_default" ],
+  }
+}
+
+class puppet::service {
+  service { $puppet::params::puppet_service :
+    ensure => running,
+    hasstatus => true,
+    hasrestart => true,
+    enable => true,
+    require => Class [ "puppet::configure" ],
   }
 }
 

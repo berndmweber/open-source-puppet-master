@@ -12,18 +12,16 @@ class puppet::master::preinstall {
   }
 }
 
-class puppet::master::install {
+class puppet::master::install inherits puppet::install {
   package { $puppet::params::master_packages :
     ensure  => present,
     require => Class [ "puppet::master::preinstall" ],
   }
 }
 
-class puppet::master::configure {
-  $is_master = true
-  class { "puppet::configure" :
-    is_master => $is_master,
-  }
+class puppet::master::configure  (
+  $is_master = true,
+) inherits puppet::configure {
   file { "${puppet::params::vardir}/reports" :
     ensure => directory,
     owner  => $puppet::params::user,
@@ -62,10 +60,13 @@ class puppet::master::configure {
   }
 }
 
+class puppet::master::service inherits puppet::service {}
+
 class puppet::master {
   class { "puppet::params" : }
   class { "puppet::master::preinstall" : }
   class { "puppet::master::install" : }
   class { "puppet::master::configure" : }
+  class { "puppet::master::service" : }
 }
 
