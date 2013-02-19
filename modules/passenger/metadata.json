@@ -1,0 +1,16 @@
+{
+  "name": "puppetlabs-passenger",
+  "author": "puppetlabs",
+  "description": "Module for Passenger configuration. This is a spoof class since the original will destroy the Ubuntu installation.\nThe original passenger module needs to be upgraded first.",
+  "license": "Apache 2.0",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-passenger",
+  "source": "git://github.com/puppetlabs/puppetlabs-passenger.git",
+  "summary": "Puppet module for Passenger",
+  "version": "0.0.99",
+  "checksums": {
+    "LICENSE": "4509849dc8e58abcb92d4e1faacb588b",
+    "Modulefile": "e3b63906bae975649b0b5aa25c799060",
+    "manifests/init.pp": "a957ad3a183cb97491dc8c66faae6e12"
+  },
+  "dependencies": []
+}
