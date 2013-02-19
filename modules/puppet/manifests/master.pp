@@ -20,6 +20,7 @@ class puppet::master::install inherits puppet::install {
 }
 
 class puppet::master::configure inherits puppet::configure {
+  # Need this to overwrite the basic setting
   $is_master = true
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
@@ -29,6 +30,7 @@ class puppet::master::configure inherits puppet::configure {
     ensure => directory,
     owner  => $puppet::params::user,
     group  => 'root',
+    recurse => true,
   }
   file { "${puppet::params::etcmaindir}/fileserver.conf" :
     ensure  => file,
