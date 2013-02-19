@@ -4,9 +4,7 @@ class puppet::install {
   }
 }
 
-class puppet::configure (
-  $is_master = false,
-) {
+class puppet::configure {
   file { $puppet::params::etcmaindir :
     ensure  => directory,
     owner   => $puppet::params::user,
@@ -24,15 +22,17 @@ class puppet::configure (
     require => File [ $puppet::params::etcmaindir ],
   }
   file { $puppet::params::puppet_default :
-    ensure => file,
+    ensure  => file,
     require => Class [ "puppet::install" ]
   }
   augeas { $puppet::params::puppet_default :
     context => "/files/${puppet::params::puppet_default}",
+    lens    => 'Shellvars.lns',
+    incl    => $puppet::params::puppet_default,
     changes => [
       "set START \"yes\"",
     ],
-    require => File [ "$puppet::params::puppet_default" ],
+    require => File [ $puppet::params::puppet_default ],
   }
 }
 

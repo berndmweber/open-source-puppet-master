@@ -19,9 +19,12 @@ class puppet::master::install inherits puppet::install {
   }
 }
 
-class puppet::master::configure  (
-  $is_master = true,
-) inherits puppet::configure {
+class puppet::master::configure inherits puppet::configure {
+  $is_master = true
+  File [ $puppet::params::puppetconf ] {
+    content => template ( "puppet/puppet.conf.erb" ),
+  }
+
   file { "${puppet::params::vardir}/reports" :
     ensure => directory,
     owner  => $puppet::params::user,
