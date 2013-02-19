@@ -21,7 +21,7 @@ class puppet::master::install inherits puppet::install {
 
 define puppet::master::install_module (
   $contributer = 'puppetlabs',
-  $ignore_dependencies = false.
+  $ignore_dependencies = false
 ) {
   if $ignore_dependencies == true {
     $params = "--ignore-dependencies"
