@@ -19,6 +19,17 @@ class puppet::master::install inherits puppet::install {
   }
 }
 
+define puppet::master::install_module (
+  $contributer = 'puppetlabs',
+) {
+  exec { "install-${name}-module" :
+    path => "/bin:/sbin:/usr/bin:/usr/sbin",
+    command => "puppet module install ${contributer}/${name}",
+    creates => "${puppet::params::modulepath}/${name}",
+    require => Class [ "puppet::configure" ],
+  }
+}
+
 class puppet::master::configure inherits puppet::configure {
   # Need this to overwrite the basic setting
   $is_master = true
@@ -37,12 +48,6 @@ class puppet::master::configure inherits puppet::configure {
     content => template ( "puppet/fileserver.conf.erb" ),
     require => File [ $puppet::params::etcmaindir ],
   }
-  exec { 'install-apache-module' :
-    path => "/bin:/sbin:/usr/bin:/usr/sbin",
-    command => "puppet module install puppetlabs/apache",
-    creates => "${puppet::params::modulepath}/apache",
-    require => Class [ "puppet::configure" ],
-  }
   file { [
     $puppet::params::manifestpath,
     $puppet::params::modulepath,
@@ -50,6 +55,8 @@ class puppet::master::configure inherits puppet::configure {
     ensure  => directory,
     require => File [ $puppet::params::etcmaindir ],
   }
+  # This will install some basic modules we need
+  puppet::master::install_module { $puppet::params::puppet_modules : }
   file { "${puppet::params::manifestpath}/site.pp" :
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
