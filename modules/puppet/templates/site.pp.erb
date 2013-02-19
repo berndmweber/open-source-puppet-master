@@ -20,6 +20,7 @@ node default {
 
 node /<%= fhn %>/ {
   class { 'apache' : }
+  class { 'ruby' : }
   class { 'puppet::master' : }
   class { 'puppet::master::apache' : }
 }
