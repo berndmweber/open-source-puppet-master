@@ -29,7 +29,7 @@ class puppet::master::configure inherits puppet::configure {
   file { "${puppet::params::vardir}/reports" :
     ensure => directory,
     owner  => $puppet::params::user,
-    group  => 'root',
+    group  => $puppet::params::group,
     recurse => true,
   }
   file { "${puppet::params::etcmaindir}/fileserver.conf" :
