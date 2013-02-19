@@ -28,4 +28,11 @@ node /<%= fhn %>/ {
   class { 'mysql::server' :
     config_hash => { 'root_password' => 'root123' }
   }
+  mysql::server::config { 'basic_config' :
+    settings => {
+      'mysqld' => {
+        'default_storage_engine' => 'InnoDB',
+      }
+    }
+  }
 }
