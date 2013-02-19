@@ -21,10 +21,14 @@ class puppet::master::install inherits puppet::install {
 
 define puppet::master::install_module (
   $contributer = 'puppetlabs',
+  $ignore_dependencies = false.
 ) {
+  if $ignore_dependencies == true {
+    $params = "--ignore-dependencies"
+  }
   exec { "install-${name}-module" :
     path => "/bin:/sbin:/usr/bin:/usr/sbin",
-    command => "puppet module install ${contributer}/${name}",
+    command => "puppet module install ${contributer}/${name} ${params}",
     creates => "${puppet::params::modulepath}/${name}",
     require => Class [ "puppet::configure" ],
   }
