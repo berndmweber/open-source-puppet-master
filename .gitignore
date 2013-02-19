@@ -1,6 +1,11 @@
 *.conf
+*.dpkg-dist
 manifests/site.pp
 modules/apache
 modules/stdlib
 modules/firewall
+modules/dashboard
+modules/mysql
+modules/passenger
+modules/ruby
 environments
