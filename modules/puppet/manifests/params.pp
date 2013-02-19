@@ -24,13 +24,14 @@ class puppet::params {
   $group            = 'puppet'
   $puppetconf       = "${etcmaindir}/puppet.conf"
   $masterport       = '8140'
-  $puppet_modules   = [ 'apache', 'mysql', 'ruby' ]
+  $puppet_modules   = [ 'apache', 'mysql' ]
 
   case $::operatingsystem {
     'Ubuntu' : {
       $puppet_packages    = [ "puppet" ]
       $master_packages    = [ "puppetmaster-passenger" ]
       $dashboard_packages = [ "puppet-dashboard" ]
+      $puppet_modules    += [ 'ruby' ]
 
       $puppet_default   = "/etc/default/puppet"
       $puppet_service   = "puppet"

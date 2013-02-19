@@ -84,8 +84,7 @@ class puppet::master::configure inherits puppet::configure {
 
 class puppet::master::service inherits puppet::service {}
 
-class puppet::master {
-  class { "puppet::params" : }
+class puppet::master inherits puppet::params {
   class { "puppet::master::preinstall" : }
   class { "puppet::master::install" : }
   class { "puppet::master::configure" : }

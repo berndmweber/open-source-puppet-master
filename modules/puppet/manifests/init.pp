@@ -46,8 +46,7 @@ class puppet::service {
   }
 }
 
-class puppet {
-  class { "puppet::params" : }
+class puppet inherits puppet::params {
   class { "puppet::install" : }
   class { "puppet::configure" : }
 }
