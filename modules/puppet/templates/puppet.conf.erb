@@ -23,11 +23,11 @@
     ssl_client_verify_header = SSL_CLIENT_VERIFY
     
 [testing]
-    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
     manifest = <%= scope.lookupvar( "puppet::params::manifestpath" )['testing'] %>/site.pp
     
 [development]
-    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['development'] %>
+    modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['development'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
     manifest = <%= scope.lookupvar( "puppet::params::manifestpath" )['development'] %>/site.pp
 
 <% end -%>
