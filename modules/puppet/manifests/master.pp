@@ -62,29 +62,14 @@ define puppet::master::install_module (
   }
 }
 
-class puppet::master::min_configure {
+class puppet::master::min_configure (
+  $type,
+) {
   file { "${puppet::params::vardir}/reports" :
     ensure => directory,
     owner  => $puppet::params::user,
     group  => $puppet::params::group,
     recurse => true,
-  }
-}
-
-class puppet::master::configure (
-  $type,
-) inherits puppet::configure {
-  # Need this to overwrite the basic setting
-  $is_master = true
-  File [ $puppet::params::puppetconf ] {
-    content => template ( "puppet/puppet.conf.erb" ),
-    notify  => Class [ 'puppet::master::service' ],
-  }
-  file { "${puppet::params::etcmaindir}/fileserver.conf" :
-    ensure  => file,
-    content => template ( "puppet/fileserver.conf.erb" ),
-    require => File [ $puppet::params::etcmaindir ],
-    notify  => Class [ 'puppet::master::service' ],
   }
   file { [
     $puppet::params::manifestpath['production'],
@@ -102,6 +87,23 @@ class puppet::master::configure (
     ensure  => file,
     content => template ( "puppet/site.pp.erb" ),
     require => File [ $puppet::params::manifestpath['production'] ],
+  }
+}
+
+class puppet::master::configure (
+  $type,
+) inherits puppet::configure {
+  # Need this to overwrite the basic setting
+  $is_master = true
+  File [ $puppet::params::puppetconf ] {
+    content => template ( "puppet/puppet.conf.erb" ),
+    notify  => Class [ 'puppet::master::service' ],
+  }
+  file { "${puppet::params::etcmaindir}/fileserver.conf" :
+    ensure  => file,
+    content => template ( "puppet/fileserver.conf.erb" ),
+    require => File [ $puppet::params::etcmaindir ],
+    notify  => Class [ 'puppet::master::service' ],
   }
   file { [
     $puppet::params::environmentspath['base'],
@@ -154,7 +156,9 @@ class puppet::master (
   class { "puppet::master::install" :
     type => $l_type,
   }
-  class { "puppet::master::min_configure" : }
+  class { "puppet::master::min_configure" :
+    type => $l_type,
+  }
   class { "puppet::master::configure" :
     type => $l_type,
   }
@@ -163,3 +167,21 @@ class puppet::master (
   }
 }
 
+class puppet::master::bootstrap (
+  $type = 'self',
+) inherits puppet::params {
+  if $::puppet_type != undef {
+    $l_type = $::puppet_type
+  } else {
+    $l_type = $type
+  }
+
+  class { "puppet" : }
+  class { "puppet::master::preinstall" : }
+  class { "puppet::master::install" :
+    type => $l_type,
+  }
+  class { "puppet::master::min_configure" :
+    type => $l_type,
+  }
+}
