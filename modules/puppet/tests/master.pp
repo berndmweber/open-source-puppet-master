@@ -1,1 +1,1 @@
-class { "puppet::master" : }
+class { "puppet::master" : type => 'apache' }
