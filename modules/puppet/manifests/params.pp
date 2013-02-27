@@ -1,3 +1,25 @@
+# == Class: puppet::params
+#
+# This is the Puppet parameters class. It holds all relevant modifiable parameters/
+# variables for the puppet classes.
+#
+# === Parameters
+#
+# === Variables
+#
+# === Examples
+#
+#  class { puppet::params : }
+#
+# === Authors
+#
+# Bernd Weber <bernd@copperfroghosting.com>
+#
+# === Copyright
+#
+# Copyright 2013 Copper Frog LLC.
+#
+
 class puppet::params {
   $etcmaindir       = "/etc/puppet"
   $vardir           = "/var/lib/puppet"
@@ -24,12 +46,21 @@ class puppet::params {
   $group            = 'puppet'
   $puppetconf       = "${etcmaindir}/puppet.conf"
   $masterport       = '8140'
-  $puppet_modules   = [ 'apache', 'mysql', 'ruby' ]
+  $puppet_modules   = {
+    "self"   => [ 'ruby' ],
+    "apache" => [ 'apache', 'mysql', 'ruby' ],
+  }
+  $puppetmasterservice = {
+    'self' => 'puppetmaster',
+  }
 
   case $::operatingsystem {
     'Ubuntu' : {
       $puppet_packages    = [ "puppet" ]
-      $master_packages    = [ "puppetmaster-passenger" ]
+      $master_packages    = {
+        "self"   => "puppetmaster",
+        "apache" => "puppetmaster-passenger",
+      }
       $dashboard_packages = [ "puppet-dashboard" ]
 
       $puppet_default   = "/etc/default/puppet"

@@ -1,3 +1,25 @@
+# == Class: puppet
+#
+# This is the Puppet control class. It helps configuring Puppet installations
+# both agent and master. The master configuration can be found in master.pp
+#
+# === Parameters
+#
+# === Variables
+#
+# === Examples
+#
+#  class { puppet : }
+#
+# === Authors
+#
+# Bernd Weber <bernd@copperfroghosting.com>
+#
+# === Copyright
+#
+# Copyright 2013 Copper Frog LLC.
+#
+
 class puppet::install {
   package { $puppet::params::puppet_packages :
     ensure => present,

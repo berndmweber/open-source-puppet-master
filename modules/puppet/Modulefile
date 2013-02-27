@@ -1,0 +1,10 @@
+name 'copperfroghosting-puppet'
+version '0.0.1'
+
+author 'Bernd Weber'
+license 'GPL v2'
+project_page 'https://github.com/bernd-copperfroghosting/open-source-puppet-master'
+source 'https://github.com/bernd-copperfroghosting/open-source-puppet-master.git'
+summary 'Puppet configuration class'
+description 'Configures bot h Puppet agents and the Puppet master'
+dependency 'puppetlabs/apache', '>=0.5.0-rc1'
