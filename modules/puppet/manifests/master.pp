@@ -62,6 +62,15 @@ define puppet::master::install_module (
   }
 }
 
+class puppet::master::min_configure {
+  file { "${puppet::params::vardir}/reports" :
+    ensure => directory,
+    owner  => $puppet::params::user,
+    group  => $puppet::params::group,
+    recurse => true,
+  }
+}
+
 class puppet::master::configure (
   $type,
 ) inherits puppet::configure {
@@ -70,12 +79,6 @@ class puppet::master::configure (
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
     notify  => Class [ 'puppet::master::service' ],
-  }
-  file { "${puppet::params::vardir}/reports" :
-    ensure => directory,
-    owner  => $puppet::params::user,
-    group  => $puppet::params::group,
-    recurse => true,
   }
   file { "${puppet::params::etcmaindir}/fileserver.conf" :
     ensure  => file,
@@ -151,6 +154,7 @@ class puppet::master (
   class { "puppet::master::install" :
     type => $l_type,
   }
+  class { "puppet::master::min_configure" : }
   class { "puppet::master::configure" :
     type => $l_type,
   }
