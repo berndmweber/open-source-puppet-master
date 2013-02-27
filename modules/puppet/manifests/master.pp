@@ -114,7 +114,9 @@ class puppet::master::configure (
   }
   case $type {
     'apache' : {
-      class { "puppet::master::apache" : }
+      class { "puppet::master::apache" :
+        require => Class [ 'puppet::master::install' ],
+      }
     }
   }
 }

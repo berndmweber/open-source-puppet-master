@@ -39,6 +39,7 @@ ISSUE="/etc/issue" # For OS and version detection
 # Set some global variables
 SCRIPTDIR="/etc"
 PUPPETDIR="/etc/puppet"
+PUPPETINSTALLCONFIG="modules/puppet/tests/bootstrap.pp"
 LOGDIR="/var/log"
 LOGFILE="pm_instantiate.log"
 LOG="${LOGDIR}/${LOGFILE}"
@@ -564,7 +565,7 @@ ${ECHO} | ${TEE} ${LOG}
 # Install Puppet master through puppet base installation
 ${ECHO} " ${cc_blue}Install ${cc_yellow}puppet master${cc_blue} through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
 PUPPET=`which puppet`
-puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/modules/puppet/tests/master.pp"
+puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/${PUPPETINSTALLCONFIG}"
 if [ ${VERBOSE} -gt 2 ]; then
   ${ECHO} "${puppetize}" | ${TEE} ${LOG}
 fi
