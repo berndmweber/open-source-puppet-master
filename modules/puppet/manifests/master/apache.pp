@@ -21,11 +21,11 @@
 # Copyright 2013 Copper Frog LLC.
 #
 
-class puppet::master::apache::configure inherits puppet::master::configure {
+class puppet::master::apache::configure {
   require ( 'apache' )
 
   apache::vhost { 'puppetmaster' :
-    priority   => '1',
+    priority   => '10',
     vhost_name => "*",
     port       => $puppet::params::masterport,
     template   => 'puppet/puppetmaster.conf.erb',

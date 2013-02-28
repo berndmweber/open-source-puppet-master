@@ -1,10 +1,11 @@
 class { 'apache' : }
 class { 'ruby' : }
-class { "puppet::params" : }
+#class { "puppet::params" : }
 # This will install some basic modules we need
-puppet::master::module { $puppet::params::puppet_modules[$type] :
-  ensure => present,
-}
+#puppet::master::module { $puppet::params::puppet_modules[$type] :
+#  ensure => present,
+#  require => Class [ "puppet::params" ],
+#}
 
 augeas { "seed_fqdn_in_hosts_file" :
   context => '/files/etc/hosts',
@@ -18,4 +19,6 @@ augeas { "seed_fqdn_in_hosts_file" :
   onlyif  => "match *[ipaddr=\"${::ipaddress}\"] size == 0",
 }
 
-class { "puppet::master::apache" : }
+class { "puppet::master::apache" :
+  require => Augeas [ "seed_fqdn_in_hosts_file" ],
+}
