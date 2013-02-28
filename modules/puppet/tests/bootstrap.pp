@@ -3,7 +3,6 @@ class { "puppet::params" : }
 # This will install some basic modules we need
 puppet::master::module { $puppet::params::puppet_modules[$type] :
   ensure => present,
-  stage => 'setup',
 }
 
 augeas { "seed_fqdn_in_hosts_file" :
