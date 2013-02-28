@@ -1,8 +1,6 @@
 *.conf
 *.dpkg-dist
 manifests/site.pp
-modules/apache
-modules/firewall
 modules/dashboard
 modules/mysql
 modules/ruby
