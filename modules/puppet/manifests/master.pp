@@ -43,13 +43,13 @@ class puppet::master::configure (
   }
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
-    notify  => Class [ 'puppet::master::service' ],
+    notify  => Service [ $puppet::params::masterservice[$type] ],
   }
   file { "${puppet::params::confdir}/fileserver.conf" :
     ensure  => file,
     content => template ( "puppet/fileserver.conf.erb" ),
     require => File [ $puppet::params::confdir ],
-    notify  => Class [ 'puppet::master::service' ],
+    notify  => Service [ $puppet::params::masterservice[$type] ],
   }
   file { $puppet::params::reportsdir :
     ensure => directory,
@@ -95,16 +95,11 @@ class puppet::master::configure (
 class puppet::master::service (
   $type,
 ) inherits puppet::service {
-  case $type {
-    'apache' : {
-      class { "puppet::master::apache::service" : }
-    }
-    default : {
-      service { $puppet::params::puppetmasterservice[$type] :
-        ensure  => running,
-        enable  => true,
-        require => Class [ 'puppet::master::install' ],
-      }
+  if $type == 'self' {
+    service { $puppet::params::masterservice[$type] :
+      ensure  => running,
+      enable  => true,
+      require => Class [ 'puppet::master::install' ],
     }
   }
 }

@@ -51,8 +51,9 @@ class puppet::params {
     "self"   => [ 'ruby' ],
     "apache" => [ 'apache', 'mysql', 'ruby' ],
   }
-  $puppetmasterservice = {
-    'self' => 'puppetmaster',
+  $masterservice    = {
+    'self'   => 'puppetmaster',
+    'apache' => 'httpd',
   }
 
   case $::operatingsystem {

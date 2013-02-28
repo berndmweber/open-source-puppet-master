@@ -34,12 +34,6 @@ class puppet::master::apache::configure {
   }
 }
 
-class puppet::master::apache::service {
-  anchor { 'puppet_master_apache_service' :
-    notify => Service [ 'httpd' ],
-  }
-}
-
 class puppet::master::apache inherits puppet::params {
   $type = 'apache'
 
