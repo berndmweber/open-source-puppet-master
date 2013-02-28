@@ -85,7 +85,6 @@ class puppet::master::configure (
     'apache' : {
       class { "puppet::master::apache" :
         require => Class [ 'puppet::master::install' ],
-        stage => 'runtime',
       }
     }
   }
