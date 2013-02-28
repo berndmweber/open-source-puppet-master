@@ -38,21 +38,30 @@ class puppet::master::configure (
 ) inherits puppet::configure {
   # Need this to overwrite the basic setting
   $is_master = true
+  File {
+    require => Class [ "puppet::master::install" ],
+  }
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
     notify  => Class [ 'puppet::master::service' ],
   }
-  file { "${puppet::params::etcmaindir}/fileserver.conf" :
+  file { "${puppet::params::confdir}/fileserver.conf" :
     ensure  => file,
     content => template ( "puppet/fileserver.conf.erb" ),
-    require => File [ $puppet::params::etcmaindir ],
+    require => File [ $puppet::params::confdir ],
     notify  => Class [ 'puppet::master::service' ],
   }
-  file { "${puppet::params::vardir}/reports" :
+  file { $puppet::params::reportsdir :
     ensure => directory,
     owner  => $puppet::params::user,
     group  => $puppet::params::group,
     recurse => true,
+  }
+  file { $puppet::params::ssldir :
+    ensure => directory,
+    owner  => $puppet::params::user,
+    group  => 'root',
+    mode   => 0771,
   }
   file { [
     $puppet::params::manifestpath['production'],
@@ -62,7 +71,7 @@ class puppet::master::configure (
     owner  => 'root',
     group  => 'root',
     recurse => true,
-    require => File [ $puppet::params::etcmaindir ],
+    require => File [ $puppet::params::confdir ],
   }
   file { "${puppet::params::manifestpath['production']}/site.pp" :
     ensure  => file,
@@ -79,7 +88,7 @@ class puppet::master::configure (
     $puppet::params::manifestpath['development'],
   ] :
     ensure  => directory,
-    require => File [ $puppet::params::etcmaindir ],
+    require => File [ $puppet::params::confdir ],
   }
 }
 

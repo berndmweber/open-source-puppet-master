@@ -27,7 +27,7 @@ class puppet::install {
 }
 
 class puppet::configure {
-  file { $puppet::params::etcmaindir :
+  file { $puppet::params::confdir :
     ensure  => directory,
     owner   => $puppet::params::user,
     group   => 'root',
@@ -36,12 +36,12 @@ class puppet::configure {
   file { $puppet::params::puppetconf :
     ensure  => file,
     content => template ( "puppet/puppet.conf.erb" ),
-    require => File [ $puppet::params::etcmaindir ],
+    require => File [ $puppet::params::confdir ],
   }
-  file { "${puppet::params::etcmaindir}/auth.conf" :
+  file { "${puppet::params::confdir}/auth.conf" :
     ensure  => file,
     content => template ( "puppet/auth.conf.erb" ),
-    require => File [ $puppet::params::etcmaindir ],
+    require => File [ $puppet::params::confdir ],
   }
   file { $puppet::params::puppet_default :
     ensure  => file,

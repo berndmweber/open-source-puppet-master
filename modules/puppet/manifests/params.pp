@@ -21,30 +21,31 @@
 #
 
 class puppet::params {
-  $etcmaindir       = "/etc/puppet"
+  $confdir          = "/etc/puppet"
   $vardir           = "/var/lib/puppet"
   $rundir           = "/var/run/puppet"
   $logdir           = "/var/log/puppet"
-  $ssldir           = "${vardir}/ssl"
+  $ssldir           = "${confdir}/ssl"
+  $reportsdir       = "${vardir}/reports"
   $rackdir          = "/usr/share/puppet/rack"
   $environmentspath = {
-    "base"        => "${etcmaindir}/environments",
-    "testing"     => "${etcmaindir}/environments/testing",
-    "development" => "${etcmaindir}/environments/development",
+    "base"        => "${confdir}/environments",
+    "testing"     => "${confdir}/environments/testing",
+    "development" => "${confdir}/environments/development",
   }
   $modulepath       = {
-    "production"  => "${etcmaindir}/modules",
+    "production"  => "${confdir}/modules",
     "testing"     => "${$environmentspath["testing"]}/modules",
     "development" => "${$environmentspath["development"]}/modules",
   }
   $manifestpath     = {
-    "production"  => "${etcmaindir}/manifests",
+    "production"  => "${confdir}/manifests",
     "testing"     => "${$environmentspath["testing"]}/manifests",
     "development" => "${$environmentspath["development"]}/manifests",
   }
   $user             = 'puppet'
   $group            = 'puppet'
-  $puppetconf       = "${etcmaindir}/puppet.conf"
+  $puppetconf       = "${confdir}/puppet.conf"
   $masterport       = '8140'
   $puppet_modules   = {
     "self"   => [ 'ruby' ],
