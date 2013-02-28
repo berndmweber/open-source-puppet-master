@@ -97,7 +97,7 @@ class puppet::master::service (
 ) inherits puppet::service {
   case $type {
     'apache' : {
-      #class { "puppet::master::apache::service" : }
+      class { "puppet::master::apache::service" : }
     }
     default : {
       service { $puppet::params::puppetmasterservice[$type] :
