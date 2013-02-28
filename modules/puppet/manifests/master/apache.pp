@@ -41,8 +41,9 @@ class puppet::master::apache::service {
 class puppet::master::apache inherits puppet::params {
   $type = 'apache'
 
-  class { "puppet::master" : type => $type }
-  class { "puppet::master::apache::configure" :
-    require => Class [ "puppet::master" ],
+  class { "puppet::master::apache::configure" : }
+  class { "puppet::master" :
+    type => $type,
+    require => Class [ "puppet::master::apache::configure" ],
   }
 }
