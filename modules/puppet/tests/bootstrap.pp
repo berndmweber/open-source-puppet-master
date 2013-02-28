@@ -18,4 +18,4 @@ augeas { "seed_fqdn_in_hosts_file" :
   onlyif  => "match *[ipaddr=\"${::ipaddress}\"] size == 0",
 }
 
-class { "puppet::master" : type => 'apache' }
+class { "puppet::master::apache" : }

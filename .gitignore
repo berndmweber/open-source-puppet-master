@@ -2,6 +2,4 @@
 *.dpkg-dist
 manifests/site.pp
 modules/dashboard
-modules/mysql
-modules/ruby
 environments

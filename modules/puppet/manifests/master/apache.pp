@@ -20,7 +20,8 @@
 #
 # Copyright 2013 Copper Frog LLC.
 #
-class puppet::master::apache inherits puppet::params {
+
+class puppet::master::apache::configure inherits puppet::master::configure {
   require ( 'apache' )
 
   apache::vhost { 'puppetmaster' :
@@ -35,4 +36,13 @@ class puppet::master::apache inherits puppet::params {
 
 class puppet::master::apache::service {
   Service <| title == 'httpd' |>
+}
+
+class puppet::master::apache inherits puppet::params {
+  $type = 'apache'
+
+  class { "puppet::master" : type => $type }
+  class { "puppet::master::apache::configure" :
+    require => Class [ "puppet::master" ],
+  }
 }
