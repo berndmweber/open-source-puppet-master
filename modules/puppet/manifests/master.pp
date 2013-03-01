@@ -39,7 +39,7 @@ class puppet::master::configure (
   # Need this to overwrite the basic setting
   $is_master = true
   File {
-    require => Class [ "puppet::master::install" ],
+    require => Class [ 'puppet::master::install' ],
   }
   File [ $puppet::params::puppetconf ] {
     content => template ( "puppet/puppet.conf.erb" ),
