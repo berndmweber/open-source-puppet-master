@@ -75,7 +75,7 @@ class puppet::test::cucumber::configure inherits puppet::params {
   }
   file { "${puppet::test::cucumber::yamldir}/${::fqdn}.yaml" :
     ensure  => file,
-    source  => "${puppet::params::yamldir}/${::fqdn}.yaml",
+    source  => "${puppet::params::yamldir}/node/${::fqdn}.yaml",
     require => File [ $puppet::test::cucumber::yamldir ],
   }
 }
