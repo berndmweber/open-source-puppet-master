@@ -36,7 +36,7 @@ class puppet::test::cucumber::install {
 
   exec { 'install-cucumber-puppet' :
     path    => '/bin:/sbin:/usr/bin:/usr/sbin',
-    command => 'gem install cucumber-puppet',
+    command => 'gem install rdoc && gem install cucumber-puppet',
     creates => '/usr/local/bin/cucumber-puppet',
     require => Class [ 'ruby' ],
   }
