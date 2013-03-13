@@ -6,11 +6,11 @@ Feature: General policy for all catalogs
   I want all catalogs to obey some general rules
 
   Scenario Outline: Compile and verify catalog
-    Given a node specified by "features/yaml/<%= scope.lookup('::fqdn') %>.yaml"
+    Given a node specified by "features/yaml/<hostname>.<%= scope.lookupvar( '::domain' ) %>.yaml"
     When I compile its catalog
     Then compilation should succeed
     And all resource dependencies should resolve
 
     Examples:
       | hostname  |
-      | localhost |
+      | <%= scope.lookupvar( '$::hostname' ) %> |

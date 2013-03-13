@@ -18,6 +18,7 @@
 class puppet::params {
   $confdir          = '/etc/puppet'
   $vardir           = '/var/lib/puppet'
+  $yamldir          = "${vardir}/yaml"
   $rundir           = '/var/run/puppet'
   $logdir           = '/var/log/puppet'
   $ssldir           = "${confdir}/ssl"

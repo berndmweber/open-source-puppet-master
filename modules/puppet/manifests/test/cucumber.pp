@@ -25,6 +25,7 @@ class puppet::test::cucumber inherits puppet::params {
   $catalogpath = 'catalog'
   $catalogdir  = "${featuredir}/${catalogpath}"
   $policyfile  = 'policy.feature'
+  $yamldir     = "${featuredir}/yaml"
 
   class { 'puppet::test::cucumber::install' : }
   class { 'puppet::test::cucumber::configure' : }
@@ -46,6 +47,7 @@ class puppet::test::cucumber::configure inherits puppet::params {
     $puppet::test::cucumber::featuredir,
     $puppet::test::cucumber::catalogdir,
     $puppet::test::cucumber::supportdir,
+    $puppet::test::cucumber::yamldir,
   ] :
     ensure  => directory,
     require => Class [ 'puppet', 'puppet::test::cucumber::install' ],
@@ -70,5 +72,10 @@ class puppet::test::cucumber::configure inherits puppet::params {
     ensure  => file,
     content => template ("puppet/test/${puppet::test::cucumber::catalogpath}/${puppet::test::cucumber::policyfile}.erb"),
     require => File [ $puppet::test::cucumber::catalogdir ],
+  }
+  file { "${puppet::test::cucumber::yamldir}/${::fqdn}.yaml" :
+    ensure  => file,
+    source  => "${puppet::params::yamldir}/${::fqdn}.yaml",
+    require => File [ $puppet::test::cucumber::yamldir ],
   }
 }
