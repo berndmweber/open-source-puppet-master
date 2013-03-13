@@ -22,6 +22,9 @@ class puppet::test::cucumber inherits puppet::params {
   $supportdir  = "${featuredir}/${supportpath}"
   $hooksfile   = 'hooks.rb'
   $worldfile   = 'world.rb'
+  $catalogpath = 'catalog'
+  $catalogdir  = "${featuredir}/${catalogpath}"
+  $policyfile  = 'policy.feature'
 
   class { 'puppet::test::cucumber::install' : }
   class { 'puppet::test::cucumber::configure' : }
@@ -41,6 +44,7 @@ class puppet::test::cucumber::install {
 class puppet::test::cucumber::configure inherits puppet::params {
   file { [
     $puppet::test::cucumber::featuredir,
+    $puppet::test::cucumber::catalogdir,
     $puppet::test::cucumber::supportdir,
   ] :
     ensure  => directory,
@@ -61,5 +65,10 @@ class puppet::test::cucumber::configure inherits puppet::params {
     recurse => true,
     source  => "puppet:///modules/puppet/test/${puppet::test::cucumber::stepspath}",
     require => File [ $puppet::test::cucumber::featuredir ],
+  }
+  file { "${puppet::test::cucumber::catalogdir}/${puppet::test::cucumber::policyfile}" :
+    ensure  => file,
+    content => template ("puppet/test/${puppet::test::cucumber::catalogpath}/${puppet::test::cucumber::policyfile}.erb"),
+    require => File [ $puppet::test::cucumber::catalogdir ],
   }
 }
