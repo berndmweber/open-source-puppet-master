@@ -22,6 +22,9 @@ class puppet::test::cucumber inherits puppet::params {
   $supportdir  = "${featuredir}/${supportpath}"
   $hooksfile   = 'hooks.rb'
   $worldfile   = 'world.rb'
+
+  class { 'puppet::test::cucumber::install' : }
+  class { 'puppet::test::cucumber::configure' : }
 }
 
 class puppet::test::cucumber::install {
