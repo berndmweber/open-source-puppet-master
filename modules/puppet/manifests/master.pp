@@ -38,6 +38,7 @@ class puppet::master (
     $l_type = $type
   }
 
+  class { 'puppet' : }
   class { 'puppet::master::install' :
     type => $l_type,
   }
