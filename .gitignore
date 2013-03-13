@@ -4,3 +4,4 @@ manifests/site.pp
 modules/dashboard
 environments
 doc
+features

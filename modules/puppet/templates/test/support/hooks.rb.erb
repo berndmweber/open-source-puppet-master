@@ -1,0 +1,10 @@
+# This file is controlled by puppet. Do NOT edit! #
+Before do
+  # adjust local configuration like this
+  @puppetcfg['confdir']  = <% scope.lookupvar( "puppet::params::confir" ) %>
+  @puppetcfg['manifest'] = <%= scope.lookupvar( "puppet::params::manifestpath" )['production'] %>/site.pp
+  @puppetcfg['modulepath']  = <%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
+
+  # adjust facts like this
+  #@facts['architecture'] = "i386"
+end
