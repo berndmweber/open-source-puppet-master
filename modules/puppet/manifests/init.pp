@@ -3,29 +3,46 @@
 # This is the Puppet control class. It helps configuring Puppet installations
 # both agent and master. The master configuration can be found in master.pp
 #
-# === Parameters
-#
-# === Variables
-#
 # === Examples
 #
 #  class { puppet : }
 #
 # === Authors
 #
-# Bernd Weber <bernd@copperfroghosting.com>
+# Bernd Weber <mailto:bernd@copperfroghosting.com>
 #
 # === Copyright
 #
-# Copyright 2013 Copper Frog LLC.
+# Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
+class puppet inherits puppet::params {
+  class { "puppet::install" : }
+  class { "puppet::configure" : }
+}
 
+
+# == Class: puppet::install
+#
+# This is the Puppet installation class. It installs the Puppet base packages.
+#
+# === Examples
+#
+#  class { puppet::install : }
+#
 class puppet::install {
   package { $puppet::params::puppet_packages :
     ensure => present,
   }
 }
 
+# == Class: puppet::configure
+#
+# This is the Puppet configuration class. It configures the Puppet necessities.
+#
+# === Examples
+#
+#  class { puppet::configure : }
+#
 class puppet::configure {
   file { $puppet::params::confdir :
     ensure  => directory,
@@ -58,6 +75,14 @@ class puppet::configure {
   }
 }
 
+# == Class: puppet::service
+#
+# This is the Puppet agent service class. It controls the Puppet agent service.
+#
+# === Examples
+#
+#  class { puppet::configure : }
+#
 class puppet::service {
   service { $puppet::params::puppet_service :
     ensure => running,
@@ -67,9 +92,3 @@ class puppet::service {
     require => Class [ "puppet::configure" ],
   }
 }
-
-class puppet inherits puppet::params {
-  class { "puppet::install" : }
-  class { "puppet::configure" : }
-}
-

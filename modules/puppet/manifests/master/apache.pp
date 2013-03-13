@@ -1,12 +1,8 @@
 # == Class: puppet::master::apache
 #
 # This is the Puppet Master class for a Passenger/Apache setup. It configures
-# the puppet master to work with Passenger and Apache instead of the internal
-# Webrick.
-#
-# === Parameters
-#
-# === Variables
+# the puppet::master to work with passenger and apache instead of the internal
+# WEBrick.
 #
 # === Examples
 #
@@ -14,13 +10,30 @@
 #
 # === Authors
 #
-# Bernd Weber <bernd@copperfroghosting.com>
+# Bernd Weber <mailto:bernd@copperfroghosting.com>
 #
 # === Copyright
 #
-# Copyright 2013 Copper Frog LLC.
+# Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
+class puppet::master::apache inherits puppet::params {
+  $type = 'apache'
 
+  class { "puppet::master" : type => $type }
+  class { "puppet::master::apache::configure" :
+    require => Class [ "puppet::master" ],
+  }
+}
+
+# == Class: puppet::master::apache::configure
+#
+# This configures the Puppet Master for apache. It defines the
+# vhost settings necessary by providing a custom vhost configuration template.
+#
+# === Examples
+#
+#  class { puppet::master::apache : }
+#
 class puppet::master::apache::configure {
   require ( 'apache' )
 
@@ -31,14 +44,5 @@ class puppet::master::apache::configure {
     template   => 'puppet/puppetmaster.conf.erb',
     docroot    => "${puppet::params::rackdir}/puppetmasterd/",
     logroot    => $puppet::params::logdir,
-  }
-}
-
-class puppet::master::apache inherits puppet::params {
-  $type = 'apache'
-
-  class { "puppet::master" : type => $type }
-  class { "puppet::master::apache::configure" :
-    require => Class [ "puppet::master" ],
   }
 }

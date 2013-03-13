@@ -3,23 +3,18 @@
 # This is the Puppet parameters class. It holds all relevant modifiable parameters/
 # variables for the puppet classes.
 #
-# === Parameters
-#
-# === Variables
-#
 # === Examples
 #
 #  class { puppet::params : }
 #
 # === Authors
 #
-# Bernd Weber <bernd@copperfroghosting.com>
+# Bernd Weber <mailto:bernd@copperfroghosting.com>
 #
 # === Copyright
 #
-# Copyright 2013 Copper Frog LLC.
+# Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
-
 class puppet::params {
   $confdir          = "/etc/puppet"
   $vardir           = "/var/lib/puppet"
