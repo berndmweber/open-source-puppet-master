@@ -16,8 +16,8 @@
 # Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
 class puppet inherits puppet::params {
-  class { "puppet::install" : }
-  class { "puppet::configure" : }
+  class { 'puppet::install' : }
+  class { 'puppet::configure' : }
 }
 
 
@@ -48,28 +48,28 @@ class puppet::configure {
     ensure  => directory,
     owner   => $puppet::params::user,
     group   => 'root',
-    require => Class [ "puppet::install" ]
+    require => Class [ 'puppet::install' ]
   }
   file { $puppet::params::puppetconf :
     ensure  => file,
-    content => template ( "puppet/puppet.conf.erb" ),
+    content => template ( 'puppet/puppet.conf.erb' ),
     require => File [ $puppet::params::confdir ],
   }
   file { "${puppet::params::confdir}/auth.conf" :
     ensure  => file,
-    content => template ( "puppet/auth.conf.erb" ),
+    content => template ( 'puppet/auth.conf.erb' ),
     require => File [ $puppet::params::confdir ],
   }
   file { $puppet::params::puppet_default :
     ensure  => file,
-    require => Class [ "puppet::install" ]
+    require => Class [ 'puppet::install' ]
   }
   augeas { $puppet::params::puppet_default :
     context => "/files/${puppet::params::puppet_default}",
     lens    => 'Shellvars.lns',
     incl    => $puppet::params::puppet_default,
     changes => [
-      "set START \"yes\"",
+      'set START "yes"',
     ],
     require => File [ $puppet::params::puppet_default ],
   }
@@ -85,10 +85,10 @@ class puppet::configure {
 #
 class puppet::service {
   service { $puppet::params::puppet_service :
-    ensure => running,
-    hasstatus => true,
+    ensure     => running,
+    hasstatus  => true,
     hasrestart => true,
-    enable => true,
-    require => Class [ "puppet::configure" ],
+    enable     => true,
+    require    => Class [ 'puppet::configure' ],
   }
 }

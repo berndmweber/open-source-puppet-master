@@ -19,9 +19,9 @@
 class puppet::master::apache inherits puppet::params {
   $type = 'apache'
 
-  class { "puppet::master" : type => $type }
-  class { "puppet::master::apache::configure" :
-    require => Class [ "puppet::master" ],
+  class { 'puppet::master' : type => $type }
+  class { 'puppet::master::apache::configure' :
+    require => Class [ 'puppet::master' ],
   }
 }
 
@@ -39,7 +39,7 @@ class puppet::master::apache::configure {
 
   apache::vhost { 'puppetmaster' :
     priority   => '10',
-    vhost_name => "*",
+    vhost_name => '*',
     port       => $puppet::params::masterport,
     template   => 'puppet/puppetmaster.conf.erb',
     docroot    => "${puppet::params::rackdir}/puppetmasterd/",

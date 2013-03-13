@@ -31,17 +31,17 @@ define puppet::master::module (
   $contributor = 'puppetlabs',
   $ignore_dependencies = false,
 ) {
-  require ( "puppet::params" )
+  require ( 'puppet::params' )
 
   if $ignore_dependencies == true {
-    $params = "--ignore-dependencies"
+    $params = '--ignore-dependencies'
   }
   if $ensure == 'present' {
     exec { "install-${name}-module" :
-      path => "/bin:/sbin:/usr/bin:/usr/sbin",
+      path    => '/bin:/sbin:/usr/bin:/usr/sbin',
       command => "puppet module install ${contributor}/${name} ${params}",
       creates => "${puppet::params::modulepath['production']}/${name}",
-      require => Class [ "puppet::configure" ],
+      require => Class [ 'puppet::configure' ],
     }
   }
 }
