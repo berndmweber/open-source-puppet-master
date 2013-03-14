@@ -9,6 +9,7 @@
 #
 #   Possible values include:
 #   * 'cucumber' : cucumber-puppet ruby gem installation
+#   * 'rspec' : rspec-puppet ruby gem installation (default)
 #
 # === Variables
 #
@@ -17,7 +18,7 @@
 #
 # === Examples
 #
-#  class { puppet::test : type => 'cucumber' }
+#  class { puppet::test : type => 'rspec' }
 #
 # === Authors
 #
@@ -28,7 +29,7 @@
 # Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
 class puppet::test (
-  $type = 'cucumber',
+  $type = 'rspec',
 ) {
   if $::puppet_type != undef {
     $l_type = $::puppet_test_type
@@ -39,6 +40,12 @@ class puppet::test (
   case $l_type {
     'cucumber' : {
       class { 'puppet::test::cucumber' : }
+    }
+    'rspec' : {
+      class { 'puppet::test::rspec' : }
+    }
+    default: {
+      fail ( "The given test type ${l_type} is currently not supported." )
     }
   }
 }

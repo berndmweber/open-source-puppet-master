@@ -1,6 +1,6 @@
 # == Class: puppet::test::cucumber
 #
-# This is the Puppet test clas for cucumber-puppets.
+# This is the Puppet test class for cucumber-puppet.
 #
 # === Examples
 #
@@ -31,6 +31,15 @@ class puppet::test::cucumber inherits puppet::params {
   class { 'puppet::test::cucumber::configure' : }
 }
 
+# == Class: puppet::test::cucumber::install
+#
+# This is the install class for cucumber-puppet installing the basic
+# requirements for the cucumber-puppet gem
+#
+# === Examples
+#
+#  class { puppet::test::cucumber::install : }
+#
 class puppet::test::cucumber::install {
   require ( 'ruby' )
 
@@ -42,6 +51,15 @@ class puppet::test::cucumber::install {
   }
 }
 
+# == Class: puppet::test::cucumber::configure
+#
+# This is the configuration class for cucumber-puppet. It configures the
+# basic directories and files required for puppet testing via cucumber-puppet.
+#
+# === Examples
+#
+#  class { puppet::test::cucumber::configure : }
+#
 class puppet::test::cucumber::configure inherits puppet::params {
   file { [
     $puppet::test::cucumber::featuredir,
