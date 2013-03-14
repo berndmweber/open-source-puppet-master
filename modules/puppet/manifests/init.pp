@@ -18,6 +18,7 @@
 class puppet inherits puppet::params {
   class { 'puppet::install' : }
   class { 'puppet::configure' : }
+  class { 'puppet::service' : }
 }
 
 
@@ -81,7 +82,7 @@ class puppet::configure {
 #
 # === Examples
 #
-#  class { puppet::configure : }
+#  class { puppet::service : }
 #
 class puppet::service {
   service { $puppet::params::puppet_service :
