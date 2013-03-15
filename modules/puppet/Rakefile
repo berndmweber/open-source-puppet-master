@@ -1,0 +1,38 @@
+require 'puppetlabs_spec_helper/rake_tasks'
+
+desc "Run spec tests and output html log"
+RSpec::Core::RakeTask.new(:spec_html_stanalone) do |t|
+  t.rspec_opts = ['-O spec/spec.opts']
+  t.pattern = 'spec/{classes,defines,unit,functions,hosts}/**/*_spec.rb'
+end
+
+desc "Create local fixtures directory"
+task :spec_local_prep do
+  FileUtils::mkdir_p("spec/fixtures/modules/puppet")
+  ['manifests','lib','files','templates'].each do |dir|
+    if File::exist? dir
+      File::exist?("spec/fixtures/modules/puppet/#{dir}") || FileUtils::ln_s("../../../../#{dir}", "spec/fixtures/modules/puppet/#{dir}")
+    end
+  end
+  FileUtils::mkdir_p("spec/fixtures/manifests")
+  FileUtils::touch("spec/fixtures/manifests/site.pp")
+end
+
+desc "Clean local fixtures directory"
+task :spec_local_clean do
+  FileUtils::rm_rf("spec/fixtures/modules/puppet")
+end
+
+desc "Run spec tests in a clean local fixtures directory and output as html log"
+task :spec_local_html do
+  Rake::Task[:spec_local_prep].invoke
+  Rake::Task[:spec_html_stanalone].invoke
+  Rake::Task[:spec_local_clean].invoke
+end
+
+desc "Run spec tests in a clean fixtures directory and output as html log"
+task :spec_html do
+  Rake::Task[:spec_prep].invoke
+  Rake::Task[:spec_html_stanalone].invoke
+  Rake::Task[:spec_clean].invoke
+end

@@ -1,0 +1,5 @@
+--format
+h
+--color
+--backtrace
+--out rspec-log.html
