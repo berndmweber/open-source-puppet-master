@@ -39,10 +39,13 @@ describe 'puppet', :type => :class do
       ]
     }
     it 'should have a template with the correct contents' do
-      content = subject.resource('file', '/etc/puppet/puppet.conf').send(:parameters)[:content]
-      expected_lines do |line|
-        content.should match(line)
-      end
+      verify_template(subject, '/etc/puppet/puppet.conf', [
+        'vardir = /var/lib/puppet',
+        'logdir = /var/log/puppet',
+        'rundir = /var/run/puppet',
+        'ssldir = /etc/puppet/ssl',
+        'modulepath = /etc/puppet/modules',
+      ])
     end  
       
     it { should contain_service('puppet').with(
