@@ -1,0 +1,4 @@
+fixtures:
+  symlinks:
+    puppet: "#{source_dir}"
+    
