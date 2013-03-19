@@ -31,13 +31,12 @@ describe 'puppet', :type => :class do
       )
     }
     it 'should have a template with the correct contents' do
-      verify_contents(subject, '/etc/puppet/pupptet.conf', [
-        "vardir = /var/lib/puppet",
-        "logdir = /lor/log/puppet",
-        "rundir = /var/run/puppet",
-        "ssldir = /etc/puppet/ssl",
-        "modulepath = /etc/puppet/modules"
-      ])
+      content = catalogue.resource('file', '/etc/puppet/pupptet.conf').send(:parameters)[:content]
+      content.should match ("vardir = /var/lib/puppet")
+      content.should match ("logdir = /lor/log/puppet")
+      content.should match ("rundir = /var/run/puppet")
+      content.should match ("ssldir = /etc/puppet/ssl")
+      content.should match ("modulepath = /etc/puppet/modules")
     end  
       
     it { should contain_service("puppet").with(
