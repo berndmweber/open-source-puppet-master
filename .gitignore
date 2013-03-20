@@ -1,5 +1,6 @@
 *.conf
 *.dpkg-dist
+ssl
 manifests/site.pp
 modules/dashboard
 environments
