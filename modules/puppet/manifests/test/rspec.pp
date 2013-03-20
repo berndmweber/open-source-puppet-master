@@ -33,9 +33,21 @@ class puppet::test::rspec::install {
 
   exec { 'install-rspec-puppet' :
     path    => '/bin:/sbin:/usr/bin:/usr/sbin',
-    command => 'gem install rdoc && gem install rspec-puppet puppetlabs_spec_helper',
+    command => 'gem install rdoc && gem install rspec-puppet',
     creates => '/usr/local/bin/rspec-puppet-init',
     require => Class [ 'ruby' ],
+  }
+  exec { 'install-rspec-puppetlabs_spec_helper' :
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    command => 'gem install puppetlabs_spec_helper',
+    unless => 'gem list --local | grep puppetlabs_spec_helper',
+    require => Exec [ 'install-rspec-puppet' ],
+  }
+  exec { 'install-rspec-puppet-augeas' :
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    command => 'gem install rspec-puppet-augeas',
+    unless => 'gem list --local | grep rspec-puppet-augeas',
+    require => Exec [ 'install-rspec-puppetlabs_spec_helper' ],
   }
 }
 
