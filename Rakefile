@@ -1,10 +1,5 @@
 all_tests = [
   'puppet',
-#  'apache',
-#  'mysql',
-#  'firewall',
-#  'ruby',
-  'stdlib'
   ]
 
 all_tests.each do |test|
