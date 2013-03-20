@@ -6,3 +6,10 @@ def verify_template(subject, title, expected_lines)
     content.should match(line)
   end
 end
+
+def verify_template_not(subject, title, not_expected_lines)
+  content = subject.resource('file', title).send(:parameters)[:content]
+  not_expected_lines.each do |line|
+    content.should_not match(line)
+  end
+end
