@@ -30,15 +30,7 @@ describe 'puppet', :type => :class do
       'require' => 'File[/etc/puppet]'
       )
     }
-    let(:expected_lines) {
-      [ 'vardir = /var/lib/puppet',
-        'logdir = /var/log/puppet',
-        'rundir = /var/run/puppet',
-        'ssldir = /etc/puppet/ssl',
-        'modulepath = /etc/puppet/modules',
-      ]
-    }
-    it 'should have a template with the correct contents' do
+    it 'should have a file puppet.conf with the correct contents' do
       verify_template(subject, '/etc/puppet/puppet.conf', [
         'vardir = /var/lib/puppet',
         'logdir = /var/log/puppet',

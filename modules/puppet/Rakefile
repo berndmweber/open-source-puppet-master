@@ -9,6 +9,6 @@ end
 desc "Run spec tests in a clean fixtures directory and output as html log"
 task :spec_html do
   Rake::Task[:spec_prep].invoke
-  Rake::Task[:spec_html_stanalone].invoke
+  Rake::Task[:spec_html_standalone].invoke
   Rake::Task[:spec_clean].invoke
 end
