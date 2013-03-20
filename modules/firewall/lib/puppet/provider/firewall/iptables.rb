@@ -36,6 +36,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     mark_flag = '--set-xmark'
   end
 
+  @protocol = "IPv4"
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -65,6 +67,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :uid => "-m owner --uid-owner",
     :pkttype => "-m pkttype --pkt-type"
   }
+
+  # Create property methods dynamically
+  (@resource_map.keys << :chain << :table << :action).each do |property|
+    define_method "#{property}" do
+      @property_hash[property.to_sym]
+    end
+
+    define_method "#{property}=" do |value|
+      @property_hash[:needs_change] = true
+    end
+  end
 
   # This is the order of resources as they appear in iptables-save output,
   # we need it to properly parse and apply rules, if the order of resource
@@ -100,6 +113,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       notice("Properties changed - updating rule")
       update
     end
+    persist_iptables(self.class.instance_variable_get(:@protocol))
     @property_hash.clear
   end
 
