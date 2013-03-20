@@ -1,4 +1,5 @@
 /coverage
+/ssl
 /rspec-log.html
 /spec/fixtures/modules/puppet
 /spec/fixtures/manifests/site.pp
