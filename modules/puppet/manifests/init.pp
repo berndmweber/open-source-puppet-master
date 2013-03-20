@@ -66,7 +66,7 @@ class puppet::configure {
     require => Class [ 'puppet::install' ]
   }
   augeas { $puppet::params::puppet_default :
-    context => "/files/${puppet::params::puppet_default}",
+    context => "/files${puppet::params::puppet_default}",
     lens    => 'Shellvars.lns',
     incl    => $puppet::params::puppet_default,
     changes => [

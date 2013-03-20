@@ -37,8 +37,38 @@ describe 'puppet', :type => :class do
         'rundir = /var/run/puppet',
         'ssldir = /etc/puppet/ssl',
         'modulepath = /etc/puppet/modules',
+        'user = puppet',
+        'group = puppet',
+        'archive_file_server = puppet.copperfroghosting.net',
+        'certname = puppet.copperfroghosting.net',
+        'server = puppet.copperfroghosting.net',
+      ])
+      verify_template_not(subject, '/etc/puppet/puppet.conf', [
+        '\[master\]',
       ])
     end  
+    it { should contain_file('/etc/puppet/auth.conf').with(
+      'ensure'  => 'file',
+      'require' => 'File[/etc/puppet]'
+      )
+    }
+    it 'should have a file auth.conf with the correct contents' do
+      verify_template(subject, '/etc/puppet/puppet.conf', [
+        '# This file is controlled by puppet. Do NOT edit! #',
+      ])
+    end  
+    it { should contain_file('/etc/default/puppet').with(
+      'ensure'  => 'file',
+      'require' => 'Class[Puppet::Install]'
+      )
+    }
+    it { should contain_augeas('/etc/default/puppet').with(
+      'context' => '/files/etc/default/puppet',
+      'lens'    => 'Shellvars.lns',
+      'incl'    => '/etc/default/puppet',
+      'require' => 'File[/etc/default/puppet]'
+      )
+    }
       
     it { should contain_service('puppet').with(
       'ensure'     => 'running',
