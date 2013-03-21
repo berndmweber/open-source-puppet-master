@@ -69,15 +69,13 @@ describe 'puppet', :type => :class do
       'require' => 'File[/etc/default/puppet]'
       )
     }
-    # Needs fix in https://github.com/domcleal/rspec-puppet-augeas/issues/1 first
-    # Commenting test out until fixed.
-    #describe_augeas '/etc/default/puppet', :lens => 'Shellvars.lns', :target => '/etc/default/puppet' do
-    #  it 'should change the contents of /etc/default/puppet' do
-    #    should execute.with_change
-    #    aug_get('START').should == 'yes'
-    #    should execute.idempotently
-    #  end
-    #end
+    describe_augeas '/etc/default/puppet', :lens => 'Shellvars.lns', :target => '/etc/default/puppet' do
+      it 'should change the contents of /etc/default/puppet' do
+        should execute.with_change
+        aug_get('START').should == 'yes'
+        should execute.idempotently
+      end
+    end
       
     it { should contain_service('puppet').with(
       'ensure'     => 'running',
