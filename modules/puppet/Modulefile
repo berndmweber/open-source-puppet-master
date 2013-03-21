@@ -6,7 +6,7 @@ license 'GPL v2'
 project_page 'https://github.com/bernd-copperfroghosting/open-source-puppet-master'
 source 'https://github.com/bernd-copperfroghosting/open-source-puppet-master.git'
 summary 'Puppet configuration class'
-description 'Configures bot h Puppet agents and the Puppet master
+description 'Configures both Puppet agents and the Puppet master
 
 Versions tested:
 * ruby - 1.8.7 (2012-02-08 patchlevel 358) [universal-darwin11.0]
@@ -29,7 +29,7 @@ Versions tested:
 * rspec-mocks - 2.13.0
 
 * rspec-puppet - 0.1.6
-* rspec-puppet-augeas - 0.2.2
+* rspec-puppet-augeas - 0.2.3
 * puppetlabs_spec_helper - 0.4.1'
 dependency 'puppetlabs/apache', '>=0.5.0-rc1'
 dependency 'puppetlabs/ruby', '>=0.0.2'
