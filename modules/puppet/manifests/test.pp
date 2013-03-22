@@ -31,7 +31,7 @@
 class puppet::test (
   $type = 'rspec',
 ) {
-  if $::puppet_type != undef {
+  if $::puppet_test_type != undef {
     $l_type = $::puppet_test_type
   } else {
     $l_type = $type

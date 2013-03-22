@@ -1,4 +1,5 @@
 fixtures:
   symlinks:
     puppet: "#{source_dir}"
+    ruby: "#{source_dir}/../ruby"
     

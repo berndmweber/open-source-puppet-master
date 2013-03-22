@@ -4,9 +4,9 @@ describe 'puppet::master', :type => :class do
   let(:node) { 'master.copperfroghosting.net' }
   let :fact_defaults do
     {
-      :ipaddress => '192.168.1.111',
+      :ipaddress   => '192.168.1.111',
       :environment => 'production',
-      :domain => 'copperfroghosting.net'
+      :domain      => 'copperfroghosting.net'
     }
   end
   describe 'with operatingsystem specific facts' do
@@ -130,10 +130,10 @@ describe 'puppet::master', :type => :class do
                 )
               }
               it { should contain_file('/etc/puppet/ssl').with(
-                'ensure'  => 'directory',
-                'owner'   => 'puppet',
-                'group'   => 'root',
-                'mode'    => '0771'
+                'ensure' => 'directory',
+                'owner'  => 'puppet',
+                'group'  => 'root',
+                'mode'   => '0771'
                 )
               }
               it { should contain_file('/etc/puppet/manifests').with(
@@ -201,9 +201,9 @@ describe 'puppet::master', :type => :class do
               
               if pmparams[:has_service]
                 it { should contain_service('puppetmaster').with(
-                  'ensure'     => 'running',
-                  'enable'     => 'true',
-                  'require'    => 'Class[Puppet::Master::Install]'
+                  'ensure'  => 'running',
+                  'enable'  => 'true',
+                  'require' => 'Class[Puppet::Master::Install]'
                   )
                 }
               else
