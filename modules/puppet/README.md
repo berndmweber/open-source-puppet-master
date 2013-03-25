@@ -5,6 +5,10 @@ This is the puppet module. It installs both a Puppet client/agent and a Puppet m
 on the configuration. It also allows the configuration of a system via boot strap
 script.
 
+Travis Build Status
+-------------------
+[![Build Status](https://travis-ci.org/bernd-copperfroghosting/open-source-puppet-master.png?branch=master)](https://travis-ci.org/bernd-copperfroghosting/open-source-puppet-master)
+
 License
 -------
 GPL v2
