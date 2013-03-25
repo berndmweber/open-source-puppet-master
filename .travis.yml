@@ -1,7 +1,7 @@
 language: ruby
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libaugeas-ruby1.8
+  - sudo apt-get install -qq augeas-lenses libaugeas-dev libaugeas0
 bundler_args: --without development
 script: "bundle exec rake test_all SPEC_OPTS='--format documentation'"
 rvm:
