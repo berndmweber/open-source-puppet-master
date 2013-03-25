@@ -3,7 +3,6 @@ source :rubygems
 group :development, :test do
   gem 'rspec-puppet'
   gem 'puppetlabs_spec_helper', :require => false
-  gem 'ruby-augeas'
   gem 'rspec-puppet-augeas', '>=0.2.3'
 end
 
