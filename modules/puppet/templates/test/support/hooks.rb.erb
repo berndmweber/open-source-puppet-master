@@ -1,6 +1,6 @@
 # This file is controlled by puppet. Do NOT edit! #
 Before do
-  @puppetcfg['confdir']  = "<%= scope.lookupvar( "puppet::params::confdir" ) %>"
+  @puppetcfg['confdir'] = "<%= scope.lookupvar( "puppet::params::confdir" ) %>"
   @puppetcfg['manifest'] = "<%= scope.lookupvar( "puppet::params::manifestpath" )['production'] %>/site.pp"
-  @puppetcfg['modulepath']  = "<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>"
+  @puppetcfg['modulepath'] = "<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>"
 end
