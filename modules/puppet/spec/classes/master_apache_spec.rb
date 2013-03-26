@@ -31,12 +31,37 @@ describe 'puppet::master::apache', :type => :class do
         }
         it { should include_class('puppet::master::apache::configure') }
         
+        it { should contain_file('/usr/share/puppet/rack').with(
+          'ensure' => 'directory',
+          'owner'  => 'root',
+          'group'  => 'root'
+          )
+        }
+        it { should contain_file('/usr/share/puppet/rack/puppetmasterd').with(
+          'ensure' => 'directory',
+          'owner'  => 'root',
+          'group'  => 'root'
+          )
+        }
+        it { should contain_file('/usr/share/puppet/rack/puppetmasterd/config.ru').with(
+          'ensure'  => 'file',
+          'owner'   => 'puppet',
+          'group'   => 'puppet',
+          'require' => 'File[/usr/share/puppet/rack/puppetmasterd]'
+          )
+        }
+        it 'should have a file config.ru with the correct contents' do
+          verify_template(subject, '/usr/share/puppet/rack/puppetmasterd/config.ru', [
+            'ARGV << "--confdir" << "/etc/puppet"',
+            'ARGV << "--vardir"  << "/var/lib/puppet"',
+          ])
+        end
         it { should contain_apache__vhost('puppetmaster').with(
           'priority'   => '10',
           'vhost_name' => '*',
           'port'       => '8140',
           'template'   => 'puppet/puppetmaster.conf.erb',
-          'docroot'    => '/usr/share/puppet/rack/puppetmasterd/',
+          'docroot'    => '/usr/share/puppet/rack/puppetmasterd',
           'logroot'    => '/var/log/puppet'
           )
         }

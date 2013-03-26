@@ -34,7 +34,7 @@ describe 'puppet::master', :type => :class do
               :has_service => true
             },
             'apache' => {
-              :package     => 'puppetmaster-passenger',
+              :package     => 'puppetmaster-common',
               :service     => 'httpd',
               :has_service => false
             }

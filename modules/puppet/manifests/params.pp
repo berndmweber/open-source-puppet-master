@@ -24,6 +24,9 @@ class puppet::params {
   $ssldir           = "${confdir}/ssl"
   $reportsdir       = "${vardir}/reports"
   $rackdir          = '/usr/share/puppet/rack'
+  $pmrackdir        = 'puppetmasterd'
+  $pmrackpath       = "${rackdir}/${pmrackdir}"
+  $pmconfigru       = 'config.ru'
   $environmentspath = {
     'base'        => "${confdir}/environments",
     'testing'     => "${confdir}/environments/testing",
@@ -60,7 +63,7 @@ class puppet::params {
       $puppet_packages    = [ 'puppet' ]
       $master_packages    = {
         'self'   => 'puppetmaster',
-        'apache' => 'puppetmaster-passenger',
+        'apache' => 'puppetmaster-common',
       }
       $dashboard_packages = [ 'puppet-dashboard' ]
 

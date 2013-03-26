@@ -2,6 +2,7 @@ fixtures:
   symlinks:
     puppet: "#{source_dir}"
     ruby: "#{source_dir}/../ruby"
+    passenger: "#{source_dir}/../passenger"
     apache: "#{source_dir}/../apache"
     stdlib: "#{source_dir}/../stdlib"
     firewall: "#{source_dir}/../firewall"

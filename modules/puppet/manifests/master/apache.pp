@@ -35,14 +35,32 @@ class puppet::master::apache inherits puppet::params {
 #  class { puppet::master::apache::configure : }
 #
 class puppet::master::apache::configure {
-  require ( 'apache' )
+  require ( 'apache', 'passenger' )
+
+  file { [
+      $puppet::params::rackdir,
+      $puppet::params::pmrackpath,
+    ] :
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+  }
+
+  file { "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" :
+    ensure  => file,
+    owner   => 'puppet',
+    group   => 'puppet',
+    content => template ( "puppet/${puppet::params::pmconfigru}.erb" ),
+    require => File [ $puppet::params::pmrackpath ],
+  }
 
   apache::vhost { 'puppetmaster' :
     priority   => '10',
     vhost_name => '*',
     port       => $puppet::params::masterport,
     template   => 'puppet/puppetmaster.conf.erb',
-    docroot    => "${puppet::params::rackdir}/puppetmasterd/",
+    docroot    => $puppet::params::pmrackpath,
     logroot    => $puppet::params::logdir,
+    require    => File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ]
   }
 }

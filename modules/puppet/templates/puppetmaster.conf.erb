@@ -5,13 +5,6 @@
   
 -%>
 # This file is controlled by puppet. Do NOT edit! #
-PassengerHighPerformance on
-PassengerMaxPoolSize 12
-PassengerPoolIdleTime 1500
-# PassengerMaxRequests 1000
-PassengerStatThrottleRate 120
-RackAutoDetect Off
-RailsAutoDetect Off
 
 Listen <%= port %>
 
@@ -37,9 +30,9 @@ Listen <%= port %>
         RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
         RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
 
-        DocumentRoot <%= docroot %>public
+        DocumentRoot <%= docroot %>/public
         RackBaseURI /
-        <Directory <%= docroot %>>
+        <Directory <%= docroot %>/>
                 Options None
                 AllowOverride None
                 Order allow,deny
