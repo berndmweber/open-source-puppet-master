@@ -21,6 +21,7 @@ node default {
 node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
+  class { 'passenger' : }
   class { 'puppet::master::apache' : }
   class { 'mysql' : }
   class { 'mysql::ruby' : }
