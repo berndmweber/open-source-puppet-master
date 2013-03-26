@@ -36,6 +36,8 @@ class puppet::master::apache inherits puppet::params {
 #
 class puppet::master::apache::configure {
   require ( 'apache', 'passenger' )
+  require apache::mod::ssl
+
 
   file { [
       $puppet::params::rackdir,
@@ -65,6 +67,11 @@ class puppet::master::apache::configure {
     require   => Class [ 'puppet::master::configure' ],
   }
 
+  a2mod { 'headers' :
+    ensure => present,
+    notify => Service['httpd'],
+  }
+
   apache::vhost { 'puppetmaster' :
     priority   => '10',
     vhost_name => '*',
@@ -73,6 +80,7 @@ class puppet::master::apache::configure {
     docroot    => $puppet::params::pmrackpath,
     logroot    => $puppet::params::logdir,
     require    => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
-                    Exec [ 'generate_master-cert' ] ],
+                    Exec [ 'generate_master-cert' ],
+                    A2mod [ 'headers', 'ssl' ] ],
   }
 }
