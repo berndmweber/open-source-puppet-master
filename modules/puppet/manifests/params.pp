@@ -42,6 +42,9 @@ class puppet::params {
   $user             = 'puppet'
   $group            = 'puppet'
   $puppetconf       = "${confdir}/puppet.conf"
+  $hieraconf        = "${confdir}/hiera.yaml"
+  $hieradir         = 'hieradata'
+  $hierapath        = "${confdir}/${hieradir}"
   $masterport       = '8140'
   $puppet_modules   = {
     'self'   => [ 'ruby' ],

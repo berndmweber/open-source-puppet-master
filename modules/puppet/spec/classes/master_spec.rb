@@ -9,6 +9,11 @@ describe 'puppet::master', :type => :class do
       :domain      => 'copperfroghosting.net'
     }
   end
+  let :default_params do
+    {
+      :enable_hiera => true
+    }
+  end
   describe 'with operatingsystem specific facts' do
     {
       'Ubuntu-12.04' => {
@@ -36,9 +41,11 @@ describe 'puppet::master', :type => :class do
           }.each do |pmtype, pmparams|
             
             describe "when type #{pmtype}" do
-              let(:params) {
-                { :type => pmtype }
-              }
+              let :params do
+                {
+                  :type => pmtype,
+                }.merge(default_params)
+              end
               it { should include_class('puppet::params') }
               it { should include_class('puppet') }
               it { should include_class('puppet::install') }
@@ -209,6 +216,7 @@ describe 'puppet::master', :type => :class do
               else
                 it { should_not contain_service('puppetmaster') }
               end
+              it { should include_class('puppet::master::hiera') }
             end
           end
         end

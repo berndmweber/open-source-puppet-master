@@ -32,7 +32,7 @@ class puppet::master::apache inherits puppet::params {
 #
 # === Examples
 #
-#  class { puppet::master::apache : }
+#  class { puppet::master::apache::configure : }
 #
 class puppet::master::apache::configure {
   require ( 'apache' )

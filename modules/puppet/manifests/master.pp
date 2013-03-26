@@ -12,14 +12,20 @@
 #   * 'self'   : Just a plain puppet::master installation with internal WEBrick
 #   * 'apache' : Install a puppet::master using the passenger module and apache
 #
+# [*enable_hiera*]
+#   Defines whether hiera should be installed and configured.
+#
 # === Variables
 #
 # [*puppet_type*]
 #   See parameter *type*
 #
+# [*puppet_enable_hiera*]
+#   See parameter *enable_hiera*
+#
 # === Examples
 #
-#  class { puppet::master : type => 'apache' }
+#  class { puppet::master : type => 'apache', enable_hiera => true }
 #
 # === Authors
 #
@@ -30,25 +36,36 @@
 # Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
 #
 class puppet::master (
-  $type = 'self',
+  $type         = 'self',
+  $enable_hiera = true,
 ) inherits puppet::params {
   if $::puppet_type != undef {
     $l_type = $::puppet_type
   } else {
     $l_type = $type
   }
+  if $::puppet_enable_hiera != undef {
+    if (str2bool($::puppet_enable_hiera) == true) {
+      $l_enable_hiera = true
+    } else {
+      $l_enable_hiera = false
+    }
+  } else {
+    $l_enable_hiera = $enable_hiera
+  }
 
   class { 'puppet' : }
   class { 'puppet::master::install' :
-    type => $l_type,
+    type    => $l_type,
     require => Class [ 'puppet' ],
   }
   class { 'puppet::master::configure' :
-    type => $l_type,
-    require => Class [ 'puppet::master::install' ],
+    type         => $l_type,
+    enable_hiera => $l_enable_hiera,
+    require      => Class [ 'puppet::master::install' ],
   }
   class { 'puppet::master::service' :
-    type => $l_type,
+    type    => $l_type,
     require => Class [ 'puppet::master::configure' ],
   }
 }
@@ -81,8 +98,12 @@ class puppet::master::install (
 # [*type*]
 #   See puppet::master::type
 #
+# [*enable_hiera*]
+#   See puppet::master::enable_hiera
+#
 class puppet::master::configure (
   $type,
+  $enable_hiera,
 ) inherits puppet::configure {
   # Need this to overwrite the basic setting
   $is_master = true
@@ -137,6 +158,9 @@ class puppet::master::configure (
   ] :
     ensure  => directory,
     require => File [ $puppet::params::confdir ],
+  }
+  if $enable_hiera == true {
+    class { 'puppet::master::hiera' : }
   }
 }
 
