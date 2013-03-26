@@ -117,7 +117,7 @@ class passenger (
   }
 
   exec {'compile-passenger':
-    path      => [ $gem_binary_path, 'usr/local/bin', '/usr/bin', '/bin'],
+    path      => [ $gem_binary_path, '/usr/local/bin', '/usr/bin', '/bin'],
     command   => 'passenger-install-apache2-module -a',
     logoutput => on_failure,
     creates   => $mod_passenger_location,
