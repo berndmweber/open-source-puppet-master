@@ -1,5 +1,6 @@
 class { 'apache' : }
 class { 'ruby' : }
+class { 'passenger' : }
 #class { "puppet::params" : }
 # This will install some basic modules we need
 #puppet::master::module { $puppet::params::puppet_modules[$type] :
