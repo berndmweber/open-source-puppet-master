@@ -60,9 +60,9 @@ class puppet::master::apache::configure {
     path      => '/bin:/sbin:/usr/bin:/usr/sbin',
     cwd       => $puppet::params::confdir,
     command   => 'puppet cert generate $(puppet master --configprint certname)',
-    unless    => 'puppet master --configprint hostcert',
+    unless    => "find ${puppet::params::ssldir}/certs -name ${::fqdn}.pem",
     logoutput => on_failure,
-    require   => Class [ 'puppet::master::install' ],
+    require   => Class [ 'puppet::master::configure' ],
   }
 
   apache::vhost { 'puppetmaster' :
