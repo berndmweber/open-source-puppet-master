@@ -40,6 +40,8 @@ class puppet::master::apache::configure {
   file { [
       $puppet::params::rackdir,
       $puppet::params::pmrackpath,
+      "${puppet::params::pmrackpath}/public",
+      "${puppet::params::pmrackpath}/tmp",
     ] :
     ensure => directory,
     owner  => 'root',
@@ -54,6 +56,15 @@ class puppet::master::apache::configure {
     require => File [ $puppet::params::pmrackpath ],
   }
 
+  exec { 'generate_master-cert' :
+    path      => '/bin:/sbin:/usr/bin:/usr/sbin',
+    cwd       => $puppet::params::confdir,
+    command   => 'puppet cert generate $(puppet master --configprint certname)',
+    unless    => 'puppet master --configprint hostcert',
+    logoutput => on_failure,
+    require   => Class [ 'puppet::master::install' ],
+  }
+
   apache::vhost { 'puppetmaster' :
     priority   => '10',
     vhost_name => '*',
@@ -61,6 +72,7 @@ class puppet::master::apache::configure {
     template   => 'puppet/puppetmaster.conf.erb',
     docroot    => $puppet::params::pmrackpath,
     logroot    => $puppet::params::logdir,
-    require    => File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ]
+    require    => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
+                    Exec [ 'generate_master-cert' ] ],
   }
 }
