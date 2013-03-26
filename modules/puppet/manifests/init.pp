@@ -17,8 +17,12 @@
 #
 class puppet inherits puppet::params {
   class { 'puppet::install' : }
-  class { 'puppet::configure' : }
-  class { 'puppet::service' : }
+  class { 'puppet::configure' :
+    require => Class [ 'puppet::install' ],
+  }
+  class { 'puppet::service' :
+    require => Class [ 'puppet::configure' ],
+  }
 }
 
 

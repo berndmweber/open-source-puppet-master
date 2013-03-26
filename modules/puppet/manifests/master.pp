@@ -41,12 +41,15 @@ class puppet::master (
   class { 'puppet' : }
   class { 'puppet::master::install' :
     type => $l_type,
+    require => Class [ 'puppet' ],
   }
   class { 'puppet::master::configure' :
     type => $l_type,
+    require => Class [ 'puppet::master::install' ],
   }
   class { 'puppet::master::service' :
     type => $l_type,
+    require => Class [ 'puppet::master::configure' ],
   }
 }
 

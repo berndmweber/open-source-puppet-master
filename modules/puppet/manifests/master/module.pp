@@ -14,6 +14,9 @@
 #  Forces the module installation disregarding any possible module dependencies.
 #  Defaults to +false+
 #
+# [*environmnent*]
+#  Define in which environment directory the module shall be installed.
+#
 # === Examples
 #
 #  puppet::master::module { 'apache': ensure => present }
@@ -30,18 +33,23 @@ define puppet::master::module (
   $ensure,
   $contributor = 'puppetlabs',
   $ignore_dependencies = false,
+  $environment = 'production',
 ) {
   require ( 'puppet::params' )
 
   if $ignore_dependencies == true {
-    $params = '--ignore-dependencies'
+    $params_id = '--ignore-dependencies'
   }
+  if $environment != 'production' {
+    $params_env = "--environment ${environment}"
+  }
+  $params = "${params_id} ${params_env}"
   if $ensure == 'present' {
     exec { "install-${name}-module" :
       path    => '/bin:/sbin:/usr/bin:/usr/sbin',
       command => "puppet module install ${contributor}/${name} ${params}",
-      creates => "${puppet::params::modulepath['production']}/${name}",
-      require => Class [ 'puppet::configure' ],
+      creates => "${puppet::params::modulepath[$environment]}/${name}",
+      require => Class [ 'puppet::master::configure' ],
     }
   }
 }
