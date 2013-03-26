@@ -48,7 +48,7 @@ class puppet::master::hiera::configure {
     owner   => 'root',
     group   => 'root',
     mode    => '0755',
-    source  => 'puppet:///modules/puppet/hiera.yaml',
+    content => template( 'puppet/hiera.yaml.erb' ),
     require => File [ $puppet::params::confdir ],
   }
   file { $puppet::params::hierapath :

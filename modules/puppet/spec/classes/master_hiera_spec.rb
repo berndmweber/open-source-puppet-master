@@ -33,6 +33,11 @@ describe 'puppet::master::hiera', :type => :class do
           'require' => 'File[/etc/puppet]'
           )
         }
+        it 'should have a file hiera.yaml with the correct contents' do
+          verify_template(subject, '/etc/puppet/hiera.yaml', [
+            ':datadir: /etc/puppet/hieradata',
+            ])
+        end
         it { should contain_file('/etc/puppet/hieradata').with(
           'ensure'  => 'directory',
           'owner'   => 'root',
