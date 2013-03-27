@@ -31,18 +31,19 @@ describe 'puppet::master::apache', :type => :class do
         }
         it { should include_class('puppet::master::apache::configure') }
         
-        it { should contain_file('/usr/share/puppet/rack').with(
-          'ensure' => 'directory',
-          'owner'  => 'root',
-          'group'  => 'root'
-          )
-        }
-        it { should contain_file('/usr/share/puppet/rack/puppetmasterd').with(
-          'ensure' => 'directory',
-          'owner'  => 'root',
-          'group'  => 'root'
-          )
-        }
+        directories = {
+          'rackdir'       => '/usr/share/puppet/rack',
+          'puppetmasterd' => '/usr/share/puppet/rack/puppetmasterd',
+          'publicdir'     => '/usr/share/puppet/rack/puppetmasterd/public',
+          'tmpdir'        => '/usr/share/puppet/rack/puppetmasterd/tmp'
+        }.each do |dir, path|
+          it { should contain_file(path).with(
+            'ensure' => 'directory',
+            'owner'  => 'root',
+            'group'  => 'root'
+            )
+          }
+        end
         it { should contain_file('/usr/share/puppet/rack/puppetmasterd/config.ru').with(
           'ensure'  => 'file',
           'owner'   => 'puppet',
@@ -56,6 +57,15 @@ describe 'puppet::master::apache', :type => :class do
             'ARGV << "--vardir"  << "/var/lib/puppet"',
           ])
         end
+        it { should contain_exec('generate_master-cert').with(
+          'path'      => '/bin:/sbin:/usr/bin:/usr/sbin',
+          'cwd'       => '/etc/puppet',
+          'command'   => 'puppet cert generate $(puppet master --configprint certname)',
+          'unless'    => 'test -e /etc/puppet/ssl/certs/master.copperfroghosting.net.pem',
+          'logoutput' => 'on_failure',
+          'require'   => 'Class[Puppet::Master::Configure]'
+        )}
+        it { should contain_a2mod('headers') }
         it { should contain_apache__vhost('puppetmaster').with(
           'priority'   => '10',
           'vhost_name' => '*',

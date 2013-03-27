@@ -27,8 +27,10 @@ class puppet::master::apache inherits puppet::params {
 
 # == Class: puppet::master::apache::configure
 #
-# This configures the Puppet Master for apache. It defines the
-# vhost settings necessary by providing a custom vhost configuration template.
+# This configures the Puppet Master for apache. It configures all resources
+# necessary for passenger operation and generates the necessary SSL certificates.
+# It defines the apache and vhost settings necessary by providing a custom vhost
+# configuration template.
 #
 # === Examples
 #
@@ -37,7 +39,6 @@ class puppet::master::apache inherits puppet::params {
 class puppet::master::apache::configure {
   require ( 'apache', 'passenger' )
   require apache::mod::ssl
-
 
   file { [
       $puppet::params::rackdir,
