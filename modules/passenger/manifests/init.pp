@@ -52,7 +52,12 @@ class passenger (
 
   case $osfamily {
     'debian': {
-      package { ['libopenssl-ruby', 'libcurl4-openssl-dev']:
+      if $::operatingsystem == 'Ubuntu' and $::operatingsystemversion >= 10.10 {
+        $pakages = [ 'libcurl4-openssl-dev' ]
+      } else {
+        $pakages = [ 'libopenssl-ruby', 'libcurl4-openssl-dev' ]
+      }
+      package { $pakages:
         ensure => present,
         before => Exec['compile-passenger'],
       }
