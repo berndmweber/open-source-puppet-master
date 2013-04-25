@@ -7,7 +7,7 @@ script.
 
 Travis Build Status
 -------------------
-[![Build Status](https://travis-ci.org/bernd-copperfroghosting/open-source-puppet-master.png?branch=master)](https://travis-ci.org/bernd-copperfroghosting/open-source-puppet-master)
+[![Build Status](https://travis-ci.org/berndmweber/open-source-puppet-master.png?branch=master)](https://travis-ci.org/berndmweber/open-source-puppet-master)
 
 License
 -------
@@ -20,7 +20,7 @@ Bernd Weber bernd@copperfroghosting.com
 Support
 -------
 
-Please log tickets and issues at our [Projects site](https://github.com/bernd-copperfroghosting/open-source-puppet-master/issues)
+Please log tickets and issues at our [Projects site](https://github.com/berndmweber/open-source-puppet-master/issues)
 
 Versions
 --------
