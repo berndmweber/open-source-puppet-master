@@ -42,6 +42,7 @@ Puppet::Type.newtype(:firewall) do
   feature :tcp_flags, "The ability to match on particular TCP flag settings"
   feature :pkttype, "Match a packet type"
   feature :socket, "Match open sockets"
+  feature :isfragment, "Match fragments"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -104,7 +105,11 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.host_to_ip(value)
+      begin
+        @resource.host_to_ip(value)
+      rescue Exception => e
+        self.fail("host_to_ip failed for #{value}, exception #{e}")
+      end
     end
   end
 
@@ -118,7 +123,11 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.host_to_ip(value)
+      begin
+        @resource.host_to_ip(value)
+      rescue Exception => e
+        self.fail("host_to_ip failed for #{value}, exception #{e}")
+      end
     end
   end
 
@@ -541,6 +550,14 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     newvalues(:unicast, :broadcast, :multicast)
+  end
+
+  newproperty(:isfragment, :required_features => :isfragment) do
+    desc <<-EOS
+      Set to true to match tcp fragments (requires type to be set to tcp)
+    EOS
+
+    newvalues(:true, :false)
   end
 
   newproperty(:socket, :required_features => :socket) do
