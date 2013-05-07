@@ -1,8 +1,9 @@
 *.conf
 *.dpkg-dist
-ssl
-manifests/site.pp
-modules/dashboard
-environments
 doc
+environments
 features
+manifests
+modules/dashboard
+spec
+ssl
