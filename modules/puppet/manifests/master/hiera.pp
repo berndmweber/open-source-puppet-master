@@ -32,6 +32,10 @@ class puppet::master::hiera inherits puppet::params {
 #  class { puppet::master::hiera::install : }
 #
 class puppet::master::hiera::install {
+  package { 'hiera-gpg' :
+    ensure   => present,
+    provider => 'gem',
+  }
 }
 
 # == Class: puppet::master::hiera::configure
