@@ -15,5 +15,5 @@
   :datadir: <%= scope.lookupvar( "puppet::params::hierapath" ) %>
 
 :gpg:
-  :datadir: <%= scope.lookupvar( "puppet::params::hierapath" ) %>
+  :datadir: <%= scope.lookupvar( "puppet::params::hierapath" ) %>/<%= scope.lookupvar( "puppet::params::gpgdir" ) %>
   :key_dir: <%= scope.lookupvar( "puppet::params::gpgpath" ) %>
