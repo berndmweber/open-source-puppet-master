@@ -8,3 +8,29 @@ For more information check this file -> [Readme.md](https://github.com/berndmweb
 Travis Build Status
 -------------------
 [![Build Status](https://travis-ci.org/berndmweber/open-source-puppet-master.png?branch=master)](https://travis-ci.org/berndmweber/open-source-puppet-master)
+
+GPG password usage
+------------------
+
+This system is pre-configured to use GPG encrypted yaml files to protect passwords.
+The following describes the process from scratch to be able to use this feature:
+
+* Generate a GPG key:<br />
+  ` $> sudo gpg --homedir /etc/puppet/gpgdata --gen-key`<br />
+  Do NOT provide a passphrase otherwise hiera-gpg will be unable to decrypt the files.
+  Otherwise follow the instructions and note the email address you provide for later, e.g. pm@testsystem.com. If you need to create additional entropy, just run `ls -R /`, or a grep command a couple times.
+* Add data to password.yaml. E.g.<br />
+  ```
+  ---
+  mysql:server:root_passwd: jona123
+  
+  ```
+* Encrypt the yaml file:<br />
+  ```
+  $> sudo gpg --trust-model=always --homedir=/etc/puppet/gpgdata --encrypt -o /etc/puppet/hieradata/gpgdata/passwords.gpg \
+     -r pm@testsystem.com /etc/puppet/hieradata/passwords.yaml
+  ```
+  It's important to mention that the encrypted file cannot be put into the hieradata directory
+* Delete or move the plain text passwords.yaml file to a secure (root-only accessible) location
+* You can test operation with:<br />
+  ` $> sudo hiera -d -c hiera.yaml mysql:server:root_passwd`
