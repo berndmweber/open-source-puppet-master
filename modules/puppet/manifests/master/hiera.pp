@@ -72,6 +72,10 @@ class puppet::master::hiera::configure {
     replace => false,
     require => File [ $puppet::params::hierapath ],
   }
+  file { "${puppet::params::hierapath}/${puppet::params::gpgdir}" :
+    ensure  => directory,
+    require => File [ $puppet::params::hierapath ],
+  }
   file { $puppet::params::gpgpath :
     ensure  => directory,
     mode    => '0700',
