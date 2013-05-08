@@ -47,36 +47,35 @@ class puppet::master::hiera::install {
 #  class { puppet::master::hiera::configure : }
 #
 class puppet::master::hiera::configure {
-  file { $puppet::params::hieraconf :
-    ensure  => file,
+  File {
     owner   => 'root',
     group   => 'root',
     mode    => '0755',
+  }
+  file { $puppet::params::hieraconf :
+    ensure  => file,
     content => template( 'puppet/hiera.yaml.erb' ),
     require => File [ $puppet::params::confdir ],
   }
   file { $puppet::params::hierapath :
     ensure => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
     require => File [ $puppet::params::hieraconf ],
   }
   file { "${puppet::params::hierapath}/common.yaml" :
     ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
     require => File [ $puppet::params::hierapath ],
   }
   file { "${puppet::params::hierapath}/passwords.yaml" :
     ensure  => file,
-    owner   => 'root',
-    group   => 'root',
     mode    => '0700',
     content => '---',
     replace => false,
     require => File [ $puppet::params::hierapath ],
+  }
+  file { $puppet::params::gpgpath :
+    ensure  => directory,
+    mode    => '0700',
+    require => File [ $puppet::params::confdir ],
   }
 }

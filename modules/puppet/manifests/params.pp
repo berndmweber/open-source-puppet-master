@@ -48,6 +48,8 @@ class puppet::params {
   $hieraconf        = "${confdir}/hiera.yaml"
   $hieradir         = 'hieradata'
   $hierapath        = "${confdir}/${hieradir}"
+  $gpgdir           = 'gpgdata'
+  $gpgpath          = "${confdir}/${gpgdir}"
   $masterport       = '8140'
   $puppet_modules   = {
     'self'   => [ 'ruby' ],
