@@ -68,7 +68,6 @@ class puppet::master::hiera::configure {
   }
   file { "${puppet::params::hierapath}/passwords.yaml" :
     ensure  => file,
-    mode    => '0700',
     content => '---',
     replace => false,
     require => File [ $puppet::params::hierapath ],
