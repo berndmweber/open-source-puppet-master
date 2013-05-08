@@ -142,12 +142,6 @@ class puppet::master::configure (
     recurse => true,
     require => File [ $puppet::params::confdir ],
   }
-  if $enable_hiera == true {
-    class { 'puppet::master::hiera' : }
-    $mysql_server_rootpw = hiera( 'mysql:server:root_passwd' )
-  } else {
-    $mysql_server_rootpw = 'root123'
-  }
   file { "${puppet::params::manifestpath['production']}/site.pp" :
     ensure  => file,
     content => template ( 'puppet/site.pp.erb' ),
@@ -164,6 +158,9 @@ class puppet::master::configure (
   ] :
     ensure  => directory,
     require => File [ $puppet::params::confdir ],
+  }
+  if $enable_hiera == true {
+    class { 'puppet::master::hiera' : }
   }
 }
 
