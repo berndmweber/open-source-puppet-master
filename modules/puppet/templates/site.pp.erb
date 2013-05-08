@@ -26,7 +26,7 @@ node /<%= fhn %>/ {
   class { 'mysql' : }
   class { 'mysql::ruby' : }
   class { 'mysql::server' :
-    config_hash => { 'root_password' => 'root123' }
+    config_hash => { 'root_password' => @mysql_server_rootpw }
   }
   mysql::server::config { 'basic_config' :
     settings => {
