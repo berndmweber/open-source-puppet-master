@@ -70,4 +70,13 @@ class puppet::master::hiera::configure {
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
     require => File [ $puppet::params::hierapath ],
   }
+  file { "${puppet::params::hierapath}/passwords.yaml" :
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0700',
+    content => '---',
+    replace => false,
+    require => File [ $puppet::params::hierapath ],
+  }
 }
