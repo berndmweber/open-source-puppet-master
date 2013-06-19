@@ -15,7 +15,7 @@ GPL v2
 
 Contact
 -------
-Bernd Weber bernd@copperfroghosting.com
+Bernd Weber bernd@nvisionary.com
 
 Support
 -------
