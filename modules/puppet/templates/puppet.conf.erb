@@ -9,11 +9,15 @@
     logdir = <%= scope.lookupvar( "puppet::params::logdir" ) %>
     rundir = <%= scope.lookupvar( "puppet::params::rundir" ) %>
     ssldir = <%= scope.lookupvar( "puppet::params::ssldir" ) %>
+    factpath = <%= scope.lookupvar( "puppet::params::factdir" ) %>
+    templatedir =  <%= scope.lookupvar( "puppet::params::templatedir" ) %>
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
     user = <%= scope.lookupvar( "puppet::params::user" ) %>
     group = <%= scope.lookupvar( "puppet::params::group" ) %>
     archive_files = true
     archive_file_server = <%= fhn %>
+    #prerun_command=/etc/puppet/etckeeper-commit-pre
+    #postrun_command=/etc/puppet/etckeeper-commit-post
 
 <% if @is_master == true -%>
 [master]

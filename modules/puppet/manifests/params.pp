@@ -23,6 +23,8 @@ class puppet::params {
   $logdir           = '/var/log/puppet'
   $ssldir           = "${confdir}/ssl"
   $reportsdir       = "${vardir}/reports"
+  $factdir          = "${vardir}/lib/facter"
+  $templatedir      = "${confdir}/templates"
   $rackdir          = '/usr/share/puppet/rack'
   $pmrackdir        = 'puppetmasterd'
   $pmrackpath       = "${rackdir}/${pmrackdir}"
