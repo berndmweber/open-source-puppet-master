@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'puppet', :type => :class do
   context 'On a Ubuntu 12.04 system' do
     let(:params) {{}}
-    let(:node) { 'puppet.copperfroghosting.net' }
+    let(:node) { 'puppet.nvisionary.com' }
     let :facts do
       { :operatingsystem => 'Ubuntu',
         :operatingsystemrelease => '12.04',
@@ -39,9 +39,9 @@ describe 'puppet', :type => :class do
         'modulepath = /etc/puppet/modules',
         'user = puppet',
         'group = puppet',
-        'archive_file_server = puppet.copperfroghosting.net',
-        'certname = puppet.copperfroghosting.net',
-        'server = puppet.copperfroghosting.net',
+        'archive_file_server = puppet.nvisionary.com',
+        'certname = puppet.nvisionary.com',
+        'server = puppet.nvisionary.com',
       ])
       verify_template_not(subject, '/etc/puppet/puppet.conf', [
         '\[master\]',

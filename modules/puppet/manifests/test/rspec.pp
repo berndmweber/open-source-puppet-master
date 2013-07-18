@@ -8,11 +8,7 @@
 #
 # === Authors
 #
-# Bernd Weber <mailto:bernd@copperfroghosting.com>
-#
-# === Copyright
-#
-# Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
+# Bernd Weber <mailto:bernd@nvisionary.com>
 #
 class puppet::test::rspec inherits puppet::params {
   class { 'puppet::test::rspec::install' : }

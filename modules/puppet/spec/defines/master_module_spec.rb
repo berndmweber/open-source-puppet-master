@@ -25,8 +25,8 @@ describe 'puppet::master::module', :type => :define do
         
         describe 'with contributor specified' do
           {
-            'puppetlabs'        => {},
-            'copperfroghosting' => {}
+            'puppetlabs' => {},
+            'nvisionary' => {}
           }.each do |contrib, cparams|
             
             describe "when contributor is #{contrib}" do

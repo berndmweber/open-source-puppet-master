@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe 'puppet::master', :type => :class do
-  let(:node) { 'master.copperfroghosting.net' }
+  let(:node) { 'master.nvisionary.com' }
   let :fact_defaults do
     {
       :ipaddress   => '192.168.1.111',
       :environment => 'production',
-      :domain      => 'copperfroghosting.net'
+      :domain      => 'nvisionary.com'
     }
   end
   let :default_params do
@@ -77,12 +77,12 @@ describe 'puppet::master', :type => :class do
                     'modulepath = /etc/puppet/modules',
                     'user = puppet',
                     'group = puppet',
-                    'archive_file_server = master.copperfroghosting.net',
-                    'certname = master.copperfroghosting.net',
-                    'server = master.copperfroghosting.net',
+                    'archive_file_server = master.nvisionary.com',
+                    'certname = master.nvisionary.com',
+                    'server = master.nvisionary.com',
                     '\[master\]',
-                    'certname = master.copperfroghosting.net',
-                    'dns_alt_names = puppet,puppet.copperfroghosting.net,master,master.copperfroghosting.net',
+                    'certname = master.nvisionary.com',
+                    'dns_alt_names = puppet,puppet.nvisionary.com,master,master.nvisionary.com',
                     '\[testing\]\n\s*modulepath = /etc/puppet/environments/testing/modules:/etc/puppet/modules\n\s*manifest = /etc/puppet/environments/testing/manifests/site.pp',
                     '\[development\]\n\s*modulepath = /etc/puppet/environments/development/modules:/etc/puppet/modules\n\s*manifest = /etc/puppet/environments/development/manifests/site.pp',
                   ])
@@ -166,8 +166,8 @@ describe 'puppet::master', :type => :class do
               }
               it 'should have a file site.pp with the correct contents' do
                 verify_template(subject, '/etc/puppet/manifests/site.pp', [
-                  'server => \'master.copperfroghosting.net\',',
-                  'node /master.copperfroghosting.net/ \{'
+                  'server => \'master.nvisionary.com\',',
+                  'node /master.nvisionary.com/ \{'
                 ])
               end  
               it { should contain_file('/etc/puppet/environments').with(

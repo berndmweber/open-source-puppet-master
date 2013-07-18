@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe 'puppet::test::cucumber', :type => :class do
-  let(:node) { 'master.copperfroghosting.net' }
+  let(:node) { 'master.nvisionary.com' }
   let :fact_defaults do
     {
       :ipaddress   => '192.168.1.111',
       :environment => 'production',
-      :domain      => 'copperfroghosting.net'
+      :domain      => 'nvisionary.com'
     }
   end
   describe 'with operatingsystem specific facts' do
@@ -73,13 +73,13 @@ describe 'puppet::test::cucumber', :type => :class do
         }
         it 'should have a file policy.feature with the correct contents' do
           verify_template(subject, '/etc/puppet/features/catalog/policy.feature', [
-            '    Given a node specified by "features/yaml/\<hostname\>.copperfroghosting.net.yaml"',
+            '    Given a node specified by "features/yaml/\<hostname\>.nvisionary.com.yaml"',
             '      \| master \|',
           ])
         end
-        it { should contain_file('/etc/puppet/features/yaml/master.copperfroghosting.net.yaml').with(
+        it { should contain_file('/etc/puppet/features/yaml/master.nvisionary.com.yaml').with(
           'ensure'  => 'file',
-          'source'  => '/var/lib/puppet/yaml/node/master.copperfroghosting.net.yaml',
+          'source'  => '/var/lib/puppet/yaml/node/master.nvisionary.com.yaml',
           'require' => 'File[/etc/puppet/features/yaml]'
           )
         }

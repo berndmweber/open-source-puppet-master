@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe 'puppet::test::rspec', :type => :class do
-  let(:node) { 'master.copperfroghosting.net' }
+  let(:node) { 'master.nvisionary.com' }
   let :fact_defaults do
     {
       :ipaddress   => '192.168.1.111',
       :environment => 'production',
-      :domain      => 'copperfroghosting.net'
+      :domain      => 'nvisionary.com'
     }
   end
   describe 'with operatingsystem specific facts' do

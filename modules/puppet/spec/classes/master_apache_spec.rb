@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe 'puppet::master::apache', :type => :class do
-  let(:node) { 'master.copperfroghosting.net' }
+  let(:node) { 'master.mvisionary.com' }
   let :fact_defaults do
     {
       :ipaddress   => '192.168.1.111',
       :environment => 'production',
-      :domain      => 'copperfroghosting.net'
+      :domain      => 'nvisionary.com'
     }
   end
   describe 'with operatingsystem specific facts' do
@@ -61,7 +61,7 @@ describe 'puppet::master::apache', :type => :class do
           'path'      => '/bin:/sbin:/usr/bin:/usr/sbin',
           'cwd'       => '/etc/puppet',
           'command'   => 'puppet cert generate $(puppet master --configprint certname)',
-          'unless'    => 'test -e /etc/puppet/ssl/certs/master.copperfroghosting.net.pem',
+          'unless'    => 'test -e /etc/puppet/ssl/certs/master.nvisionary.com.pem',
           'logoutput' => 'on_failure',
           'require'   => 'Class[Puppet::Master::Configure]'
         )}
@@ -79,8 +79,8 @@ describe 'puppet::master::apache', :type => :class do
           verify_template(subject, '10-puppetmaster.conf', [
             'Listen 8140',
             '<VirtualHost \*:8140>',
-            'SSLCertificateFile      /etc/puppet/ssl/certs/master.copperfroghosting.net.pem',
-            'SSLCertificateKeyFile   /etc/puppet/ssl/private_keys/master.copperfroghosting.net.pem',
+            'SSLCertificateFile      /etc/puppet/ssl/certs/master.nvisionary.com.pem',
+            'SSLCertificateKeyFile   /etc/puppet/ssl/private_keys/master.nvisionary.com.pem',
             'SSLCertificateChainFile /etc/puppet/ssl/certs/ca.pem',
             'SSLCACertificateFile    /etc/puppet/ssl/certs/ca.pem',
             'SSLCARevocationFile     /etc/puppet/ssl/ca/ca_crl.pem',

@@ -23,11 +23,7 @@
 #
 # === Authors
 #
-# Bernd Weber <mailto:bernd@copperfroghosting.com>
-#
-# === Copyright
-#
-# Copyright 2013 {Copper Frog LLC.}[copperfroghosting.com]
+# Bernd Weber <mailto:bernd@nvisionary.com>
 #
 define puppet::master::module (
   $ensure,
