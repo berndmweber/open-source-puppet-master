@@ -48,7 +48,8 @@ class passenger (
 ) inherits passenger::params {
 
   include apache
-  require apache::mod::dev
+  # NV change due to updated apache module
+  require apache::dev
 
   case $osfamily {
     'debian': {
