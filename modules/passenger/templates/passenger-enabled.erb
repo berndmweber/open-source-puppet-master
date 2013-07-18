@@ -1,5 +1,5 @@
 <IfModule mod_passenger.c>
-	PassengerRoot <%= @gem_path %>/passenger-<%= @passenger_version %>
+	PassengerRoot <%= scope.lookupvar( "passenger::params::passenger_root" ) %>
 	PassengerRuby /usr/bin/ruby
 
 	# you probably want to tune these settings
@@ -8,5 +8,5 @@
 	PassengerPoolIdleTime 1500
 	# PassengerMaxRequests 1000
 	PassengerStatThrottleRate 120
-	RailsAutoDetect On
+	PassengerEnabled on
 </IfModule>
