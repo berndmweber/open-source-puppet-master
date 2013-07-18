@@ -68,11 +68,6 @@ class puppet::master::apache::configure {
     require   => Class [ 'puppet::master::configure' ],
   }
 
-  a2mod { 'headers' :
-    ensure => present,
-    notify => Service['httpd'],
-  }
-
   apache::vhost { 'puppetmaster' :
     priority        => '10',
     vhost_name      => '*',
@@ -83,6 +78,7 @@ class puppet::master::apache::configure {
     custom_fragment => template( 'puppet/puppetmaster.conf.erb' ),
     require    => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
                     Exec [ 'generate_master-cert' ],
-                    A2mod [ 'headers', 'ssl' ] ],
+                    Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
+                  ],
   }
 }
