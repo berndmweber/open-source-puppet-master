@@ -14,7 +14,7 @@ class passenger::params {
   $passenger_version  = '4.0.10'
   $passenger_provider = 'gem'
   
-  if $passenger_version > 4 {
+  if versioncmp ($passenger_version, '4.0.0') > 0 {
     $builddir = 'buildout'
   } else {
     $builddir = 'ext'
