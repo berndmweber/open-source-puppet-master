@@ -67,5 +67,27 @@ After installing homebrew use it to install augeas, then rebuild the gem and ins
 $> ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 $> brew doctor
 $> brew install augeas
+```
+
+Make sure that the following is also installed:
+* gems 'rake' and 'rake-tasks'
+* XCode
+* 'libxml2' via homebrew
+
+In the cloned git rpository for ruby-augeas, apply the patch above.
+You'll probably also have to add the following:
+* Add a symlink
+```
+$> ln -s /usr/local/Cellar/libxml2/2.9.1/include/libxml2 /usr/local/include/libxml2
+```
+* Add this to 'extconf.rb' under the first '$CFLAGS' line:
+```
+$CFLAGS += "-I/usr/local/include -I/usr/local/include/libxml2"
+```
+
+Change the version in the 'Rakefile' to '0.5.1' so that it doesn't conflict with the official release of '0.5.0'.
+```
+$> rake
+$> rake package
 $> sudo gem install --local pkg/ruby-augeas-0.5.1.gem
 ```
