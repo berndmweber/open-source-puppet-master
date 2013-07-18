@@ -74,12 +74,13 @@ class puppet::master::apache::configure {
   }
 
   apache::vhost { 'puppetmaster' :
-    priority   => '10',
-    vhost_name => '*',
-    port       => $puppet::params::masterport,
-    template   => 'puppet/puppetmaster.conf.erb',
-    docroot    => $puppet::params::pmrackpath,
-    logroot    => $puppet::params::logdir,
+    priority        => '10',
+    vhost_name      => '*',
+    port            => $puppet::params::masterport,
+    docroot         => $puppet::params::pmrackpath,
+    logroot         => $puppet::params::logdir,
+    options         => [ 'None' ],
+    custom_fragment => template( 'puppet/puppetmaster.conf.erb' ),
     require    => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
                     Exec [ 'generate_master-cert' ],
                     A2mod [ 'headers', 'ssl' ] ],
