@@ -1,68 +1,57 @@
 # This file is controlled by puppet. Do NOT edit! #
 #
 # This is the default auth.conf file, which implements the default rules
-# used by the puppet master. (That is, the rules below will still apply
-# even if this file is deleted.)
+# used by the puppet master.
 #
-# The ACLs are evaluated in top-down order. More specific stanzas should
-# be towards the top of the file and more general ones at the bottom;
-# otherwise, the general rules may "steal" requests that should be
-# governed by the specific rules.
-#
-# See http://docs.puppetlabs.com/guides/rest_auth_conf.html for a more complete
-# description of auth.conf's behavior.
+# The ACL are checked in order of appearance in this file.
 #
 # Supported syntax:
-# Each stanza in auth.conf starts with a path to match, followed
-# by optional modifiers, and finally, a series of allow or deny
-# directives.
+# This file supports two different syntax depending on how
+# you want to express the ACL.
 #
-# Example Stanza
+# Path syntax (the one used below):
 # ---------------------------------
-# path /path/to/resource     # simple prefix match
-# # path ~ regex             # alternately, regex match
+# path /path/to/resource
 # [environment envlist]
 # [method methodlist]
 # [auth[enthicated] {yes|no|on|off|any}]
-# allow [host|backreference|*|regex]
-# deny [host|backreference|*|regex]
-# allow_ip [ip|cidr|ip_wildcard|*]
-# deny_ip [ip|cidr|ip_wildcard|*]
+# allow [host|ip|*]
+# deny [host|ip]
 #
-# The path match can either be a simple prefix match or a regular
-# expression. `path /file` would match both `/file_metadata` and
-# `/file_content`. Regex matches allow the use of backreferences
-# in the allow/deny directives.
+# The path is matched as a prefix. That is /file match at
+# the same time /file_metadat and /file_content.
 #
-# The regex syntax is the same as for Ruby regex, and captures backreferences
-# for use in the `allow` and `deny` lines of that stanza
+# Regex syntax:
+# -------------
+# This one is differenciated from the path one by a '~'
 #
-# Examples:
+# path ~ regex
+# [environment envlist]
+# [method methodlist]
+# [auth[enthicated] {yes|no|on|off|any}]
+# allow [host|ip|*]
+# deny [host|ip]
 #
-# path ~ ^/path/to/resource    # Equivalent to `path /path/to/resource`.
-# allow *                      # Allow all authenticated nodes (since auth
-#                              # defaults to `yes`).
+# The regex syntax is the same as ruby ones.
 #
-# path ~ ^/catalog/([^/]+)$    # Permit nodes to access their own catalog (by
-# allow $1                     # certname), but not any other node's catalog.
+# Ex:
+# path ~ .pp$
+# will match every resource ending in .pp (manifests files for instance)
 #
-# path ~ ^/file_(metadata|content)/extra_files/  # Only allow certain nodes to
-# auth yes                                       # access the "extra_files"
-# allow /^(.+)\.example\.com$/                   # mount point; note this must
-# allow_ip 192.168.100.0/24                      # go ABOVE the "/file" rule,
-#                                                # since it is more specific.
+# path ~ ^/path/to/resource
+# is essentially equivalent to path /path/to/resource
 #
-# environment:: restrict an ACL to a comma-separated list of environments
-# method:: restrict an ACL to a comma-separated list of HTTP methods
+# environment:: restrict an ACL to a specific set of environments
+# method:: restrict an ACL to a specific set of methods
 # auth:: restrict an ACL to an authenticated or unauthenticated request
 # the default when unspecified is to restrict the ACL to authenticated requests
 # (ie exactly as if auth yes was present).
 #
 
-### Authenticated ACLs - these rules apply only when the client
+### Authenticated ACL - those applies only when the client
 ### has a valid certificate and is thus authenticated
 
-# allow nodes to retrieve their own catalog
+# allow nodes to retrieve their own catalog (ie their configuration)
 path ~ ^/catalog/([^/]+)$
 method find
 allow $1
@@ -77,42 +66,38 @@ path /certificate_revocation_list/ca
 method find
 allow *
 
-# allow all nodes to store their reports
-path /report
+# allow all nodes to store their own reports
+path ~ ^/report/([^/]+)$
 method save
-allow *
+allow $1
 
-# Allow all nodes to access all file services; this is necessary for
-# pluginsync, file serving from modules, and file serving from custom
-# mount points (see fileserver.conf). Note that the `/file` prefix matches
-# requests to both the file_metadata and file_content paths. See "Examples"
-# above if you need more granular access control for custom mount points.
+# inconditionnally allow access to all files services
+# which means in practice that fileserver.conf will
+# still be used
 path /file
 allow *
 
-### Unauthenticated ACLs, for clients without valid certificates; authenticated
-### clients can also access these paths, though they rarely need to.
+### Unauthenticated ACL, for clients for which the current master doesn't
+### have a valid certificate; we allow authenticated users, too, because
+### there isn't a great harm in letting that request through.
 
-# allow access to the CA certificate; unauthenticated nodes need this
-# in order to validate the puppet master's certificate
+# allow access to the master CA
 path /certificate/ca
 auth any
 method find
 allow *
 
-# allow nodes to retrieve the certificate they requested earlier
 path /certificate/
 auth any
 method find
 allow *
 
-# allow nodes to request a new certificate
 path /certificate_request
 auth any
 method find, save
 allow *
 
-# deny everything else; this ACL is not strictly necessary, but
-# illustrates the default policy.
+# this one is not stricly necessary, but it has the merit
+# to show the default policy which is deny everything else
 path /
 auth any
