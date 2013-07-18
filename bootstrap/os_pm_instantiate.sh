@@ -145,7 +145,7 @@ calculate_exec_time ()
 # Evaluate the /etc/issue file to automatically extract OS
 eval_issue_os ()
 {
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}eval_issue_os \$1: ${1}${cc_normal}"
   fi
   if [ -n "${1}" ]; then
@@ -166,20 +166,20 @@ eval_issue_os ()
 # Evaluate the /etc/issue file to automatically extract OS version
 eval_issue_osversion ()
 {
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}eval_issue_osversion \$1: ${1}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -n "${1}" ]; then
     case "${1}" in
       Ubuntu)
         OSVERSION="${2:0:5}"
-        if [ ${VERBOSE} -gt 2 ]; then
+        if [ ${VERBOSE} -gt 1 ]; then
           ${ECHO} "${cc_yellow}version \$2: ${2}${cc_normal}" | ${TEE} ${LOG}
         fi
         ;;
       CentOS)
         OSVERSION="${3:0:1}"
-        if [ ${VERBOSE} -gt 2 ]; then
+        if [ ${VERBOSE} -gt 1 ]; then
           ${ECHO} "${cc_yellow}version \$3: ${3}${cc_normal}" | ${TEE} ${LOG}
         fi
         ;;
@@ -195,7 +195,7 @@ eval_issue_osversion ()
 # Make sure we have a valid OS
 eval_os ()
 {
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}eval_os \$1: ${1}${cc_normal}" | ${TEE} ${LOG}
   fi
   if [ -n "${1}" ]; then
@@ -223,7 +223,7 @@ eval_os ()
 # Make sure the OS-version matches the OS and is supported
 eval_osversion ()
 {
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}eval_osversion${cc_normal}" | ${TEE} ${LOG}
   fi
   case "${OS}" in
@@ -275,7 +275,7 @@ fi
 # Make sure we have all answers. Otherwise ask the user for input on missing information
 if [ -z "${OS}" ]; then
   foundos=0
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}OS not found${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_issue_os ${TEMPOS}
@@ -285,18 +285,18 @@ if [ -z "${OS}" ]; then
   fi
 else
   foundos=1
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_green}OS found${cc_normal}" | ${TEE} ${LOG}
   fi
 fi
 if [ ${foundos} -eq 1 ]; then
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_green}foundos is true${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_os ${OS}
   validos=$?
   if [ ${validos} -eq 0 ]; then
-    if [ ${VERBOSE} -gt 2 ]; then
+    if [ ${VERBOSE} -gt 1 ]; then
       ${ECHO} "${cc_red}invalid OS found: ${cc_yellow}${OS}${cc_normal}" | ${TEE} ${LOG}
     fi
     foundos=0
@@ -329,7 +329,7 @@ if [ ${foundos} -eq 0 ]; then
 fi
 if [ -z "${OSVERSION}" ]; then
   foundosversion=0
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_yellow}OS version not found${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_issue_osversion ${TEMPOS}
@@ -339,18 +339,18 @@ if [ -z "${OSVERSION}" ]; then
   fi
 else
   foundosversion=1
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_green}OS version found: ${foundosversion}${cc_normal}" | ${TEE} ${LOG}
   fi
 fi
 if [ ${foundosversion} -eq 1 ]; then
-  if [ ${VERBOSE} -gt 2 ]; then
+  if [ ${VERBOSE} -gt 1 ]; then
     ${ECHO} "${cc_green}foundosversion is true${cc_normal}" | ${TEE} ${LOG}
   fi
   eval_osversion ${OS}
   validosversion=$?
   if [ ${validosversion} -eq 0 ]; then
-    if [ ${VERBOSE} -gt 2 ]; then
+    if [ ${VERBOSE} -gt 1 ]; then
       ${ECHO} "${cc_red}invalid OS found: ${cc_yellow}${OSVERSION}${cc_normal}" | ${TEE} ${LOG}
     fi
     foundosversion=0
@@ -471,7 +471,7 @@ if [ ${VERBOSE} -lt 1 ]; then
 fi
 if [ ! -e "${REPOFILE}" ]; then
 	dl="${CURL} ${silent} -o /tmp/${REPOFILE} http://${REPOPATH}/${REPOFILE}"
-	if [ ${VERBOSE} -gt 2 ]; then
+	if [ ${VERBOSE} -gt 1 ]; then
 	  ${ECHO} "${dl}" | ${TEE} ${LOG}
 	fi
 	if [ ${VERBOSE} -gt 0 ]; then
@@ -485,7 +485,7 @@ fi
 repo_check ${REPOFILEBASE}
 if [ "$?" -gt 0 ]; then
 	rinstall="${REPOINSTALL} /tmp/${REPOFILE}"
-	if [ ${VERBOSE} -gt 2 ]; then
+	if [ ${VERBOSE} -gt 1 ]; then
 	  ${ECHO} "${rinstall}" | ${TEE} ${LOG}
 	fi
 	if [ ${VERBOSE} -gt 0 ]; then
@@ -501,7 +501,7 @@ ${ECHO} | ${TEE} ${LOG}
 
 # Update the repository information
 ${ECHO} " ${cc_blue}Updaing ${cc_yellow}APT${cc_blue} with new information...${cc_normal}" | ${TEE} ${LOG}
-if [ ${VERBOSE} -gt 2 ]; then
+if [ ${VERBOSE} -gt 1 ]; then
   ${ECHO} "${REPOUPDATE}" | ${TEE} ${LOG}
 fi
 if [ ${VERBOSE} -gt 0 ]; then
@@ -520,7 +520,7 @@ while [ ${bpi} -lt ${bpc} ]; do
 	repo_check ${BASEPACKAGES[${bpi}]}
   if [ "$?" -gt 0 ]; then
 		pkginst="${PKGINSTALL} ${BASEPACKAGES[${bpi}]}"
-		if [ ${VERBOSE} -gt 2 ]; then
+		if [ ${VERBOSE} -gt 1 ]; then
 		  ${ECHO} "${pkginst}" | ${TEE} ${LOG}
 		fi
 		if [ ${VERBOSE} -gt 0 ]; then
@@ -548,7 +548,7 @@ if [ "${PUPPETDIR}" == "${SCRIPTDIR}/${TEMPPUPPETDIR}" ]; then
 fi
 if [ ! -d "${TEMPPUPPETDIR}" ]; then
 	dlghrepo="git clone --progress ${GITHUBREPO} ${TEMPPUPPETDIR}"
-	if [ ${VERBOSE} -gt 2 ]; then
+	if [ ${VERBOSE} -gt 1 ]; then
 	  ${ECHO} "${dlghrepo}" | ${TEE} ${LOG}
 	fi
 	if [ ${VERBOSE} -gt 0 ]; then
@@ -566,7 +566,7 @@ ${ECHO} | ${TEE} ${LOG}
 ${ECHO} " ${cc_blue}Install ${cc_yellow}puppet master${cc_blue} through puppet base installation...${cc_normal}" | ${TEE} ${LOG}
 PUPPET=`which puppet`
 puppetize="${PUPPET} apply --modulepath=${SCRIPTDIR}/${TEMPPUPPETDIR}/modules ${SCRIPTDIR}/${TEMPPUPPETDIR}/${PUPPETINSTALLCONFIG}"
-if [ ${VERBOSE} -gt 2 ]; then
+if [ ${VERBOSE} -gt 1 ]; then
   ${ECHO} "${puppetize}" | ${TEE} ${LOG}
 fi
 if [ ${VERBOSE} -gt 0 ]; then
