@@ -68,6 +68,8 @@ class puppet::master::apache::configure {
     require   => Class [ 'puppet::master::configure' ],
   }
 
+  class { 'apache::mod::headers' : }
+
   apache::vhost { 'puppetmaster' :
     priority        => '10',
     vhost_name      => '*',
