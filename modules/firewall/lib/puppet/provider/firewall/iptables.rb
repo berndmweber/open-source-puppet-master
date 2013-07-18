@@ -22,6 +22,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :pkttype
   has_feature :isfragment
   has_feature :socket
+  has_feature :address_type
+  has_feature :iprange
 
   optional_commands({
     :iptables => 'iptables',
@@ -42,6 +44,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
+    :dst_type => "-m addrtype --dst-type",
+    :dst_range => "-m iprange --dst-range",
     :dport => ["-m multiport --dports", "-m (udp|tcp) --dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
@@ -58,6 +62,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
+    :src_type => "-m addrtype --src-type",
+    :src_range => "-m iprange --src-range",
     :sport => ["-m multiport --sports", "-m (udp|tcp) --sport"],
     :state => "-m state --state",
     :table => "-t",
@@ -85,9 +91,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
-    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
+    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :dst_type, :src_type, :socket, :pkttype, :name, :state, :icmp,
+    :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
+    :log_level, :reject, :set_mark]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -166,7 +174,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       if bool == :isfragment then
         # only replace those -f that are not followed by an l to
         # distinguish between -f and the '-f' inside of --tcp-flags.
-        values = values.sub(/-f(?=[^l])/, '-f true')
+        values = values.sub(/-f(?!l)(?=.*--comment)/, '-f true')
       end
     end
 
@@ -228,18 +236,29 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # iptables-save and user supplied resources is consistent.
     hash[:state] = hash[:state].sort unless hash[:state].nil?
 
-    # This forces all existing, commentless rules to be moved to the bottom of the stack.
-    # Puppet-firewall requires that all rules have comments (resource names) and will fail if
-    # a rule in iptables does not have a comment. We get around this by appending a high level
+    # This forces all existing, commentless rules or rules with invalid comments to be moved 
+    # to the bottom of the stack.
+    # Puppet-firewall requires that all rules have comments (resource names) and match this 
+    # regex and will fail if a rule in iptables does not have a comment. We get around this 
+    # by appending a high level
     if ! hash[:name]
       num = 9000 + counter
       hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
+    elsif not /^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/ =~ hash[:name]
+      num = 9000 + counter
+      hash[:name] = "#{num} #{/([[:alpha:][:digit:][:punct:][:space:]]+)/.match(hash[:name])[1]}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
     if hash[:jump] == 'LOG' && ! hash[:log_level]
       hash[:log_level] = '4'
+    end
+
+    # Iptables defaults to burst '5', so it is ommitted from the output of iptables-save.
+    # If the :limit value is set and you don't have a burst set, we assume it to be '5'.
+    if hash[:limit] && ! hash[:burst]
+      hash[:burst] = '5'
     end
 
     hash[:line] = line
@@ -277,30 +296,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def delete_args
-    count = []
-    line = properties[:line].gsub(/\-A/, '-D').split
-
-    # Grab all comment indices
-    line.each do |v|
-      if v =~ /"/
-        count << line.index(v)
-      end
-    end
-
-    if ! count.empty?
-      # Remove quotes and set first comment index to full string
-      line[count.first] = line[count.first..count.last].join(' ').gsub(/"/, '')
-
-      # Make all remaining comment indices nil
-      ((count.first + 1)..count.last).each do |i|
-        line[i] = nil
-      end
-    end
-
+    # Split into arguments
+    line = properties[:line].gsub(/\-A/, '-D').split(/\s(?=(?:[^"]|"[^"]*")*$)/).map{|v| v.gsub(/"/, '')}
     line.unshift("-t", properties[:table])
-
-    # Return array without nils
-    line.compact
   end
 
   # This method takes the resource, and attempts to generate the command line

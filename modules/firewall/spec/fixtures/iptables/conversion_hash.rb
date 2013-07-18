@@ -117,6 +117,34 @@ ARGS_TO_HASH = {
       :sport => ["15","512-1024"],
     },
   },
+  'dst_type_1' => {
+    :line => '-A INPUT -m addrtype --dst-type LOCAL',
+    :table => 'filter',
+    :params => {
+      :dst_type => 'LOCAL',
+    },
+  },
+  'src_type_1' => {
+    :line => '-A INPUT -m addrtype --src-type LOCAL',
+    :table => 'filter',
+    :params => {
+      :src_type => 'LOCAL',
+    },
+  },
+  'dst_range_1' => {
+    :line => '-A INPUT -m iprange --dst-range 10.0.0.2-10.0.0.20',
+    :table => 'filter',
+    :params => {
+      :dst_range => '10.0.0.2-10.0.0.20',
+    },
+  },
+  'src_range_1' => {
+    :line => '-A INPUT -m iprange --src-range 10.0.0.2-10.0.0.20',
+    :table => 'filter',
+    :params => {
+      :src_range => '10.0.0.2-10.0.0.20',
+    },
+  },
   'tcp_flags_1' => {
     :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
     :table => 'filter',
@@ -167,12 +195,22 @@ ARGS_TO_HASH = {
       :jump => 'LOG'
     },
   },
-  'load_limit_module' => {
+  'load_limit_module_and_implicit_burst' => {
     :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 15/hour',
     :table => 'filter',
     :params => {
       :dport => ['123'],
-      :limit => '15/hour'
+      :limit => '15/hour',
+      :burst => '5'
+    },
+  },
+  'limit_with_explicit_burst' => {
+    :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 30/hour --limit-burst 10',
+    :table => 'filter',
+    :params => {
+      :dport => ['123'],
+      :limit => '30/hour',
+      :burst => '10'
     },
   },
   'proto_ipencap' => {
@@ -296,6 +334,15 @@ ARGS_TO_HASH = {
       :action => 'accept',
       :chain => 'PREROUTING',
       :socket => true,
+    },
+  },
+  'isfragment_option' => {
+    :line => '-A INPUT -f -m comment --comment "010 a-f comment with dashf" -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :name => '010 a-f comment with dashf',
+      :action => 'accept',
+      :isfragment => true,
     },
   },
   'single_tcp_sport' => {
@@ -470,6 +517,38 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
   },
+  'dst_type_1' => {
+    :params => {
+      :name => '000 dst_type',
+      :table => 'filter',
+      :dst_type => 'LOCAL',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', :LOCAL, '-m', 'comment', '--comment', '000 dst_type'],
+  },
+  'src_type_1' => {
+    :params => {
+      :name => '000 src_type',
+      :table => 'filter',
+      :src_type => 'LOCAL',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', :LOCAL, '-m', 'comment', '--comment', '000 src_type'],
+  },
+  'dst_range_1' => {
+    :params => {
+      :name => '000 dst_range',
+      :table => 'filter',
+      :dst_range => '10.0.0.1-10.0.0.10',
+    },
+    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 dst_range'],
+  },
+  'src_range_1' => {
+    :params => {
+      :name => '000 src_range',
+      :table => 'filter',
+      :dst_range => '10.0.0.1-10.0.0.10',
+    },
+    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 src_range'],
+  },
   'tcp_flags_1' => {
     :params => {
       :name => "000 initiation",
@@ -524,7 +603,7 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '4'],
   },
-  'load_limit_module' => {
+  'load_limit_module_and_implicit_burst' => {
     :params => {
       :name => '057 INPUT limit NTP',
       :table => 'filter',
@@ -532,6 +611,16 @@ HASH_TO_ARGS = {
       :limit => '15/hour'
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '15/hour'],
+  },
+  'limit_with_explicit_burst' => {
+    :params => {
+      :name => '057 INPUT limit NTP',
+      :table => 'filter',
+      :dport => '123',
+      :limit => '30/hour',
+      :burst => '10'
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '30/hour', '--limit-burst', '10'],
   },
   'proto_ipencap' => {
     :params => {
@@ -705,5 +794,24 @@ HASH_TO_ARGS = {
       :socket => true,
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-m', 'comment', '--comment', '050 socket option', '-j', 'ACCEPT'],
+  },
+  'isfragment_option' => {
+    :params => {
+      :name => '050 isfragment option',
+      :table => 'filter',
+      :proto => :all,
+      :action => 'accept',
+      :isfragment => true,
+    },
+    :args => ['-t', :filter, '-p', :all, '-f', '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
+  },
+  'isfragment_option not changing -f in comment' => {
+    :params => {
+      :name => '050 testcomment-with-fdashf',
+      :table => 'filter',
+      :proto => :all,
+      :action => 'accept',
+    },
+    :args => ['-t', :filter, '-p', :all, '-m', 'comment', '--comment', '050 testcomment-with-fdashf', '-j', 'ACCEPT'],
   },
 }
