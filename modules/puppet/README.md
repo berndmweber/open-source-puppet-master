@@ -32,20 +32,20 @@ Versions tested:
 * ruby - 1.8.7 (2011-06-30 patchlevel 352) [x86_64-linux]
 * gem - 1.8.15
 <p />
-* rake - 10.0.3
-* rake - 0.8.7
-<p />
+* bundler - 1.3.5
 * diff-lcs - 1.2.1
 * hiera - 1.1.2
-* json - 1.7.7
-* json_pure - 1.7.7
+* json - 1.7.7, 1.8.0
+* json_pure - 1.7.7, 1.8.0
 * meataclass - 0.0.1
-* mocha - 0.13.3
-* rdoc - 4.0.0
-* rspec - 2.13.0
-* rspec-core - 2.13.1
-* rspec-expectations - 2.13.0
-* rspec-mocks - 2.13.0
+* mocha - 0.13.3, 0.14.0
+* rake - 10.0.3, 10.1.0
+* rake-tasks - 0.2
+* rdoc - 4.0.0, 4.0.1
+* rspec - 2.13.0, 2.14.1
+* rspec-core - 2.13.1, 2.14.3
+* rspec-expectations - 2.13.0, 2,14,0
+* rspec-mocks - 2.13.0, 2.14.1
 <p />
 * rspec-puppet - 0.1.6
 * rspec-puppet-augeas - 0.2.3
