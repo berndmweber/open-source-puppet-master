@@ -3,7 +3,7 @@
 doc
 environments
 features
-manifests
+./manifests
 modules/dashboard
 spec
 ssl
