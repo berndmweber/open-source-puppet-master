@@ -74,7 +74,7 @@ class puppet::master::apache::configure {
     priority        => '10',
     vhost_name      => '*',
     port            => $puppet::params::masterport,
-    docroot         => $puppet::params::pmrackpath,
+    docroot         => "${puppet::params::pmrackpath}/public",
     logroot         => $puppet::params::logdir,
     options         => [ 'None' ],
     custom_fragment => template( 'puppet/puppetmaster.conf.erb' ),
