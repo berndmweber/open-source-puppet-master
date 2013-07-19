@@ -36,8 +36,8 @@ The following describes the process from scratch to be able to use this feature:
   ```
 * Encrypt the yaml file:<br />
   ```
-  $> sudo gpg --trust-model=always --homedir=/etc/puppet/gpgdata --encrypt -o /etc/puppet/hieradata/gpgdata/passwords.gpg \
-     -r pm@testsystem.com /etc/puppet/hieradata/passwords.yaml
+  $> sudo gpg --trust-model=always --homedir=/etc/puppet/gpgdata --encrypt -o /etc/puppet/environments/production/hieradata/gpgdata/passwords.gpg \
+     -r pm@testsystem.com /etc/puppet/environments/production/hieradata/passwords.yaml
   ```
   It's important to mention that the encrypted file cannot be put into the hieradata directory
 * Delete or move the plain text passwords.yaml file to a secure (root-only accessible) location
