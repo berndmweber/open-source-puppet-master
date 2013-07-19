@@ -175,6 +175,11 @@ describe 'puppet::master', :type => :class do
                 'require' => 'File[/etc/puppet]'
                 )
               }
+              it { should contain_file('/etc/puppet/environments/production').with(
+                'ensure'  => 'directory',
+                'require' => 'File[/etc/puppet]'
+                )
+              }
               it { should contain_file('/etc/puppet/environments/testing').with(
                 'ensure'  => 'directory',
                 'require' => 'File[/etc/puppet]'

@@ -145,6 +145,7 @@ class puppet::master::configure (
   }
   file { [
     $puppet::params::environmentspath['base'],
+    $puppet::params::environmentspath['production'],
     $puppet::params::environmentspath['testing'],
     $puppet::params::modulepath['testing'],
     $puppet::params::manifestpath['testing'],

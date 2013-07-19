@@ -53,28 +53,61 @@ class puppet::master::hiera::configure {
     content => template( 'puppet/hiera.yaml.erb' ),
     require => File [ $puppet::params::confdir ],
   }
-  file { $puppet::params::hierapath :
+  file { [
+    $puppet::params::hierapath['production'],
+    $puppet::params::hierapath['testing'],
+    $puppet::params::hierapath['development'],
+  ] :
     ensure => directory,
     require => File [ $puppet::params::hieraconf ],
   }
-  file { "${puppet::params::hierapath}/common.yaml" :
+  file { "${puppet::params::hierapath['production']}/common.yaml" :
     ensure  => file,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
-    require => File [ $puppet::params::hierapath ],
+    require => File [ $puppet::params::hierapath['production'] ],
   }
-  file { "${puppet::params::hierapath}/passwords.yaml" :
+  file { [
+    "${puppet::params::hierapath['testing']}/common.yaml",
+    "${puppet::params::hierapath['development']}/common.yaml",
+  ] :
     ensure  => file,
-    content => '---',
     replace => false,
-    require => File [ $puppet::params::hierapath ],
+    source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
   }
-  file { "${puppet::params::hierapath}/${puppet::params::gpgdir}" :
+  puppet::master::hiera::create_empty_file { [
+    "${puppet::params::hierapath['production']}/passwords.yaml",
+    "${puppet::params::hierapath['testing']}/passwords.yaml",
+    "${puppet::params::hierapath['development']}/passwords.yaml",
+  ] : }
+  file { [
+    "${puppet::params::hierapath['production']}/${puppet::params::gpgdir}",
+    "${puppet::params::hierapath['testing']}/${puppet::params::gpgdir}",
+    "${puppet::params::hierapath['development']}/${puppet::params::gpgdir}",
+  ] :
     ensure  => directory,
-    require => File [ $puppet::params::hierapath ],
   }
   file { $puppet::params::gpgpath :
     ensure  => directory,
+    owner   => 'puppet',
+    group   => 'puppet',
+    mode    => '0700',
+    require => File [ $puppet::params::vardir ],
+  }
+  file { "${puppet::params::confdir}/${puppet::params::gpgdir}" :
+    ensure  => directory,
+    owner   => 'puppet',
+    group   => 'puppet',
     mode    => '0700',
     require => File [ $puppet::params::confdir ],
+  }
+}
+
+define puppet::master::hiera::create_empty_file ()
+{
+  file { $name :
+    ensure  => file,
+    content => '---',
+    replace => false,
+    require => File [ dirname ($name) ],
   }
 }

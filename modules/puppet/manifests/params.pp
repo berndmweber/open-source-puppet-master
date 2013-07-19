@@ -27,6 +27,7 @@ class puppet::params {
   $pmconfigru       = 'config.ru'
   $environmentspath = {
     'base'        => "${confdir}/environments",
+    'production'  => "${confdir}/environments/production",
     'testing'     => "${confdir}/environments/testing",
     'development' => "${confdir}/environments/development",
   }
@@ -45,9 +46,13 @@ class puppet::params {
   $puppetconf       = "${confdir}/puppet.conf"
   $hieraconf        = "${confdir}/hiera.yaml"
   $hieradir         = 'hieradata'
-  $hierapath        = "${confdir}/${hieradir}"
+  $hierapath        = {
+    'production'  => "${$environmentspath['production']}/${hieradir}",
+    'testing'     => "${$environmentspath['testing']}/${hieradir}",
+    'development' => "${$environmentspath['development']}/${hieradir}",
+  }
   $gpgdir           = 'gpgdata'
-  $gpgpath          = "${confdir}/${gpgdir}"
+  $gpgpath          = "${vardir}/.gnupg"
   $masterport       = '8140'
   $puppet_modules   = {
     'self'   => [ 'ruby' ],

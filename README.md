@@ -16,9 +16,18 @@ This system is pre-configured to use GPG encrypted yaml files to protect passwor
 The following describes the process from scratch to be able to use this feature:
 
 * Generate a GPG key:<br />
-  ` $> sudo gpg --homedir /etc/puppet/gpgdata --gen-key`<br />
+  ` $> sudo gpg --homedir /var/lib/puppet/.gnupg --gen-key`<br />
   Do NOT provide a passphrase otherwise hiera-gpg will be unable to decrypt the files.
-  Otherwise follow the instructions and note the email address you provide for later, e.g. pm@testsystem.com. If you need to create additional entropy, just run `ls -R /`, or a grep command a couple times.
+  Otherwise follow the instructions and note the email address you provide for later, e.g. pm@testsystem.com.
+  If you need to create additional entropy, just run `ls -R /`, or a grep command a couple times.
+* Make sure the .gnupg directory is owned by Puppet:
+  ```
+  $> chown -R puppet:puppet /var/lib/puppet/.gnupg
+  ```
+* Import the public key to your puppet directory: <br />
+  ```
+  $> sudo gpg --homedir=/etc/puppet/gpgdata --import /root/.gnupg/pubring.gpg
+  ```
 * Add data to password.yaml. E.g.<br />
   ```
   ---
