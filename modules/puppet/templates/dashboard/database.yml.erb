@@ -47,21 +47,21 @@
 # 
 production:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['production'] %>
-  username: <%= scope.lookupvar( "puppet::params::dashboard_user" ) %>
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
   password: <%= @db_password %>
   encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
   adapter: mysql
 
 development:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['production'] %>
-  username: <%= scope.lookupvar( "puppet::params::dashboard_user" ) %>
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
   password: <%= @db_password %>
   encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
   adapter: mysql
 
 testing:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['production'] %>
-  username: <%= scope.lookupvar( "puppet::params::dashboard_user" ) %>
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
   password: <%= @db_password %>
   encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
   adapter: mysql
