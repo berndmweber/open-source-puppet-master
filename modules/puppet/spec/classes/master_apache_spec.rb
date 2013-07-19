@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 describe 'puppet::master::apache', :type => :class do
-  let(:node) { 'master.mvisionary.com' }
+  let(:node) { 'master.nvisionary.com' }
   let :fact_defaults do
     {
-      :ipaddress   => '192.168.1.111',
-      :environment => 'production',
-      :domain      => 'nvisionary.com'
+      :ipaddress      => '192.168.1.111',
+      :environment    => 'production',
+      :domain         => 'nvisionary.com',
+      :concat_basedir => '/tmp',
     }
   end
   describe 'with operatingsystem specific facts' do
@@ -25,6 +26,9 @@ describe 'puppet::master::apache', :type => :class do
         
         it { should include_class('puppet::params') }
         it { should include_class('puppet::master') }
+        it { should include_class('passenger') }
+        it { should include_class('apache::mod::headers') }
+        it { should include_class('apache::mod::ssl') }
         it { should contain_class('puppet::master').with(
           'type' => 'apache'
           )
@@ -65,19 +69,18 @@ describe 'puppet::master::apache', :type => :class do
           'logoutput' => 'on_failure',
           'require'   => 'Class[Puppet::Master::Configure]'
         )}
-        it { should contain_a2mod('headers') }
         it { should contain_apache__vhost('puppetmaster').with(
-          'priority'   => '10',
-          'vhost_name' => '*',
-          'port'       => '8140',
-          'template'   => 'puppet/puppetmaster.conf.erb',
-          'docroot'    => '/usr/share/puppet/rack/puppetmasterd',
-          'logroot'    => '/var/log/puppet'
+          'priority'        => '10',
+          'vhost_name'      => '*',
+          'port'            => '8140',
+          'options'         => 'None',
+          'custom_fragment' => %r{RackBaseURI /\n},
+          'docroot'         => '/usr/share/puppet/rack/puppetmasterd/public',
+          'logroot'         => '/var/log/puppet'
           )
         }
         it 'should have a file 10-puppetmaster.conf with the correct contents' do
           verify_template(subject, '10-puppetmaster.conf', [
-            'Listen 8140',
             '<VirtualHost \*:8140>',
             'SSLCertificateFile      /etc/puppet/ssl/certs/master.nvisionary.com.pem',
             'SSLCertificateKeyFile   /etc/puppet/ssl/private_keys/master.nvisionary.com.pem',
@@ -85,7 +88,12 @@ describe 'puppet::master::apache', :type => :class do
             'SSLCACertificateFile    /etc/puppet/ssl/certs/ca.pem',
             'SSLCARevocationFile     /etc/puppet/ssl/ca/ca_crl.pem',
             'DocumentRoot /usr/share/puppet/rack/puppetmasterd/public',
-            '<Directory /usr/share/puppet/rack/puppetmasterd/>'
+            '<Directory /usr/share/puppet/rack/puppetmasterd/public>',
+            'Options None',
+            'AllowOverride None',
+            'Order allow,deny',
+            'Allow from all',
+            'RackBaseURI /'
           ])
         end  
         

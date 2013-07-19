@@ -34,6 +34,7 @@ class puppet::master::apache inherits puppet::params {
 #
 class puppet::master::apache::configure {
   require ( 'apache', 'passenger' )
+  require apache::mod::headers
   require apache::mod::ssl
 
   file { [
@@ -64,8 +65,6 @@ class puppet::master::apache::configure {
     require   => Class [ 'puppet::master::configure' ],
   }
 
-  class { 'apache::mod::headers' : }
-
   apache::vhost { 'puppetmaster' :
     priority        => '10',
     vhost_name      => '*',
@@ -74,9 +73,9 @@ class puppet::master::apache::configure {
     logroot         => $puppet::params::logdir,
     options         => [ 'None' ],
     custom_fragment => template( 'puppet/puppetmaster.conf.erb' ),
-    require    => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
-                    Exec [ 'generate_master-cert' ],
-                    Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
-                  ],
+    require         => [ File [ "${puppet::params::pmrackpath}/${puppet::params::pmconfigru}" ],
+                         Exec [ 'generate_master-cert' ],
+                         Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
+                       ],
   }
 }

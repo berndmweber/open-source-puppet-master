@@ -6,4 +6,4 @@ fixtures:
     apache: "#{source_dir}/../apache"
     stdlib: "#{source_dir}/../stdlib"
     firewall: "#{source_dir}/../firewall"
-    
+    concat: "#{source_dir}/../concat"
