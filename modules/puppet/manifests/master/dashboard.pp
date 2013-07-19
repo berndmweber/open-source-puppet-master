@@ -104,16 +104,17 @@ class puppet::master::dashboard::configure {
   }
   exec { 'configure_production_db' :
     cwd         => $puppet::params::dashboard_path,
-    path        => ['/usr/bin', '/bin'],
+    path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake RAILS_ENV=production db:migrate",
-    refreshonly => true,
+    logoutput   => on_failure,
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }
   exec { 'configure_development_db' :
     cwd         => $puppet::params::dashboard_path,
-    path        => ['/usr/bin', '/bin'],
+    path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake db:migrate db:test:prepare",
     refreshonly => true,
+    logoutput   => on_failure,
     require     => Exec [ 'configure_production_db' ],
   }
   file { "${puppet::params::dashboard_path}/config/settings.yml" :
