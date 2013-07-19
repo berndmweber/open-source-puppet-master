@@ -26,7 +26,7 @@ node /<%= fhn %>/ {
   class { 'mysql' : }
   class { 'mysql::ruby' : }
   class { 'mysql::server' :
-    config_hash => { 'root_password' => hiera( 'mysql:server:root_passwd' ) }
+    config_hash => { 'root_password' => hiera( 'mysql::server::root_passwd' ) }
   }
   mysql::server::config { 'basic_config' :
     settings => {
