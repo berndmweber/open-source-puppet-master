@@ -18,6 +18,11 @@ node default {
   #   class { 'my_class': }
 }
 
+$hiera_gpg_check = hiera( 'mysql::server::root_passwd', 'N/A' )
+if $hiera_gpg_check == 'N/A' {
+    fail ( '     You need to configure GPG first. Please follow the instructions here: https://github.com/berndmweber/open-source-puppet-master#gpg-password-usage     ' )
+}
+
 node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
