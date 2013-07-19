@@ -75,6 +75,13 @@ describe 'puppet::master::hiera', :type => :class do
           'mode'    => '0755'
           )
         }
+        it { should contain_file('/etc/puppet/environments/production/hieradata/master.nvisionary.com.yaml').with(
+          'ensure'  => 'file',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0755'
+          )
+        }
         it { should contain_file('/etc/puppet/environments/testing/hieradata/common.yaml').with(
           'ensure'  => 'file',
           'replace' => false,

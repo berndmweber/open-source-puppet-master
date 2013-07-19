@@ -30,9 +30,7 @@ node /<%= fhn %>/ {
   class { 'puppet::master::apache' : }
   class { 'mysql' : }
   class { 'mysql::ruby' : }
-  class { 'mysql::server' :
-    config_hash => { 'root_password' => hiera( 'mysql::server::root_passwd' ) }
-  }
+  class { 'mysql::server' : }
   mysql::server::config { 'basic_config' :
     settings => {
       'mysqld' => {
@@ -40,4 +38,5 @@ node /<%= fhn %>/ {
       }
     }
   }
+  class { 'puppet::master::dashboard' : }
 }

@@ -21,7 +21,6 @@ class puppet inherits puppet::params {
   }
 }
 
-
 # == Class: puppet::install
 #
 # This is the Puppet installation class. It installs the Puppet base packages.

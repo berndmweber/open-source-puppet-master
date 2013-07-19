@@ -73,6 +73,13 @@ class puppet::params {
   $dashboard_path         = "${vardir}/${dashboard_base_name}"
   $dashboard_user         = 'puppet-dashboard'
   $dashboard_group        = 'puppet-dashboard'
+  $dashboard_db           = {
+    'production'  => 'dashboard_production',
+    'development' => 'dashboard_development',
+    'testing'     => 'dashboard_testing',
+  }
+  $dashboard_db_user      = 'pm_dashboard'
+  $dashboard_db_encoding  = 'utf8'
 
   case $::operatingsystem {
     'Ubuntu' : {

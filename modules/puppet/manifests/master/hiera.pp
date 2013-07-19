@@ -66,6 +66,11 @@ class puppet::master::hiera::configure {
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
     require => File [ $puppet::params::hierapath['production'] ],
   }
+  file { "${puppet::params::hierapath['production']}/${::fqdn}.yaml" :
+    ensure  => file,
+    source  => "puppet:///modules/puppet/${puppet::params::hieradir}/master.yaml",
+    require => File [ $puppet::params::hierapath['production'] ],
+  }
   file { [
     "${puppet::params::hierapath['testing']}/common.yaml",
     "${puppet::params::hierapath['development']}/common.yaml",

@@ -1,0 +1,3 @@
+---
+mysql::config::default_storage_engine: 'InnoDB'
+mysql::config::max_allowed_packet: '32M'

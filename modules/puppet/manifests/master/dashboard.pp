@@ -79,6 +79,47 @@ class puppet::master::dashboard::install {
 #  class { puppet::master::dashboard::configure : }
 #
 class puppet::master::dashboard::configure {
+  File {
+    owner => $puppet::params::dashboard_user,
+    group => $puppet::params::dashboard_group,
+  }
   
+  $db_password = hiera ( 'puppet::master::dashboard::mysql::db::password' )
+  mysql::db { [
+    $puppet::params::dashboard_db['production'],
+    $puppet::params::dashboard_db['development'],
+    $puppet::params::dashboard_db['testing'],
+  ] :
+    user     => $puppet::params::dashboard_db_user,
+    password => $db_password,
+    host     => 'localhost',
+    grant    => ['all'],
+    charset  => $puppet::params::dashboard_db_encoding,
+    before   => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
+  }
+  file { "${puppet::params::dashboard_path}/config/database.yml" :
+    ensure  => file,
+    mode    => '0660',
+    content => template ( 'puppet/dashboard/database.yml.erb' ),
+  }
+  exec { 'configure_production_db' :
+    cwd         => $puppet::params::dashboard_path,
+    path        => ['/usr/bin', '/bin'],
+    command     => "rake RAILS_ENV=production db:migrate",
+    refreshonly => true,
+    require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
+  }
+  exec { 'configure_development_db' :
+    cwd         => $puppet::params::dashboard_path,
+    path        => ['/usr/bin', '/bin'],
+    command     => "rake db:migrate db:test:prepare",
+    refreshonly => true,
+    require     => Exec [ 'configure_production_db' ],
+  }
+  file { "${puppet::params::dashboard_path}/config/settings.yml" :
+    ensure  => file,
+    mode    => '0660',
+    content => template ( 'puppet/dashboard/settings.yml.erb' ),
+  }
 }
 
