@@ -136,6 +136,12 @@ describe 'puppet::master', :type => :class do
                 'recurse' => true
                 )
               }
+              it { should contain_file('/var/lib/puppet').with(
+                'ensure'  => 'directory',
+                'owner'   => 'puppet',
+                'group'   => 'puppet'
+                )
+              }
               it { should contain_file('/etc/puppet/ssl').with(
                 'ensure' => 'directory',
                 'owner'  => 'puppet',

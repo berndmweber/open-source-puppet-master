@@ -116,6 +116,11 @@ class puppet::master::configure (
     require => File [ $puppet::params::confdir ],
     notify  => Service [ $puppet::params::masterservice[$type] ],
   }
+  file { $puppet::params::vardir :
+    ensure  => directory,
+    owner   => $puppet::params::user,
+    group   => $puppet::params::group,
+  }
   file { $puppet::params::reportsdir :
     ensure  => directory,
     owner   => $puppet::params::user,

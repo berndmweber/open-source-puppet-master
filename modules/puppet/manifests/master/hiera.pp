@@ -88,15 +88,15 @@ class puppet::master::hiera::configure {
   }
   file { $puppet::params::gpgpath :
     ensure  => directory,
-    owner   => 'puppet',
-    group   => 'puppet',
+    owner   => $puppet::params::user,
+    group   => $puppet::params::group,
     mode    => '0700',
     require => File [ $puppet::params::vardir ],
   }
   file { "${puppet::params::confdir}/${puppet::params::gpgdir}" :
     ensure  => directory,
-    owner   => 'puppet',
-    group   => 'puppet',
+    owner   => $puppet::params::user,
+    group   => $puppet::params::group,
     mode    => '0700',
     require => File [ $puppet::params::confdir ],
   }
