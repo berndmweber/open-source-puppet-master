@@ -53,6 +53,7 @@ class puppet::master::apache::configure {
     owner   => 'puppet',
     group   => 'puppet',
     content => template ( "puppet/${puppet::params::pmconfigru}.erb" ),
+    notify  => Service [ 'httpd' ],
     require => File [ $puppet::params::pmrackpath ],
   }
 

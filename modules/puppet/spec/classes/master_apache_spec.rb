@@ -52,6 +52,7 @@ describe 'puppet::master::apache', :type => :class do
           'ensure'  => 'file',
           'owner'   => 'puppet',
           'group'   => 'puppet',
+          'notify'  => 'Service[httpd]',
           'require' => 'File[/usr/share/puppet/rack/puppetmasterd]'
           )
         }
