@@ -44,6 +44,7 @@ class puppet::params {
   $user             = 'puppet'
   $group            = 'puppet'
   $puppetconf       = "${confdir}/puppet.conf"
+
   $hieraconf        = "${confdir}/hiera.yaml"
   $hieradir         = 'hieradata'
   $hierapath        = {
@@ -53,6 +54,7 @@ class puppet::params {
   }
   $gpgdir           = 'gpgdata'
   $gpgpath          = "${vardir}/.gnupg"
+
   $masterport       = '8140'
   $puppet_modules   = {
     'self'   => [ 'ruby' ],
@@ -63,6 +65,15 @@ class puppet::params {
     'apache' => 'httpd',
   }
 
+  $dashboard_version      = '1.2.23'
+  $dashboard_base_name    = 'puppet-dashboard'
+  $dashboard_package_name = "${dashboard_base_name}-${dashboard_version}"
+  $dashboard_package      = "${dashboard_package_name}.tar.gz"
+  $dashboard_location     = "http://downloads.puppetlabs.com/dashboard/${dashboard_package}"
+  $dashboard_path         = "${vardir}/${dashboard_base_name}"
+  $dashboard_user         = 'puppet-dashboard'
+  $dashboard_group        = 'puppet-dashboard'
+
   case $::operatingsystem {
     'Ubuntu' : {
       $puppet_packages    = [ 'puppet' ]
@@ -70,7 +81,6 @@ class puppet::params {
         'self'   => 'puppetmaster',
         'apache' => 'puppetmaster-common',
       }
-      $dashboard_packages = [ 'puppet-dashboard' ]
 
       $puppet_default   = '/etc/default/puppet'
       $puppet_service   = 'puppet'
