@@ -7,11 +7,10 @@
 :logger: console
  
 :hierarchy:
-  - %{env}/%{location}/%{calling_module}
-  - %{env}/%{calling_module}
-  - passwords
-  - "%{operatingsystem}"
-  - common
+  - 'passwords'
+  - '%{::clientcert}'
+  - '%{::operatingsystem}'
+  - 'common'
  
 :yaml:
   :datadir: <%= scope.lookupvar( "puppet::params::environmentspath" )['base'] %>/%{environment}/<%= scope.lookupvar( "puppet::params::hieradir" ) %>

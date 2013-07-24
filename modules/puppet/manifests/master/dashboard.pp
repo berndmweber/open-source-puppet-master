@@ -144,6 +144,7 @@ class puppet::master::dashboard::configure {
                          Exec [ 'configure_production_db' ],
                          Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
                        ],
+    tag             => 'dashboard',
   }
   file { '/etc/init.d/dashboard-workers' :
     ensure  => file,

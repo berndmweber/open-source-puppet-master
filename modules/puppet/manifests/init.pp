@@ -51,7 +51,7 @@ class puppet::configure {
     require => Class [ 'puppet::install' ]
   }
   
-  if tagged ( 'puppet::master::dashboard' ) {
+  if tagged ( 'dashboard' ) {
     $do_dashboard_config = true
   } else {
     $do_dashboard_config = false
