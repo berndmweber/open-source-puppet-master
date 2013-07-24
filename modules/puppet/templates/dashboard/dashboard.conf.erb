@@ -10,6 +10,9 @@
            Allow from localhost
            Allow from localhost.localdomain
            Allow from 127.0.0.1
+<% if !@allowed_ip_ranges.empty; @allowed_ip_ranges.each do |ip| -%>
+           Allow from <%= ip %>
+<% end; end -%>
            Allow from <%= domain %>
            # This can be locked down to just your puppet master if required
            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
@@ -26,6 +29,9 @@
            Allow from localhost.localdomain
            Allow from localhost
            Allow from 127.0.0.1
+<% if !@allowed_ip_ranges.empty; @allowed_ip_ranges.each do |ip| -%>
+           Allow from <%= ip %>
+<% end; end -%>
            Allow from <%= domain %>
            # This can be locked down to just your puppet master if required
            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html

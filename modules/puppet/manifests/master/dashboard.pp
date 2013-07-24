@@ -10,14 +10,17 @@
 #
 # Bernd Weber <mailto:bernd@nvisionary.com>
 #
-class puppet::master::dashboard inherits puppet::params {
+class puppet::master::dashboard (
+  $allowed_ip_ranges = [],
+) inherits puppet::params {
   require ( 'mysql', 'mysql::server', 'mysql::ruby' )
   
   class { 'puppet::master::dashboard::install' :
     require => Class [ 'puppet::master::apache' ],
   }
   class { 'puppet::master::dashboard::configure' :
-    require => Class [ 'puppet::master::dashboard::install' ],
+    allowed_ip_ranges => $allowed_ip_ranges,
+    require           => Class [ 'puppet::master::dashboard::install' ],
   }
   class { 'puppet::master::dashboard::service' :
     require => Class [ 'puppet::master::dashboard::configure' ],
@@ -81,7 +84,9 @@ class puppet::master::dashboard::install {
 #
 #  class { puppet::master::dashboard::configure : }
 #
-class puppet::master::dashboard::configure {
+class puppet::master::dashboard::configure (
+  $allowed_ip_ranges,
+) {
   require ( 'apache', 'passenger' )
   require apache::mod::headers
   require apache::mod::ssl
