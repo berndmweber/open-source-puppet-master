@@ -45,24 +45,31 @@
 # At the moment, "adapter" can only be "mysql", and "encoding" should always
 # be "utf8".
 #
-common:
+
+production:
+  database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['production'] %>
   username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
   password: <%= @db_password %>
   encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
   adapter: <%= scope.lookupvar( "puppet::params::dashboard_db_adapter" ) %>
 
-production:
-  database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['production'] %>
-  <<: *common
-
 development:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['development'] %>
-  <<: *common
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
+  password: <%= @db_password %>
+  encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
+  adapter: <%= scope.lookupvar( "puppet::params::dashboard_db_adapter" ) %>
 
 testing:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['testing'] %>
-  <<: *common
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
+  password: <%= @db_password %>
+  encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
+  adapter: <%= scope.lookupvar( "puppet::params::dashboard_db_adapter" ) %>
 
 test:
   database: <%= scope.lookupvar( "puppet::params::dashboard_db" )['test'] %>
-  <<: *common
+  username: <%= scope.lookupvar( "puppet::params::dashboard_db_user" ) %>
+  password: <%= @db_password %>
+  encoding: <%= scope.lookupvar( "puppet::params::dashboard_db_encoding" ) %>
+  adapter: <%= scope.lookupvar( "puppet::params::dashboard_db_adapter" ) %>
