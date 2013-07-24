@@ -132,6 +132,8 @@ class puppet::master::dashboard::configure {
     vhost_name      => '*',
     port            => $puppet::params::dashboard_http_port,
     docroot         => "${puppet::params::dashboard_path}/public",
+    docroot_owner   => $puppet::params::dashboard_user,
+    docroot_group   => $puppet::params::dashboard_group,
     logroot         => $puppet::params::logdir,
     options         => [ 'None' ],
     custom_fragment => template( 'puppet/dashboard/dashboard.conf.erb' ),
