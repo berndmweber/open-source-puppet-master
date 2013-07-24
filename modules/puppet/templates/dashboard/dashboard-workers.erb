@@ -27,7 +27,7 @@ DASHBOARD_USER=<%= scope.lookupvar( "puppet::params::dashboard_user" ) %>
 DASHBOARD_RUBY=`which ruby`
 DASHBOARD_ENVIRONMENT=production
 DASHBOARD_PORT=<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %>
-NUM_DELAYED_JOB_WORKERS=<% cpus %>
+NUM_DELAYED_JOB_WORKERS=<%= cpus %>
 
 is_puppet_dashboard_workers_running() {
     RETVAL=1
@@ -58,7 +58,7 @@ wait_for_worker_start() {
 }
 
 stop_puppet_dashboard_workers() {
-    start-stop-daemon  --start --quiet --oknodo --user ${DASHBOARD_USER} --chuid ${DASHBOARD_USER} --exec /bin/bash -e -c "
+    start-stop-daemon  --start --quiet --oknodo --user ${DASHBOARD_USER} --chuid ${DASHBOARD_USER} --exec /bin/bash -- -e -c "
                 pushd "${DASHBOARD_HOME}" &> /dev/null;
                   export PATH='${PATH}';
                   export RAILS_ENV=production;
@@ -73,7 +73,7 @@ stop_puppet_dashboard_workers() {
 
 start_puppet_dashboard_workers() {
     if ! is_puppet_dashboard_workers_running; then
-      start-stop-daemon  --start --quiet --oknodo --user ${DASHBOARD_USER} --chuid ${DASHBOARD_USER} --exec /bin/bash -e -c "
+      start-stop-daemon  --start --quiet --oknodo --user ${DASHBOARD_USER} --chuid ${DASHBOARD_USER} --exec /bin/bash -- -e -c "
                   pushd "${DASHBOARD_HOME}" &> /dev/null;
                     export PATH='${PATH}';
                     export RAILS_ENV=production;
