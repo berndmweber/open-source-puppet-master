@@ -25,8 +25,14 @@
     dns_alt_names = puppet,puppet.<%= domain %>,<%= hn %>,<%= fhn %>
     ssl_client_header = SSL_CLIENT_S_DN
     ssl_client_verify_header = SSL_CLIENT_VERIFY
+<% if @do_dashboard_config -%>
     reports = store, http
     reporturl = http://<%= fhn %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %>/reports/upload
+    node_terminus = exec
+    external_nodes = /usr/bin/env PUPPET_DASHBOARD_URL=http://<%= fhn %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %> <%= scope.lookupvar( "puppet::params::dashboard_path" ) %>/bin/external_node
+<% else -%>
+    reports = store
+<% end -%>
 
 [testing]
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
