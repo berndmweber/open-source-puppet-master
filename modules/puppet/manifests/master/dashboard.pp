@@ -79,6 +79,10 @@ class puppet::master::dashboard::install {
 #  class { puppet::master::dashboard::configure : }
 #
 class puppet::master::dashboard::configure {
+  require ( 'apache', 'passenger' )
+  require apache::mod::headers
+  require apache::mod::ssl
+
   File {
     owner => $puppet::params::dashboard_user,
     group => $puppet::params::dashboard_group,
@@ -106,7 +110,7 @@ class puppet::master::dashboard::configure {
     cwd         => $puppet::params::dashboard_path,
     path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake RAILS_ENV=production db:migrate",
-    unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use dashboard_production; show tables;' | grep nodes",
+    unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use ${puppet::params::dashboard_db['production']}; show tables;' | grep nodes",
     logoutput   => on_failure,
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }
@@ -122,6 +126,19 @@ class puppet::master::dashboard::configure {
     ensure  => file,
     mode    => '0660',
     content => template ( 'puppet/dashboard/settings.yml.erb' ),
+  }
+  apache::vhost { 'dashboard' :
+    priority        => '12',
+    vhost_name      => '*',
+    port            => $puppet::params::dashboard_http_port,
+    docroot         => "${puppet::params::dashboard_path}/public",
+    logroot         => $puppet::params::logdir,
+    options         => [ 'None' ],
+    custom_fragment => template( 'puppet/dashboard/dashboard.conf.erb' ),
+    require         => [ File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
+                         Exec [ 'configure_production_db' ],
+                         Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
+                       ],
   }
 }
 
