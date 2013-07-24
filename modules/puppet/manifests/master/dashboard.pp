@@ -169,6 +169,8 @@ class puppet::master::dashboard::service {
     ensure     => running,
     hasstatus  => true,
     hasrestart => true,
+    # TODO: Not sure why it isn't able to get the status without this?!
+    status     => 'service dashboard-workers status',
     subscribe  => File [ '/etc/init.d/dashboard-workers' ],
   }
 }
