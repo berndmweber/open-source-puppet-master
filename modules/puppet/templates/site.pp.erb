@@ -27,10 +27,7 @@ node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
   class { 'passenger' : }
-  class { 'puppet::master::apache' : }
-  class { 'mysql' : }
-  class { 'mysql::ruby' : }
-  class { 'mysql::server' : }
+  class { 'puppet::master::dashboard' : }
   mysql::server::config { 'basic_config' :
     settings => {
       'mysqld' => {
@@ -38,5 +35,4 @@ node /<%= fhn %>/ {
       }
     }
   }
-  class { 'puppet::master::dashboard' : }
 }

@@ -14,7 +14,7 @@ class puppet::master::dashboard inherits puppet::params {
   require ( 'mysql', 'mysql::server', 'mysql::ruby' )
   
   class { 'puppet::master::dashboard::install' :
-    require => Class [ 'puppet::master' ],
+    require => Class [ 'puppet::master::apache' ],
   }
   class { 'puppet::master::dashboard::configure' :
     require => Class [ 'puppet::master::dashboard::install' ],
