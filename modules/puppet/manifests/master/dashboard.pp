@@ -19,6 +19,9 @@ class puppet::master::dashboard inherits puppet::params {
   class { 'puppet::master::dashboard::configure' :
     require => Class [ 'puppet::master::dashboard::install' ],
   }
+  class { 'puppet::master::dashboard::service' :
+    require => Class [ 'puppet::master::dashboard::configure' ],
+  }
 }
 
 # == Class: puppet::master::dashboard::install
@@ -141,6 +144,32 @@ class puppet::master::dashboard::configure {
                          Exec [ 'configure_production_db' ],
                          Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
                        ],
+  }
+  file { '/etc/init.d/dashboard-workers' :
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template ( 'puppet/dashboard/dashboard-workers.erb' ),
+    require => Apache::Vhost [ 'dashboard' ],
+  }
+}
+
+# == Class: puppet::master::dashboard::service
+#
+# This configures the dashboard services for puppet masters.
+#
+# === Examples
+#
+#  class { puppet::master::dashboard::service : }
+#
+class puppet::master::dashboard::service {
+  service { 'dashboard-workers' :
+    enable     => true,
+    ensure     => running,
+    hasstatus  => true,
+    hasrestart => true,
+    subscribe  => File [ '/etc/init.d/dashboard-workers' ],
   }
 }
 
