@@ -13,7 +13,7 @@
            Allow from <%= domain %>
            # This can be locked down to just your puppet master if required
            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
-           Allow from all
+           # Allow from all
            Satisfy any
        </Limit>
    </Location>
@@ -23,13 +23,13 @@
        <Limit GET>
            # Configuration restricts HTTP actions to GET only
            Order allow,deny
-           # Allow from localhost.localdomain
-           # Allow from localhost
-           # Allow from 127.0.0.1
-           # Allow from <%= domain %>
+           Allow from localhost.localdomain
+           Allow from localhost
+           Allow from 127.0.0.1
+           Allow from <%= domain %>
            # This can be locked down to just your puppet master if required
            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
-           Allow from all
+           # Allow from all
            Satisfy any
        </Limit>
    </Location>

@@ -50,6 +50,12 @@ class puppet::configure {
     group   => 'root',
     require => Class [ 'puppet::install' ]
   }
+  
+  if tagged ( 'puppet::master::dashboard' ) {
+    $do_dashboard_config = true
+  } else {
+    $do_dashboard_config = false
+  }
   file { $puppet::params::puppetconf :
     ensure  => file,
     content => template ( 'puppet/puppet.conf.erb' ),
