@@ -25,11 +25,13 @@
     dns_alt_names = puppet,puppet.<%= domain %>,<%= hn %>,<%= fhn %>
     ssl_client_header = SSL_CLIENT_S_DN
     ssl_client_verify_header = SSL_CLIENT_VERIFY
-    
+    reports = store, http
+    reporturl = http://<%= fhn %>:3000/reports/upload
+
 [testing]
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
     manifest = <%= scope.lookupvar( "puppet::params::manifestpath" )['testing'] %>/site.pp
-    
+
 [development]
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['development'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
     manifest = <%= scope.lookupvar( "puppet::params::manifestpath" )['development'] %>/site.pp

@@ -106,7 +106,7 @@ class puppet::master::dashboard::configure {
     cwd         => $puppet::params::dashboard_path,
     path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake RAILS_ENV=production db:migrate",
-    unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use dashboard_production; show tables;'",
+    unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use dashboard_production; show tables;' | grep nodes",
     logoutput   => on_failure,
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }

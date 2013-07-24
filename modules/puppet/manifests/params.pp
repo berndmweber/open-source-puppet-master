@@ -77,9 +77,11 @@ class puppet::params {
     'production'  => 'dashboard_production',
     'development' => 'dashboard_development',
     'testing'     => 'dashboard_testing',
+    'test'        => 'dashboard_test',
   }
   $dashboard_db_user      = 'pm_dashboard'
   $dashboard_db_encoding  = 'utf8'
+  $dashboard_db_adapter   = 'mysql'
 
   case $::operatingsystem {
     'Ubuntu' : {
