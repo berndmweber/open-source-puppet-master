@@ -44,7 +44,7 @@ enable_inventory_service: true
 inventory_server: '<%= hn %>'
 
 # Port for the inventory server.
-inventory_port: 8140
+inventory_port: <%= scope.lookupvar( "puppet::params::dashboard_inventory_port" ) %>
 
 # Set this to true to allow Dashboard to display diffs on files that
 # are archived in the file bucket.
@@ -54,7 +54,7 @@ use_file_bucket_diffs: true
 file_bucket_server: '<%= hn %>'
 
 # Port for the file bucket server.
-file_bucket_port: 8140
+file_bucket_port: <%= scope.lookupvar( "puppet::params::dashboard_inventory_port" ) %>
 
 # Amount of time in seconds since last report before a node is considered no longer reporting
 no_longer_reporting_cutoff: 3600

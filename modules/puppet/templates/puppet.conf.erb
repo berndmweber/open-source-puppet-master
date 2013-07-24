@@ -26,7 +26,7 @@
     ssl_client_header = SSL_CLIENT_S_DN
     ssl_client_verify_header = SSL_CLIENT_VERIFY
     reports = store, http
-    reporturl = http://<%= fhn %>:3000/reports/upload
+    reporturl = http://<%= fhn %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %>/reports/upload
 
 [testing]
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>

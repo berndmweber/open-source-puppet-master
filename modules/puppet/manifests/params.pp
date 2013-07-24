@@ -79,10 +79,12 @@ class puppet::params {
     'testing'     => 'dashboard_testing',
     'test'        => 'dashboard_test',
   }
-  $dashboard_db_user      = 'pm_dashboard'
-  $dashboard_db_encoding  = 'utf8'
-  $dashboard_db_adapter   = 'mysql'
-  $dashboard_http_port    = '3000'
+  $dashboard_db_user        = 'pm_dashboard'
+  $dashboard_db_encoding    = 'utf8'
+  $dashboard_db_adapter     = 'mysql'
+  $dashboard_report_port    = '3000'
+  $dashboard_inventory_port = '8140'
+  $dashboard_http_port      = '8080'
 
   case $::operatingsystem {
     'Ubuntu' : {
