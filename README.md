@@ -42,4 +42,4 @@ The following describes the process from scratch to be able to use this feature:
   It's important to mention that the encrypted file cannot be put into the hieradata directory
 * Delete or move the plain text passwords.yaml file to a secure (root-only accessible) location
 * You can test operation with:<br />
-  ` $> sudo hiera -d -c hiera.yaml mysql::server::root_passwd` environment=production
+  ` $> sudo hiera -d -c hiera.yaml mysql::server::root_passwd environment=production`
