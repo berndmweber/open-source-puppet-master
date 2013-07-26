@@ -1,6 +1,23 @@
 <%
   domain = scope.lookupvar( "::domain" )
+  dashboard_path = scope.lookupvar( "puppet::params::dashboard_path" )
+  dashboard_vhost = scope.lookupvar( "puppet::params::dashboard_vhost_name" )
 %>
+    SSLEngine on
+    SSLProtocol -ALL +SSLv3 +TLSv1
+    SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+
+    SSLCertificateFile        <%= dashboard_path %>/certs/<%= dashboard_vhost %>.cert.pem
+    SSLCertificateKeyFile     <%= dashboard_path %>/certs/<%= dashboard_vhost %>.private_key.pem
+    SSLCACertificateFile      <%= dashboard_path %>/certs/<%= dashboard_vhost %>.ca_cert.pem
+
+    # If Apache complains about invalid signatures on the CRL, you can try disabling
+    # CRL checking by commenting the next line, but this is not recommended.
+    SSLCARevocationFile       <%= dashboard_path %>/certs/<%= dashboard_vhost %>.ca_crl.pem
+
+    SSLVerifyClient optional
+    SSLVerifyDepth  1
+    SSLOptions +StdEnvVars
 
    # For report submission from masters.
    <Location /reports/upload>
@@ -40,46 +57,14 @@
        </Limit>
    </Location>
 
-#   # For web access by humans.
-#   <Location "/">
-#       AuthType basic
-#       AuthName "Puppet Dashboard"
-#       Require valid-user
-#       AuthBasicProvider file
-#       AuthUserFile /etc/apache2/passwords # Change to your preferred password file location
-#   </Location>
+   <Location / >
+#          AuthType basic
+#          AuthName "Puppet Dashboard"
+#          Require valid-user
+#          AuthBasicProvider file
+#          AuthUserFile /etc/apache2/passwords # Change to your preferred password file location
+           # Enable this to require client-side certificates for Dashboard connections
+           #SSLVerifyClient require
+   </Location>
 
-# Uncomment this section to enable HTTPS (SSL)
-#Listen 443
-#<VirtualHost *:443>
-#        SSLEngine on
-#        SSLProtocol -ALL +SSLv3 +TLSv1
-#        SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
-#
-#        SSLCertificateFile        /usr/share/puppet-dashboard/certs/dashboard.cert.pem
-#        SSLCertificateKeyFile     /usr/share/puppet-dashboard/certs/dashboard.private_key.pem
-#        SSLCACertificateFile      /usr/share/puppet-dashboard/certs/dashboard.ca_cert.pem
-#
-#        # If Apache complains about invalid signatures on the CRL, you can try disabling
-#        # CRL checking by commenting the next line, but this is not recommended.
-#        SSLCARevocationFile       /usr/share/puppet-dashboard/certs/dashboard.ca_crl.pem
-#
-#        SSLVerifyClient optional
-#        SSLVerifyDepth  1
-#        SSLOptions +StdEnvVars
-#
-#        ServerName dashboard.example.com # UPDATE THIS TO YOUR FQDN
-#        DocumentRoot /usr/share/puppet-dashboard/public
-#        <Directory   /usr/share/puppet-dashboard/public>
-#                Options None
-#                AllowOverride None
-#                Order allow,deny
-#                allow from all
-#        </Directory>
-#        <Location / >
-#                Order deny,allow
-#                Allow from ALL
-#                # Enable this to require client-side certificates for Dashboard connections
-#                #SSLVerifyClient require
-#        </Location>
-#</VirtualHost>
+   
