@@ -1,6 +1,7 @@
 <%
   hn = scope.lookupvar( "::hostname" )
   fhn = scope.lookupvar( "::fqdn" )
+  dashboard_vhost = scope.lookupvar( "puppet::params::dashboard_vhost_name" )
 %>
 #===[ Settings ]=========================================================
 #
@@ -16,17 +17,17 @@
 
 # Node name to use when contacting the puppet master.  This is the
 # CN that is used in Dashboard's certificate.
-cn_name: 'dashboard'
+cn_name: '<%= dashboard_vhost %>'
 
-ca_crl_path: 'certs/dashboard.ca_crl.pem'
+ca_crl_path: 'certs/<%= dashboard_vhost %>.ca_crl.pem'
 
-ca_certificate_path: 'certs/dashboard.ca_cert.pem'
+ca_certificate_path: 'certs/<%= dashboard_vhost %>.ca_cert.pem'
 
-certificate_path: 'certs/dashboard.cert.pem'
+certificate_path: 'certs/<%= dashboard_vhost %>.cert.pem'
 
-private_key_path: 'certs/dashboard.private_key.pem'
+private_key_path: 'certs/<%= dashboard_vhost %>.private_key.pem'
 
-public_key_path: 'certs/dashboard.public_key.pem'
+public_key_path: 'certs/<%= dashboard_vhost %>.public_key.pem'
 
 # Hostname of the certificate authority.
 ca_server: '<%= hn %>'
