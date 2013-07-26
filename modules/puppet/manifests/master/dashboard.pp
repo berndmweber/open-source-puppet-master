@@ -161,7 +161,7 @@ class puppet::master::dashboard::configure (
   exec { 'create_dashboard_certificate' :
     user    => $puppet::params::dashboard_user,
     command => "rake cert:create_key_pair",
-    creates => "certs/${puppet::params::dashboard_vhost_name}.private_key.pem",
+    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.private_key.pem",
     require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
   }
   exec { 'create_dashboard_certificate_request' :
@@ -178,7 +178,7 @@ class puppet::master::dashboard::configure (
   exec { 'retrieve_dashboard_certificate' :
     user    => $puppet::params::dashboard_user,
     command => "rake cert:retrieve",
-    creates => "certs/${puppet::params::dashboard_vhost_name}.cert.pem",
+    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.cert.pem",
     require => Exec [ 'accept_dashboard_certificate_request' ],
   }
 }
