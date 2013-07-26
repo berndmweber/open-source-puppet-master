@@ -73,6 +73,7 @@ class puppet::params {
   $dashboard_path         = "${vardir}/${dashboard_base_name}"
   $dashboard_user         = 'puppet-dashboard'
   $dashboard_group        = 'puppet-dashboard'
+  $dashboard_vhost_name   = 'dashboard'
   $dashboard_db           = {
     'production'  => 'dashboard_production',
     'development' => 'dashboard_development',

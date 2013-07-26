@@ -95,7 +95,12 @@ class puppet::master::dashboard::configure (
     owner => $puppet::params::dashboard_user,
     group => $puppet::params::dashboard_group,
   }
-  
+  Exec {
+    cwd         => $puppet::params::dashboard_path,
+    path        => ['/usr/local/bin', '/usr/bin', '/bin'],
+    logoutput   => on_failure,
+  }
+
   $db_password = hiera ( 'puppet::master::dashboard::mysql::db::password' )
   mysql::db { [
     $puppet::params::dashboard_db['production'],
@@ -115,19 +120,13 @@ class puppet::master::dashboard::configure (
     content => template ( 'puppet/dashboard/database.yml.erb' ),
   }
   exec { 'configure_production_db' :
-    cwd         => $puppet::params::dashboard_path,
-    path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake RAILS_ENV=production db:migrate",
     unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use ${puppet::params::dashboard_db['production']}; show tables;' | grep nodes",
-    logoutput   => on_failure,
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }
   exec { 'configure_development_db' :
-    cwd         => $puppet::params::dashboard_path,
-    path        => ['/usr/local/bin', '/usr/bin', '/bin'],
     command     => "rake db:migrate db:test:prepare",
     refreshonly => true,
-    logoutput   => on_failure,
     subscribe   => Exec [ 'configure_production_db' ],
   }
   file { "${puppet::params::dashboard_path}/config/settings.yml" :
@@ -135,7 +134,7 @@ class puppet::master::dashboard::configure (
     mode    => '0660',
     content => template ( 'puppet/dashboard/settings.yml.erb' ),
   }
-  apache::vhost { 'dashboard' :
+  apache::vhost { $puppet::params::dashboard_vhost_name :
     priority        => '12',
     vhost_name      => '*',
     port            => $puppet::params::dashboard_http_port,
@@ -157,7 +156,30 @@ class puppet::master::dashboard::configure (
     group   => 'root',
     mode    => '0755',
     content => template ( 'puppet/dashboard/dashboard-workers.erb' ),
-    require => Apache::Vhost [ 'dashboard' ],
+    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+  }
+  exec { 'create_dashboard_certificate' :
+    user    => $puppet::params::dashboard_user,
+    command => "rake cert:create_key_pair",
+    creates => "certs/${puppet::params::dashboard_vhost_name}.private_key.pem",
+    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+  }
+  exec { 'create_dashboard_certificate_request' :
+    user        => $puppet::params::dashboard_user,
+    command     => "rake cert:request",
+    refreshonly => true,
+    subscribe   => Exec [ 'create_dashboard_certificate' ],
+  }
+  exec { 'accept_dashboard_certificate_request' :
+    command => "puppet cert sign ${puppet::params::dashboard_vhost_name}",
+    onlyif  => "puppet cert list | grep ${puppet::params::dashboard_vhost_name}",
+    require => Exec [ 'create_dashboard_certificate_request' ],
+  }
+  exec { 'retrieve_dashboard_certificate' :
+    user    => $puppet::params::dashboard_user,
+    command => "rake cert:retrieve",
+    creates => "certs/${puppet::params::dashboard_vhost_name}.cert.pem",
+    require => Exec [ 'accept_dashboard_certificate_request' ],
   }
 }
 
