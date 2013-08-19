@@ -27,7 +27,6 @@ node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
   class { 'passenger' : }
-  class { 'puppet::master::dashboard' : }
   mysql::server::config { 'basic_config' :
     settings => {
       'mysqld' => {
@@ -35,8 +34,10 @@ node /<%= fhn %>/ {
         'max_allowed_packet'      => '32M',
         'innodb_buffer_pool_size' => '512M',
         'innodb_file_per_table'   => '1',
-        'innodb_data_file_path'   => 'ibdata:10M:autoextend:max:10G',
       }
-    }
+    },
+    before => Class [ 'puppet::master::dashboard' ],
+    
   }
+  class { 'puppet::master::dashboard' : }
 }
