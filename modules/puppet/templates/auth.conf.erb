@@ -100,7 +100,7 @@ allow *
 path  /facts
 method find, search
 auth any
-allow <%= scope.lookupvar( "puppet::params::dashboard_vhost_name" ) %>
+allow <%= scope.lookupvar( "puppet::params::dashboard_fqdn" ) %>
 
 # this one is not stricly necessary, but it has the merit
 # to show the default policy which is deny everything else

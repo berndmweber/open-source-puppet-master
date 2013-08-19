@@ -27,7 +27,7 @@
     ssl_client_verify_header = SSL_CLIENT_VERIFY
 <% if @do_dashboard_config -%>
     reports = store, http
-    reporturl = https://<%= fhn %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %>/reports/upload
+    reporturl = https://<%= scope.lookupvar( "puppet::params::dashboard_fqdn" ) %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %>/reports/upload
     node_terminus = exec
     external_nodes = /usr/bin/env PUPPET_CERT_PATH=$ssldir/certs/<%= fhn %>.pem PUPPET_PKEY_PATH=$ssldir/private_keys/<%= fhn %>.pem PUPPET_DASHBOARD_URL=https://<%= scope.lookupvar( "puppet::params::dashboard_fqdn" ) %>:<%= scope.lookupvar( "puppet::params::dashboard_report_port" ) %> <%= scope.lookupvar( "puppet::params::dashboard_path" ) %>/bin/external_node
 <% else -%>
