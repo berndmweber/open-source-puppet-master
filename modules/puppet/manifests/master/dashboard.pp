@@ -122,12 +122,12 @@ class puppet::master::dashboard::configure (
     content => template ( 'puppet/dashboard/database.yml.erb' ),
   }
   exec { 'configure_production_db' :
-    command     => "rake RAILS_ENV=production db:migrate",
+    command     => "rake RAILS_ENV=production db:migrate 2>/dev/null",
     unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use ${puppet::params::dashboard_db['production']}; show tables;' | grep nodes",
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }
 #  exec { 'configure_development_db' :
-#    command     => "rake db:migrate db:test:prepare",
+#    command     => "rake db:migrate db:test:prepare 2>/dev/null",
 #    refreshonly => true,
 #    subscribe   => Exec [ 'configure_production_db' ],
 #  }
@@ -171,6 +171,12 @@ class puppet::master::dashboard::configure (
     creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_fqdn}.cert.pem",
     require => Exec [ 'accept_dashboard_certificate_request' ],
   }
+  exec { 'add_pm_to_dashboard' :
+    user    => $puppet::params::dashboard_user,
+    command => "rake RAILS_ENV=production node:add name=${::fqdn} 2>/dev/null",
+    unless  => "rake RAILS_ENV=production node:list 2>/dev/null | grep ${fqdn}",
+    require => Exec [ "retrieve_dashboard_certificate" ],
+  }
   apache::vhost { $puppet::params::dashboard_vhost_name :
     priority        => '12',
     vhost_name      => '*',
@@ -195,6 +201,21 @@ class puppet::master::dashboard::configure (
     mode    => '0755',
     content => template ( 'puppet/dashboard/dashboard-workers.erb' ),
     require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+  }
+  cron { 'optimize_production_db' :
+    command => "cd ${puppet::params::dashboard_path}; rake RAILS_ENV=production db:raw:optimize 2>/dev/null",
+    user    => $puppet::params::dashboard_user,
+    hour    => 1,
+    minute  => 0,
+    require => Exec [ 'configure_production_db' ],
+  }
+  cron { 'clean_reports_production_db' :
+    command => "cd ${puppet::params::dashboard_path}; rake RAILS_ENV=production reports:prune upto=1 unit=mon 2>/dev/null",
+    user    => $puppet::params::dashboard_user,
+    hour    => 3,
+    minute  => 0,
+    weekday => 6,
+    require => Exec [ 'configure_production_db' ],
   }
 }
 
