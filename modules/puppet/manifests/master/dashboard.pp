@@ -48,7 +48,7 @@ class puppet::master::dashboard::install {
   }
 
   $pkg_download_location = "/tmp/${puppet::params::dashboard_package}"
-  $pkg_extract_location = "${puppet::params::vardir}/${puppet::params::dashboard_package_name}"
+  $pkg_extract_location = "/var/lib/${puppet::params::dashboard_package_name}"
   exec { 'download_dashboard_package' :
     cwd     => '/tmp',
     path    => ['/usr/bin', '/bin'],
