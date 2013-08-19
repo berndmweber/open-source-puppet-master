@@ -48,7 +48,7 @@ class puppet::master::dashboard::install {
   }
 
   $pkg_download_location = "/tmp/${puppet::params::dashboard_package}"
-  $pkg_extract_location = "/var/lib/${puppet::params::dashboard_package_name}"
+  $pkg_extract_location = "${puppet::params::dashboard_basedir}/${puppet::params::dashboard_package_name}"
   exec { 'download_dashboard_package' :
     cwd     => '/tmp',
     path    => ['/usr/bin', '/bin'],
@@ -56,7 +56,7 @@ class puppet::master::dashboard::install {
     creates => $pkg_download_location,
   }
   exec { 'extract_dashboard_package' :
-    cwd     => $puppet::params::vardir,
+    cwd     => $puppet::params::dashboard_basedir,
     path    => ['/usr/bin', '/bin'],
     command => "tar -xzf ${pkg_download_location}",
     creates => $pkg_extract_location,

@@ -70,7 +70,8 @@ class puppet::params {
   $dashboard_package_name = "${dashboard_base_name}-${dashboard_version}"
   $dashboard_package      = "${dashboard_package_name}.tar.gz"
   $dashboard_location     = "http://downloads.puppetlabs.com/dashboard/${dashboard_package}"
-  $dashboard_path         = "/var/lib/${dashboard_base_name}"
+  $dashboard_basedir      = '/var/lib'
+  $dashboard_path         = "${dashboard_basedir}/${dashboard_base_name}"
   $dashboard_user         = 'puppet-dashboard'
   $dashboard_group        = 'puppet-dashboard'
   $dashboard_vhost_name   = 'dashboard'
