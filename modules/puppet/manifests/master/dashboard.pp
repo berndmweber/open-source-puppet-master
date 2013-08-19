@@ -194,6 +194,14 @@ class puppet::master::dashboard::configure (
                        ],
     tag             => 'dashboard',
   }
+  file { $puppet::params::dashboard_htpasswd_path :
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => 'dashboard_admin:{SHA}L9YGd1FLvh/04IfSELcZxBcM7eI=',
+    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+  }
   file { '/etc/init.d/dashboard-workers' :
     ensure  => file,
     owner   => 'root',

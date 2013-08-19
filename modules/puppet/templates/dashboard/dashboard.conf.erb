@@ -58,13 +58,13 @@
    </Location>
 
    <Location / >
-#          AuthType basic
-#          AuthName "Puppet Dashboard"
-#          Require valid-user
-#          AuthBasicProvider file
-#          AuthUserFile /etc/apache2/passwords # Change to your preferred password file location
-           # Enable this to require client-side certificates for Dashboard connections
-           #SSLVerifyClient require
+          AuthType basic
+          AuthName "Puppet Dashboard"
+          Require valid-user
+          AuthBasicProvider file
+          AuthUserFile <%= scope.lookupvar( 'puppet::params::dashboard_htpasswd_path' ) %>
+          # Enable this to require client-side certificates for Dashboard connections
+          #SSLVerifyClient require
    </Location>
 
    

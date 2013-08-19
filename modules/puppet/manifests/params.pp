@@ -88,6 +88,7 @@ class puppet::params {
   $dashboard_report_port    = '3000'
   $dashboard_inventory_port = $masterport
   $dashboard_http_port      = $dashboard_report_port
+  $dashboard_htpasswd_path  = "${puppet::params::dashboard_path}/config/htpasswords"
 
   case $::operatingsystem {
     'Ubuntu' : {
