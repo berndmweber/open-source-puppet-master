@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-apache",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "summary": "Puppet module for Apache",
   "author": "puppetlabs",
   "description": "Module for Apache configuration",
@@ -32,20 +32,20 @@
       ],
       "providers": [
         {
-          "name": "gentoo",
-          "doc": "Manage Apache 2 modules on Gentoo"
-        },
-        {
-          "name": "modfix",
-          "doc": "Dummy provider for A2mod.\n\n    Fake nil resources when there is no crontab binary available. Allows\n    puppetd to run on a bootstrapped machine before a Cron package has been\n    installed. Workaround for: http://projects.puppetlabs.com/issues/2384\n    "
+          "name": "a2mod",
+          "doc": "Manage Apache 2 modules on Debian and Ubuntu"
         },
         {
           "name": "redhat",
           "doc": "Manage Apache 2 modules on RedHat family OSs"
         },
         {
-          "name": "a2mod",
-          "doc": "Manage Apache 2 modules on Debian and Ubuntu"
+          "name": "modfix",
+          "doc": "Dummy provider for A2mod.\n\n    Fake nil resources when there is no crontab binary available. Allows\n    puppetd to run on a bootstrapped machine before a Cron package has been\n    installed. Workaround for: http://projects.puppetlabs.com/issues/2384\n    "
+        },
+        {
+          "name": "gentoo",
+          "doc": "Manage Apache 2 modules on Gentoo"
         }
       ],
       "name": "a2mod",
@@ -53,15 +53,15 @@
     }
   ],
   "checksums": {
-    ".bundle/config": "b898efea5e8783d6593fcdabec67e925",
+    ".bundle/config": "7f1c988748783d2a8d455376eed1470c",
     ".fixtures.yml": "abe7da15beecab9f2023d55185f90bbb",
     ".nodeset.yml": "f2b857f9fc7a701ff118e28591c12925",
     ".travis.yml": "e18e7deea7676026028b8b287c36935a",
-    "CHANGELOG": "5cbc39b9a7bf1ffa662b9bd76c6f1ad2",
-    "Gemfile": "d44cd671d70f6ba0143fe2194f43ce33",
-    "Gemfile.lock": "53c429f143c6903972b71652b5ac571d",
+    "CHANGELOG": "adba9a757b6a95b68ed92d6963a2f8fd",
+    "Gemfile": "3a276fb813c6fccbac8fa8893cff9299",
+    "Gemfile.lock": "7d8f10dc30686dcf4c3365d1903390b1",
     "LICENSE": "b3f8a01d8699078d82e8c3c992307517",
-    "Modulefile": "890fb7a17031a6697564df72c9d69f30",
+    "Modulefile": "46b069926a4730f17d1462f1d4e82ad8",
     "README.md": "195dc5cf038b80a61a1574c9d52e8a31",
     "Rakefile": "0428ea3759a4692c91604396c406a9c1",
     "files/httpd": "295f5e924afe6f752d29327e73fe6d0a",
@@ -73,7 +73,7 @@
     "lib/puppet/type/a2mod.rb": "f230e4c3e6a111bc6dc79ab2287c9a29",
     "manifests/balancer.pp": "7ecb1536337337a1b81e34b5ea75ac84",
     "manifests/balancermember.pp": "d24354d979dd3dc112757f89d69902f5",
-    "manifests/default_mods.pp": "91b0fd1d4a448c68d96c27cc304ff7f6",
+    "manifests/default_mods.pp": "a4bb67920d93a0cea882bd9ab196f3c6",
     "manifests/dev.pp": "606c3cbe27f32b61cfcbd15fb211890c",
     "manifests/init.pp": "ae2d79ff4bcfefe6b9d5573891dc30a3",
     "manifests/listen.pp": "5efc62bd75a0a9a9565b12bd8cb2a9e4",
@@ -83,8 +83,8 @@
     "manifests/mod/auth_kerb.pp": "7876ffdca25396285a26afae8dd030eb",
     "manifests/mod/autoindex.pp": "1b07e7737b4b27f977f80c289172a55b",
     "manifests/mod/cache.pp": "51b4826a72090da8e463bc007695f05b",
-    "manifests/mod/cgi.pp": "eba237e3f10511c02d8f27b99592103d",
-    "manifests/mod/cgid.pp": "465b8603b0b74a769edb4b47a98aec2f",
+    "manifests/mod/cgi.pp": "8c9265733584e188196fe69fd3b9fdd7",
+    "manifests/mod/cgid.pp": "63bd38d692ec78f351a6f234f29c2f16",
     "manifests/mod/dav.pp": "f0228b06b7101864f7c943b541e570d2",
     "manifests/mod/dav_fs.pp": "93fce4f45e7a85e9d6eb2b745390eaba",
     "manifests/mod/dav_svn.pp": "85a9a3efe5cce6096d89cf29195e6dc1",
@@ -103,7 +103,7 @@
     "manifests/mod/passenger.pp": "4bb1e37a8c2c25319d5cc8e28f6112b4",
     "manifests/mod/perl.pp": "72195ad624f68e2c0009074d118bf8e4",
     "manifests/mod/php.pp": "247915331ce4ee815a0c032897a83157",
-    "manifests/mod/prefork.pp": "5ca6538c012828300f6f24cc19f13945",
+    "manifests/mod/prefork.pp": "f629fc3968e4ef8864d61d2552765995",
     "manifests/mod/proxy.pp": "e0e9f9963f720501d9b53ab9fb35f256",
     "manifests/mod/proxy_html.pp": "25cbac9bc2553bc3a18ede060a1a14fd",
     "manifests/mod/proxy_http.pp": "773d0fbb934440a24b3bc87517faa4d4",
@@ -115,7 +115,7 @@
     "manifests/mod/status.pp": "1619d96a0d9b9534145209c98c683cbe",
     "manifests/mod/userdir.pp": "7166fee20a3e5b97d61dfae18fb745c9",
     "manifests/mod/vhost_alias.pp": "ea2d06875ed4f47ba65da0f7169e529e",
-    "manifests/mod/worker.pp": "e2d1bf1a9b428ae9688e705dc428701a",
+    "manifests/mod/worker.pp": "d3097be363188d34ca84cb438e4754e0",
     "manifests/mod/wsgi.pp": "86b284ccc6571fb702eb2647c975d3a3",
     "manifests/mod/xsendfile.pp": "ebe6241729f1b0d8125043a1f34caa54",
     "manifests/namevirtualhost.pp": "27bb9faa95147fcd15ec2aa0a95bc3af",
@@ -149,10 +149,11 @@
     "spec/fixtures/system/distro_commands.yaml": "d9617961568154565a6725a3831408d3",
     "spec/spec.opts": "c407193b3d9028941ef59edd114f5968",
     "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
-    "spec/spec_helper_system.rb": "271b9ac8eebcc9a24f6691e4ef122021",
-    "spec/system/basic_spec.rb": "ad17556c443caa7eec6e2054bc96193f",
+    "spec/spec_helper_system.rb": "61560d4eb97f7531d378462050a7c423",
+    "spec/system/basic_spec.rb": "73bab7cf3eb0554b7d7801613c4b483e",
     "spec/system/class_spec.rb": "61b330fe643b16041cd3c1830fff48a6",
     "spec/system/mod_php_spec.rb": "b2c39f0a5f35f5c860e99798b6605413",
+    "spec/system/prefork_worker_spec.rb": "d7b05867fd73464971919fd4393b3719",
     "spec/system/vhost_spec.rb": "8c1f24de9e391fb6c4ae88ed3084d9a3",
     "spec/unit/provider/a2mod/gentoo_spec.rb": "24ad9db4f6ba0b4fc7ed77b509b4244c",
     "templates/httpd.conf.erb": "faf2a55d29d91b2bde7cbc004d4c95e3",
