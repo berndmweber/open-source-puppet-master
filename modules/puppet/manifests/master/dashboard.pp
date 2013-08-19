@@ -142,7 +142,8 @@ class puppet::master::dashboard::configure (
     lens    => 'Hosts.lns',
     incl    => '/etc/hosts',
     changes => [
-      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_vhost_name} ${puppet::params::dashboard_fqdn}",
+      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_vhost_name}",
+      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_fqdn}",
     ],
     onlyif  => "match *[alias=\"${puppet::params::dashboard_vhost_name}\"] size == 0",
     require => File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
@@ -211,8 +212,6 @@ class puppet::master::dashboard::service {
     ensure     => running,
     hasstatus  => true,
     hasrestart => true,
-    # TODO: Not sure why it isn't able to get the status without this?!
-    status     => 'service dashboard-workers status',
     subscribe  => File [ '/etc/init.d/dashboard-workers' ],
   }
 }
