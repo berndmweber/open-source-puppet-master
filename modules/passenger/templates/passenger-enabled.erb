@@ -1,6 +1,6 @@
 <IfModule mod_passenger.c>
-	PassengerRoot <%= scope.lookupvar( "passenger::params::passenger_root" ) %>
-	PassengerRuby /usr/bin/ruby
+	PassengerRoot <%= @passenger_root %>
+	PassengerRuby <%= @passenger_ruby %>
 
 	# you probably want to tune these settings
 	PassengerHighPerformance on
@@ -8,5 +8,9 @@
 	PassengerPoolIdleTime 1500
 	# PassengerMaxRequests 1000
 	PassengerStatThrottleRate 120
+<% if scope.lookupvar( "passenger::params::is_version_4" ) -%>
 	PassengerEnabled on
+<% else -%>
+    RailsAutoDetect On
+<% end -%>
 </IfModule>

@@ -1,34 +1,43 @@
 {
-  "description": "Module for Passenger configuration",
-  "checksums": {
-    "templates/passenger-conf.erb": "e5a78e0fe9f8b38897d9cc28461c8d34",
-    "manifests/params.pp": "9df06803d26db0609ce5992d52e9c207",
-    "templates/passenger-load.erb": "632ab635ec86643d92ad14cd80265418",
-    "templates/passenger-enabled.erb": "4552134135b1b12fbacadd235ef6feaf",
-    "LICENSE": "4509849dc8e58abcb92d4e1faacb588b",
-    "README.md": "b3cee172bcd9ee1df97977b13ee7cd8f",
-    "tests/init.pp": "ed442a24364697ff755ec0399fb4a0a5",
-    "Modulefile": "d934ea2d55ae3b680d009de8528c2f55",
-    "manifests/init.pp": "8b64af36504e6086b68222c13cee1486"
-  },
-  "summary": "Puppet module for Passenger",
+  "name": "puppetlabs-passenger",
+  "version": "0.1.0",
   "source": "git://github.com/puppetlabs/puppetlabs-passenger.git",
+  "author": "puppetlabs",
+  "license": "Apache 2.0",
+  "summary": "Puppet module for Passenger",
+  "description": "Module for Passenger configuration",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-passenger",
   "dependencies": [
     {
-      "version_requirement": ">= 0.0.3",
-      "name": "puppetlabs/apache"
+      "name": "puppetlabs/apache",
+      "version_requirement": ">= 0.0.3"
     },
     {
-      "version_requirement": ">= 0.0.1",
-      "name": "puppetlabs/ruby"
+      "name": "puppetlabs/ruby",
+      "version_requirement": ">= 0.0.1"
     }
   ],
-  "project_page": "https://github.com/puppetlabs/puppetlabs-passenger",
-  "author": "puppetlabs",
   "types": [
 
   ],
-  "version": "0.0.4",
-  "name": "puppetlabs-passenger",
-  "license": "Apache 2.0"
+  "checksums": {
+    "CHANGELOG": "2240b090c5346491ab440ab48836ed4c",
+    "Gemfile": "aba4d00d83671fab4f9d8c8289ba00f1",
+    "Gemfile.lock": "897ec604745fff98a4d352d3d81fc25b",
+    "LICENSE": "4509849dc8e58abcb92d4e1faacb588b",
+    "Modulefile": "f5c1562ee40d76ddaed386af51d291f8",
+    "README.md": "e3e99759ca8f9a93e5b651e0ed5f0011",
+    "Rakefile": "0428ea3759a4692c91604396c406a9c1",
+    "manifests/init.pp": "3a2745513be31a1c3d60e31db96647a4",
+    "manifests/params.pp": "66c56cb50be537207d69f2cdec076d62",
+    "spec/classes/passenger_spec.rb": "45c99bc4223becd797e0abeeb5677a4e",
+    "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
+    "spec/spec_helper_system.rb": "9389463e478bfc517e3176efbb1121db",
+    "spec/system/basic_spec.rb": "428a3c3e140bb442ebf878a838dba83d",
+    "spec/system/class_spec.rb": "f461c73ed2d3e4305fdf8486fe8df16a",
+    "templates/passenger-conf.erb": "6ba4bc98d6c26f76deb9e4165777948e",
+    "templates/passenger-enabled.erb": "04fdf04e66bdf4659262dbab1a151969",
+    "templates/passenger-load.erb": "f8c403ae10780f205dd005aa233ecca9",
+    "tests/init.pp": "ed442a24364697ff755ec0399fb4a0a5"
+  }
 }
