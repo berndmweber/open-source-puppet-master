@@ -26,7 +26,7 @@ The following describes the process from scratch to be able to use this feature:
   ```
 * Import the public key to your puppet directory: <br />
   ```
-  $> sudo gpg --homedir=/etc/puppet/gpgdata --import /root/.gnupg/pubring.gpg
+  $> sudo gpg --homedir=/etc/puppet/gpgdata --import /var/lib/puppet/.gnupg/pubring.gpg
   ```
 * Add data to password.yaml. E.g.<br />
   ```
