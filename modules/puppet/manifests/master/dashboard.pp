@@ -200,6 +200,7 @@ class puppet::master::dashboard::configure (
     group   => 'root',
     mode    => '0755',
     content => 'dashboard_admin:{SHA}L9YGd1FLvh/04IfSELcZxBcM7eI=',
+    replace => false,
     require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
   }
   file { '/etc/init.d/dashboard-workers' :
