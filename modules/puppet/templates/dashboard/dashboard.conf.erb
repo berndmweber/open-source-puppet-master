@@ -1,7 +1,7 @@
 <%
   domain = scope.lookupvar( "::domain" )
   dashboard_path = scope.lookupvar( "puppet::params::dashboard_path" )
-  dashboard_vhost = scope.lookupvar( "puppet::params::dashboard_vhost_name" )
+  dashboard_vhost = scope.lookupvar( "puppet::params::dashboard_fqdn" )
 %>
     SSLEngine on
     SSLProtocol -ALL +SSLv3 +TLSv1

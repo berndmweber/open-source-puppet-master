@@ -142,7 +142,7 @@ class puppet::master::dashboard::configure (
     lens    => 'Hosts.lns',
     incl    => '/etc/hosts',
     changes => [
-      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_vhost_name}",
+      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_vhost_name} ${puppet::params::dashboard_fqdn}",
     ],
     onlyif  => "match *[alias=\"${puppet::params::dashboard_vhost_name}\"] size == 0",
     require => File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
@@ -150,7 +150,7 @@ class puppet::master::dashboard::configure (
   exec { 'create_dashboard_certificate' :
     user    => $puppet::params::dashboard_user,
     command => "rake cert:create_key_pair",
-    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.private_key.pem",
+    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_fqdn}.private_key.pem",
     require => Augeas [ "seed_${puppet::params::dashboard_vhost_name}_in_hosts_file" ],
   }
   exec { 'create_dashboard_certificate_request' :
@@ -160,14 +160,14 @@ class puppet::master::dashboard::configure (
     subscribe   => Exec [ 'create_dashboard_certificate' ],
   }
   exec { 'accept_dashboard_certificate_request' :
-    command => "puppet cert sign ${puppet::params::dashboard_vhost_name}",
-    onlyif  => "puppet cert list | grep ${puppet::params::dashboard_vhost_name}",
+    command => "puppet cert sign ${puppet::params::dashboard_fqdn}",
+    onlyif  => "puppet cert list | grep ${puppet::params::dashboard_fqdn}",
     require => Exec [ 'create_dashboard_certificate_request' ],
   }
   exec { 'retrieve_dashboard_certificate' :
     user    => $puppet::params::dashboard_user,
     command => "rake cert:retrieve",
-    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.cert.pem",
+    creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_fqdn}.cert.pem",
     require => Exec [ 'accept_dashboard_certificate_request' ],
   }
   apache::vhost { $puppet::params::dashboard_vhost_name :

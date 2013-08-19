@@ -75,6 +75,7 @@ class puppet::params {
   $dashboard_user         = 'puppet-dashboard'
   $dashboard_group        = 'puppet-dashboard'
   $dashboard_vhost_name   = 'dashboard'
+  $dashboard_fqdn         = "${dashboard_vhost_name}.${::domain}"
   $dashboard_db           = {
     'production'  => 'dashboard_production',
     'development' => 'dashboard_development',
