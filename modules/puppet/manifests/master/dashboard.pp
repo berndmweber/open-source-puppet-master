@@ -71,6 +71,8 @@ class puppet::master::dashboard::install {
   }
   file { $puppet::params::dashboard_path :
     ensure  => link,
+    owner   => $puppet::params::dashboard_user,
+    group   => $puppet::params::dashboard_group,
     target  => $pkg_extract_location,
     require => File [ $pkg_extract_location ],
   }
