@@ -31,7 +31,11 @@ node /<%= fhn %>/ {
   mysql::server::config { 'basic_config' :
     settings => {
       'mysqld' => {
-        'default_storage_engine' => 'InnoDB',
+        'default_storage_engine'  => 'InnoDB',
+        'max_allowed_packet'      => '32M',
+        'innodb_buffer_pool_size' => '512M',
+        'innodb_file_per_table'   => '1',
+        'innodb_data_file_path'   => 'ibdata:10M:autoextend:max:10G',
       }
     }
   }
