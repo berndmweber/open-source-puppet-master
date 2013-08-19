@@ -124,45 +124,32 @@ class puppet::master::dashboard::configure (
     unless      => "mysql -u${puppet::params::dashboard_db_user} -p${db_password} -e 'use ${puppet::params::dashboard_db['production']}; show tables;' | grep nodes",
     require     => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }
-  exec { 'configure_development_db' :
-    command     => "rake db:migrate db:test:prepare",
-    refreshonly => true,
-    subscribe   => Exec [ 'configure_production_db' ],
-  }
+#  exec { 'configure_development_db' :
+#    command     => "rake db:migrate db:test:prepare",
+#    refreshonly => true,
+#    subscribe   => Exec [ 'configure_production_db' ],
+#  }
   file { "${puppet::params::dashboard_path}/config/settings.yml" :
     ensure  => file,
     mode    => '0660',
     content => template ( 'puppet/dashboard/settings.yml.erb' ),
+    require => Exec [ 'configure_production_db' ],
   }
-  apache::vhost { $puppet::params::dashboard_vhost_name :
-    priority        => '12',
-    vhost_name      => '*',
-    port            => $puppet::params::dashboard_http_port,
-    docroot         => "${puppet::params::dashboard_path}/public",
-    docroot_owner   => $puppet::params::dashboard_user,
-    docroot_group   => $puppet::params::dashboard_group,
-    logroot         => $puppet::params::logdir,
-    options         => [ 'None' ],
-    custom_fragment => template( 'puppet/dashboard/dashboard.conf.erb' ),
-    require         => [ File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
-                         Exec [ 'configure_production_db' ],
-                         Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
-                       ],
-    tag             => 'dashboard',
-  }
-  file { '/etc/init.d/dashboard-workers' :
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template ( 'puppet/dashboard/dashboard-workers.erb' ),
-    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+  augeas { "seed_${puppet::params::dashboard_vhost_name}_in_hosts_file" :
+    context => '/files/etc/hosts',
+    lens    => 'Hosts.lns',
+    incl    => '/etc/hosts',
+    changes => [
+      "set *[ipaddr=\"127.0.0.1\"]/alias[*] ${puppet::params::dashboard_vhost_name}",
+    ],
+    onlyif  => "match *[alias=\"${puppet::params::dashboard_vhost_name}\"] size == 0",
+    require => File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
   }
   exec { 'create_dashboard_certificate' :
     user    => $puppet::params::dashboard_user,
     command => "rake cert:create_key_pair",
     creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.private_key.pem",
-    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
+    require => Augeas [ "seed_${puppet::params::dashboard_vhost_name}_in_hosts_file" ],
   }
   exec { 'create_dashboard_certificate_request' :
     user        => $puppet::params::dashboard_user,
@@ -180,6 +167,31 @@ class puppet::master::dashboard::configure (
     command => "rake cert:retrieve",
     creates => "${puppet::params::dashboard_path}/certs/${puppet::params::dashboard_vhost_name}.cert.pem",
     require => Exec [ 'accept_dashboard_certificate_request' ],
+  }
+  apache::vhost { $puppet::params::dashboard_vhost_name :
+    priority        => '12',
+    vhost_name      => '*',
+    port            => $puppet::params::dashboard_http_port,
+    docroot         => "${puppet::params::dashboard_path}/public",
+    docroot_owner   => $puppet::params::dashboard_user,
+    docroot_group   => $puppet::params::dashboard_group,
+    logroot         => $puppet::params::logdir,
+    options         => [ 'None' ],
+    custom_fragment => template( 'puppet/dashboard/dashboard.conf.erb' ),
+    require         => [ File [ "${puppet::params::dashboard_path}/config/settings.yml" ],
+                         Exec [ 'configure_production_db' ],
+                         Exec [ 'accept_dashboard_certificate_request' ],
+                         Class [ 'apache::mod::ssl', 'apache::mod::headers' ],
+                       ],
+    tag             => 'dashboard',
+  }
+  file { '/etc/init.d/dashboard-workers' :
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template ( 'puppet/dashboard/dashboard-workers.erb' ),
+    require => Apache::Vhost [ $puppet::params::dashboard_vhost_name ],
   }
 }
 
