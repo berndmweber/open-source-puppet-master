@@ -31,8 +31,12 @@ class puppet::master::cloud_provisioner::install {
     ensure   => present,
     provider => 'gem',
   }
+  package { 'nokogiri' :
+    ensure => '1.4.4',
+  }
   package { 'fog' :
-    ensure => '0.7.2',
+    ensure  => '0.7.2',
+    require => Package [ 'nokogiri' ],
   }
   package { 'guid' : }
 }
