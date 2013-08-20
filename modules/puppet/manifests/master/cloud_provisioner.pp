@@ -27,13 +27,14 @@ class puppet::master::cloud_provisioner inherits puppet::params {
 #  class { puppet::master::cloud_provisioner::install : }
 #
 class puppet::master::cloud_provisioner::install {
-  package { [
-    'fog',
-    'guid',
-  ] :
+  Package {
     ensure   => present,
     provider => 'gem',
   }
+  package { 'fog' :
+    ensure => '0.7.2',
+  }
+  package { 'guid' : }
 }
 
 # == Class: puppet::master::cloud_provisioner::configure
