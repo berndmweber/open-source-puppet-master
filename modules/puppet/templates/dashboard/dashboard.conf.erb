@@ -19,60 +19,58 @@
     SSLVerifyDepth  1
     SSLOptions +StdEnvVars
 
-   # For report submission from masters.
-   <Location /reports/upload>
-       <Limit POST>
-           # Configuration restricts HTTP actions to POST only
-           Order allow,deny
-           Allow from localhost
-           Allow from localhost.localdomain
-           Allow from 127.0.0.1
+    # For report submission from masters.
+    <Location /reports/upload>
+        <Limit POST>
+            # Configuration restricts HTTP actions to POST only
+            Order allow,deny
+            Allow from localhost
+            Allow from localhost.localdomain
+            Allow from 127.0.0.1
 <% if !@allowed_ip_ranges.empty?; @allowed_ip_ranges.each do |ip| -%>
-           Allow from <%= ip %>
+            Allow from <%= ip %>
 <% end; end -%>
-           Allow from <%= domain %>
-           # This can be locked down to just your puppet master if required
-           # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
-           # Allow from all
-           Satisfy any
-       </Limit>
-   </Location>
+            Allow from <%= domain %>
+            # This can be locked down to just your puppet master if required
+            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
+            # Allow from all
+            Satisfy any
+        </Limit>
+    </Location>
 
-   # For node definitions from masters.
-   <Location /nodes>
-       <Limit GET>
-           # Configuration restricts HTTP actions to GET only
-           Order allow,deny
-           Allow from localhost.localdomain
-           Allow from localhost
-           Allow from 127.0.0.1
+    # For node definitions from masters.
+    <Location /nodes>
+        <Limit GET>
+            # Configuration restricts HTTP actions to GET only
+            Order allow,deny
+            Allow from localhost.localdomain
+            Allow from localhost
+            Allow from 127.0.0.1
 <% if !@allowed_ip_ranges.empty?; @allowed_ip_ranges.each do |ip| -%>
-           Allow from <%= ip %>
+            Allow from <%= ip %>
 <% end; end -%>
-           Allow from <%= domain %>
-           # This can be locked down to just your puppet master if required
-           # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
-           # Allow from all
-           Satisfy any
-       </Limit>
-   </Location>
+            Allow from <%= domain %>
+            # This can be locked down to just your puppet master if required
+            # See examples above, or http://httpd.apache.org/docs/2.2/howto/access.html
+            # Allow from all
+            Satisfy any
+        </Limit>
+    </Location>
 
-   <Location / >
-          Order allow,deny
-           Allow from localhost.localdomain
-           Allow from localhost
-           Allow from 127.0.0.1
+    <Location / >
+        Order allow,deny
+        Allow from localhost.localdomain
+        Allow from localhost
+        Allow from 127.0.0.1
 <% if !@allowed_ip_ranges.empty?; @allowed_ip_ranges.each do |ip| -%>
-           Allow from <%= ip %>
+        Allow from <%= ip %>
 <% end; end -%>
-           Satisfy any
-           AuthType basic
-           AuthName "Puppet Dashboard"
-           Require valid-user
-           AuthBasicProvider file
-           AuthUserFile <%= scope.lookupvar( 'puppet::params::dashboard_htpasswd_path' ) %>
-           # Enable this to require client-side certificates for Dashboard connections
-           #SSLVerifyClient require
-   </Location>
-
-   
+        Satisfy any
+        AuthType basic
+        AuthName "Puppet Dashboard"
+        Require valid-user
+        AuthBasicProvider file
+        AuthUserFile <%= scope.lookupvar( 'puppet::params::dashboard_htpasswd_path' ) %>
+        # Enable this to require client-side certificates for Dashboard connections
+        #SSLVerifyClient require
+    </Location>
