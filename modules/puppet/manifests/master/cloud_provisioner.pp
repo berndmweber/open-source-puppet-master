@@ -31,7 +31,7 @@ class puppet::master::cloud_provisioner::install {
     ensure   => present,
   }
   package { [
-    'libxslt-dev',
+    'libxslt1-dev',
     'libxml2-dev',
     ] : }
   package { 'nokogiri' :
