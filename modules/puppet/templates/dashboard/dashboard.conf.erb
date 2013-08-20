@@ -58,13 +58,21 @@
    </Location>
 
    <Location / >
-          AuthType basic
-          AuthName "Puppet Dashboard"
-          Require valid-user
-          AuthBasicProvider file
-          AuthUserFile <%= scope.lookupvar( 'puppet::params::dashboard_htpasswd_path' ) %>
-          # Enable this to require client-side certificates for Dashboard connections
-          #SSLVerifyClient require
+          Order allow,deny
+           Allow from localhost.localdomain
+           Allow from localhost
+           Allow from 127.0.0.1
+<% if !@allowed_ip_ranges.empty?; @allowed_ip_ranges.each do |ip| -%>
+           Allow from <%= ip %>
+<% end; end -%>
+           Satisfy any
+           AuthType basic
+           AuthName "Puppet Dashboard"
+           Require valid-user
+           AuthBasicProvider file
+           AuthUserFile <%= scope.lookupvar( 'puppet::params::dashboard_htpasswd_path' ) %>
+           # Enable this to require client-side certificates for Dashboard connections
+           #SSLVerifyClient require
    </Location>
 
    
