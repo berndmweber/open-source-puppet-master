@@ -1,4 +1,6 @@
 ---
 mysql::config::default_storage_engine: 'InnoDB'
 mysql::config::max_allowed_packet: '32M'
+mysql::config::innodb_buffer_pool_size: '512M'
+mysql::config::innodb_file_per_table: '1'
 puppet::master::dashboard::allowed_ip_ranges: '192.168.0.0/24'
