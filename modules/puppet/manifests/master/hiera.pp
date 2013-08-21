@@ -79,11 +79,15 @@ class puppet::master::hiera::configure {
     replace => false,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
   }
-  puppet::master::hiera::create_empty_file { [
+  file { [
     "${puppet::params::hierapath['production']}/passwords.yaml",
     "${puppet::params::hierapath['testing']}/passwords.yaml",
     "${puppet::params::hierapath['development']}/passwords.yaml",
-  ] : }
+  ] :
+    ensure  => file,
+    replace => false,
+    source  => "puppet:///modules/puppet/${puppet::params::hieradir}/passwords.yaml",
+  }
   file { [
     "${puppet::params::hierapath['production']}/${puppet::params::gpgdir}",
     "${puppet::params::hierapath['testing']}/${puppet::params::gpgdir}",
