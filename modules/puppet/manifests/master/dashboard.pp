@@ -62,12 +62,18 @@ class puppet::master::dashboard::install {
     creates => $pkg_extract_location,
     require => Exec [ 'download_dashboard_package' ],
   }
+  exec { 'ensure_user_for_dashboard_path' :
+    cwd     => $pkg_extract_location,
+    path    => ['/usr/bin', '/bin'],
+    command => "chown -R ${puppet::params::dashboard_user}:${puppet::params::dashboard_group} ${pkg_extract_location}",
+    unless  => "stat -c %U ${pkg_extract_location} | grep ${puppet::params::dashboard_user}",
+    require => Exec [ 'extract_dashboard_package' ],
+  }
   file { $pkg_extract_location :
     ensure  => directory,
     owner   => $puppet::params::dashboard_user,
     group   => $puppet::params::dashboard_group,
-    recurse => true,
-    require => Exec [ 'extract_dashboard_package' ],
+    require => Exec [ 'ensure_user_for_dashboard_path' ],
   }
   file { $puppet::params::dashboard_path :
     ensure  => link,
