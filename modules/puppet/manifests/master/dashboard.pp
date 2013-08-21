@@ -54,6 +54,7 @@ class puppet::master::dashboard::install {
     path    => ['/usr/bin', '/bin'],
     command => "curl -o ${puppet::params::dashboard_package} ${puppet::params::dashboard_location}",
     creates => $pkg_download_location,
+    require => User [ $puppet::params::dashboard_user ],
   }
   exec { 'extract_dashboard_package' :
     cwd     => $puppet::params::dashboard_basedir,
