@@ -5,5 +5,5 @@ environments
 features
 ./manifests
 modules/dashboard
-spec
+./spec
 ssl

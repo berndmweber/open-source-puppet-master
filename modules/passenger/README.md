@@ -37,6 +37,7 @@ This will establish Passenger on your node with sane default values. However, yo
         passenger_package      => 'passenger',
         gem_path               => '/var/lib/gems/1.8/gems',
         gem_binary_path        => '/var/lib/gems/1.8/bin',
+        passenger_root         => '/var/lib/gems/1.8/gems/passenger-2.2.11'
         mod_passenger_location => '/var/lib/gems/1.8/gems/passenger-2.2.11/ext/apache2/mod_passenger.so',
       }
     }
@@ -85,7 +86,7 @@ This module was developed and tested against RHEL and Debian based systems (Cent
 Development
 ------------
 
-Puppet Labs modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can’t access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
+Puppet Labs modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can‚Äôt access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
 
 We want to keep it as easy as possible to contribute changes so that our modules work in your environment. There are a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
 
