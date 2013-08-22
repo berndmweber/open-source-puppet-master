@@ -43,7 +43,7 @@ describe 'puppet::master::module', :type => :define do
                       {
                        :contributor => contrib,
                        :environment => env
-                      }.merge(constant_default_params)               
+                      }.merge(constant_default_params)
                     end
                     let :var_params do
                        default_params.merge(cparams)
