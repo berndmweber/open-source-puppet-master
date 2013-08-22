@@ -104,6 +104,7 @@ describe 'puppet::master::hiera', :type => :class do
           'owner'   => 'root',
           'group'   => 'root',
           'mode'    => '0755',
+          'source'  => 'puppet:///modules/puppet/hieradata/passwords.yaml',
           'require' => 'File[/etc/puppet/environments/production/hieradata]'
           )
         }
@@ -113,6 +114,7 @@ describe 'puppet::master::hiera', :type => :class do
           'owner'   => 'root',
           'group'   => 'root',
           'mode'    => '0755',
+          'source'  => 'puppet:///modules/puppet/hieradata/passwords.yaml',
           'require' => 'File[/etc/puppet/environments/testing/hieradata]'
           )
         }
@@ -122,6 +124,7 @@ describe 'puppet::master::hiera', :type => :class do
           'owner'   => 'root',
           'group'   => 'root',
           'mode'    => '0755',
+          'source'  => 'puppet:///modules/puppet/hieradata/passwords.yaml',
           'require' => 'File[/etc/puppet/environments/development/hieradata]'
           )
         }

@@ -79,13 +79,11 @@ class puppet::master::hiera::configure {
     replace => false,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
   }
-  file { [
+  puppet::master::hiera::create_file { [
     "${puppet::params::hierapath['production']}/passwords.yaml",
     "${puppet::params::hierapath['testing']}/passwords.yaml",
     "${puppet::params::hierapath['development']}/passwords.yaml",
   ] :
-    ensure  => file,
-    replace => false,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/passwords.yaml",
   }
   file { [
@@ -111,12 +109,24 @@ class puppet::master::hiera::configure {
   }
 }
 
-define puppet::master::hiera::create_empty_file ()
+define puppet::master::hiera::create_file (
+  $source  = "",
+  $content = "---"
+)
 {
-  file { $name :
-    ensure  => file,
-    content => '---',
-    replace => false,
-    require => File [ dirname ($name) ],
+  if source == "" {
+    file { $name :
+      ensure  => file,
+      content => $content,
+      replace => false,
+      require => File [ dirname ($name) ],
+    }
+  } else {
+    file { $name :
+      ensure  => file,
+      source  => $source,
+      replace => false,
+      require => File [ dirname ($name) ],
+    }
   }
 }
