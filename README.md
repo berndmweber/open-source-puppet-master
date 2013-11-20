@@ -13,6 +13,7 @@ Travis Build Status
 Steps to use this repo
 ----------------------
 
+* Make sure you give your server a meaningful name before proceeding. This name will be used to configure the certificates for the Puppet Master. Later changes will result in all kinds of certification reconfigurations (basically hell...).
 * Clone or better fork this repo so you can make changes to it.
  * Modify the repository path in [os_pm_instantiate.sh](https://github.com/berndmweber/open-source-puppet-master/blob/master/bootstrap/os_pm_instantiate.sh) and/or [ec2_os_pm_instantiate.sh](https://github.com/berndmweber/open-source-puppet-master/blob/master/bootstrap/ec2_os_pm_instantiate.sh)
  * If you use this on EC2 follow the steps in the [following chapter](https://github.com/berndmweber/open-source-puppet-master#ec2-support) ccreating a multi-mime-type configuration
