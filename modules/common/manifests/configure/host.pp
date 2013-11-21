@@ -18,10 +18,10 @@ define common::configure::host (
 
 # TODO: The ec2 facts still don't work within puppet.
 #  if $::ec2_ami_id != undef {
-    ec2host { $host :
-      ensure        => $ensure,
-      host_aliases  => $host_aliases,
-      ip            => $ip,
-    }
+#    ec2host { $host :
+#      ensure        => $ensure,
+#      host_aliases  => $host_aliases,
+#      ip            => $ip,
+#    }
 #  }
 }
