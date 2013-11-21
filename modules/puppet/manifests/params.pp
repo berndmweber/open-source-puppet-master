@@ -91,7 +91,7 @@ class puppet::params {
   $dashboard_http_port      = $dashboard_report_port
   $dashboard_htpasswd_path  = "${puppet::params::dashboard_path}/config/htpasswords"
 
-  $puppetdb_server_name     = 'puppetmaster'
+  $puppetdb_server_name     = $::hostname
 
   case $::operatingsystem {
     'Ubuntu' : {
