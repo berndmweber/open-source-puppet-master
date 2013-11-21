@@ -18,15 +18,18 @@ node default {
   #   class { 'my_class': }
 }
 
-$hiera_gpg_check = hiera( 'mysql::config::root_password', 'N/A' )
+$hiera_gpg_check = hiera( 'mysql::server::root_password', 'N/A' )
 if $hiera_gpg_check == 'N/A' {
     fail ( '     You need to configure GPG first. Please follow the instructions here: https://github.com/berndmweber/open-source-puppet-master#gpg-password-usage     ' )
 }
 
+# Puppet master
 node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
   class { 'passenger' : }
   class { 'puppet::master::dashboard' : }
+  class { 'puppet::master::puppetdb' : }
   class { 'puppet::master::cloud_provisioner' : }
+  class { 'mysql::bindings' : }
 }

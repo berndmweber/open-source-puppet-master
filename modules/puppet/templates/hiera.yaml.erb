@@ -3,18 +3,20 @@
 :backends:
   - yaml
   - gpg
- 
+
 :logger: console
- 
+
+:merge_behavior: deeper
+
 :hierarchy:
   - 'passwords'
   - '%{::clientcert}'
   - '%{::operatingsystem}'
   - 'common'
- 
+
 :yaml:
-  :datadir: <%= scope.lookupvar( "puppet::params::environmentspath" )['base'] %>/%{environment}/<%= scope.lookupvar( "puppet::params::hieradir" ) %>
+  :datadir: <%= scope.lookupvar( "puppet::params::environmentspath" )['base'] %>/%{::environment}/<%= scope.lookupvar( "puppet::params::hieradir" ) %>
 
 :gpg:
-  :datadir: <%= scope.lookupvar( "puppet::params::environmentspath" )['base'] %>/%{environment}/<%= scope.lookupvar( "puppet::params::hieradir" ) %>/<%= scope.lookupvar( "puppet::params::gpgdir" ) %>
+  :datadir: <%= scope.lookupvar( "puppet::params::environmentspath" )['base'] %>/%{::environment}/<%= scope.lookupvar( "puppet::params::hieradir" ) %>/<%= scope.lookupvar( "puppet::params::gpgdir" ) %>
   :key_dir: <%= scope.lookupvar( "puppet::params::gpgpath" ) %>

@@ -59,7 +59,7 @@ class puppet::params {
   $masterport       = '8140'
   $puppet_modules   = {
     'self'   => [ 'ruby' ],
-    'apache' => [ 'apache', 'mysql', 'ruby' ],
+    'apache' => [ 'apache', 'mysql::server', 'ruby' ],
   }
   $masterservice    = {
     'self'   => 'puppetmaster',
@@ -90,6 +90,8 @@ class puppet::params {
   $dashboard_inventory_port = $masterport
   $dashboard_http_port      = $dashboard_report_port
   $dashboard_htpasswd_path  = "${puppet::params::dashboard_path}/config/htpasswords"
+
+  $puppetdb_server_name     = 'puppetmaster'
 
   case $::operatingsystem {
     'Ubuntu' : {

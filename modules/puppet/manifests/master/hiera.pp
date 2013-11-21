@@ -10,7 +10,9 @@
 #
 # Bernd Weber <mailto:bernd@nvisionary.com>
 #
-class puppet::master::hiera inherits puppet::params {
+class puppet::master::hiera (
+  $hosts = 'UNSET',
+) inherits puppet::params {
   class { 'puppet::master::hiera::install' :
     require => Class [ 'puppet::master' ],
   }
@@ -28,7 +30,10 @@ class puppet::master::hiera inherits puppet::params {
 #  class { puppet::master::hiera::install : }
 #
 class puppet::master::hiera::install {
-  package { 'hiera-gpg' :
+  package { [
+    'hiera-gpg',
+    'deep_merge',
+  ] :
     ensure   => present,
     provider => 'gem',
   }
@@ -61,23 +66,29 @@ class puppet::master::hiera::configure {
     ensure => directory,
     require => File [ $puppet::params::hieraconf ],
   }
-  file { "${puppet::params::hierapath['production']}/common.yaml" :
+  file { "${puppet::params::hierapath[$::environment]}/common.yaml" :
     ensure  => file,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
-    require => File [ $puppet::params::hierapath['production'] ],
+    require => File [ $puppet::params::hierapath[$::environment] ],
   }
-  file { "${puppet::params::hierapath['production']}/${::fqdn}.yaml" :
+  file { "${puppet::params::hierapath[$::environment]}/${::fqdn}.yaml" :
     ensure  => file,
     source  => "puppet:///modules/puppet/${puppet::params::hieradir}/master.yaml",
-    require => File [ $puppet::params::hierapath['production'] ],
+    require => File [ $puppet::params::hierapath[$::environment] ],
   }
-  file { [
-    "${puppet::params::hierapath['testing']}/common.yaml",
-    "${puppet::params::hierapath['development']}/common.yaml",
-  ] :
-    ensure  => file,
-    replace => false,
-    source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
+  if !defined(File["${puppet::params::hierapath['testing']}/common.yaml"]) {
+    file { "${puppet::params::hierapath['testing']}/common.yaml" :
+      ensure  => file,
+      replace => false,
+      source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
+    }
+  }
+  if !defined(File["${puppet::params::hierapath['development']}/common.yaml"]) {
+    file { "${puppet::params::hierapath['development']}/common.yaml" :
+      ensure  => file,
+      replace => false,
+      source  => "puppet:///modules/puppet/${puppet::params::hieradir}/common.yaml",
+    }
   }
   puppet::master::hiera::create_file { [
     "${puppet::params::hierapath['production']}/passwords.yaml",
@@ -107,25 +118,38 @@ class puppet::master::hiera::configure {
     mode    => '0700',
     require => File [ $puppet::params::confdir ],
   }
+  if $puppet::master::hiera::hosts != 'UNSET' {
+    create_resources('puppet::master::hiera::create_host_yaml', $puppet::master::hiera::hosts)
+  }
+}
+
+define puppet::master::hiera::create_host_yaml (
+  $template,
+) {
+  puppet::master::hiera::create_file { "${puppet::params::hierapath[$::environment]}/${name}.yaml" :
+    source  => "puppet:///modules/puppet/${puppet::params::hieradir}/${template}.yaml",
+    replace => true,
+  }
 }
 
 define puppet::master::hiera::create_file (
   $source  = "",
-  $content = "---"
+  $content = "---",
+  $replace = false,
 )
 {
   if source == "" {
     file { $name :
       ensure  => file,
       content => $content,
-      replace => false,
+      replace => $replace,
       require => File [ dirname ($name) ],
     }
   } else {
     file { $name :
       ensure  => file,
       source  => $source,
-      replace => false,
+      replace => $replace,
       require => File [ dirname ($name) ],
     }
   }

@@ -13,8 +13,8 @@
 class puppet::master::dashboard (
   $allowed_ip_ranges = [],
 ) inherits puppet::params {
-  require ( 'mysql', 'mysql::server', 'mysql::ruby' )
-  
+  require ( 'mysql::server', 'common' )
+
   class { 'puppet::master::dashboard::install' :
     require => Class [ 'puppet::master::apache' ],
   }
@@ -41,16 +41,17 @@ class puppet::master::dashboard::install {
     home       => $puppet::params::dashboard_path,
     gid        => $puppet::params::dashboard_group,
     managehome => false,
-    shell      => '/bin/false',
+    shell      => '/bin/bash',
   }
   group { $puppet::params::dashboard_group :
     ensure => present,
   }
 
-  $pkg_download_location = "/tmp/${puppet::params::dashboard_package}"
+  $pkg_download_location = "${common::package_source_dir}/${puppet::params::dashboard_package}"
   $pkg_extract_location = "${puppet::params::dashboard_basedir}/${puppet::params::dashboard_package_name}"
+
   exec { 'download_dashboard_package' :
-    cwd     => '/tmp',
+    cwd     => $common::package_source_dir,
     path    => ['/usr/bin', '/bin'],
     command => "curl -o ${puppet::params::dashboard_package} ${puppet::params::dashboard_location}",
     creates => $pkg_download_location,
@@ -119,7 +120,7 @@ class puppet::master::dashboard::configure (
     user     => $puppet::params::dashboard_db_user,
     password => $db_password,
     host     => 'localhost',
-    grant    => ['all'],
+    grant    => ['ALL'],
     charset  => $puppet::params::dashboard_db_encoding,
     before   => File [ "${puppet::params::dashboard_path}/config/database.yml" ],
   }

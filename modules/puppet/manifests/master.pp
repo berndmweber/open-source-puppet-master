@@ -148,10 +148,10 @@ class puppet::master::configure (
     recurse => true,
     require => File [ $puppet::params::confdir ],
   }
-  file { "${puppet::params::manifestpath['production']}/site.pp" :
+  file { "${puppet::params::manifestpath[$::environment]}/site.pp" :
     ensure  => file,
     content => template ( 'puppet/site.pp.erb' ),
-    require => File [ $puppet::params::manifestpath['production'] ],
+    require => File [ $puppet::params::manifestpath[$::environment] ],
   }
   file { [
     $puppet::params::environmentspath['base'],
@@ -168,6 +168,14 @@ class puppet::master::configure (
   }
   if $enable_hiera == true {
     class { 'puppet::master::hiera' : }
+  }
+  cron { 'clean_puppet_master_reports' :
+    command => "/usr/bin/puppet apply -e \"tidy { '${puppet::params::reportsdir}': age => '5w', recurse => true }\" 2>>${puppet::params::logdir}/puppet_clean_reports.log",
+    user    => 'root',
+    hour    => 3,
+    minute  => 30,
+    weekday => 6,
+    require => File [ $puppet::params::confdir, $puppet::params::reportsdir ],
   }
 }
 

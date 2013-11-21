@@ -56,6 +56,12 @@ class puppet::configure {
   } else {
     $do_dashboard_config = false
   }
+  #TODO: Need to circle back to this. Tag does not get picked up.
+#  if tagged ( 'puppetdb' ) {
+#    $do_puppetdb_config = true
+#  } else {
+#    $do_puppetdb_config = false
+#  }
   file { $puppet::params::puppetconf :
     ensure  => file,
     content => template ( 'puppet/puppet.conf.erb' ),

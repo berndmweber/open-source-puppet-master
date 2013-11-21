@@ -1,6 +1,34 @@
 ---
-mysql::config::default_storage_engine: 'InnoDB'
-mysql::config::max_allowed_packet: '32M'
-mysql::config::innodb_buffer_pool_size: '512M'
-mysql::config::innodb_file_per_table: '1'
-puppet::master::dashboard::allowed_ip_ranges: '192.168.0.0/24'
+common::addl_packages:
+  gcc:
+    ensure: present
+  git:
+    ensure: present
+common::hosts:
+  puppetmaster.nvisionary.com:
+    ip:         127.0.1.1
+    host_aliases:
+      - puppetmaster
+      - puppet
+      - puppetdb
+
+apache::mod::worker::maxclients:        20
+apache::mod::worker::minsparethreads:   5
+apache::mod::worker::maxsparethreads:   20
+apache::mod::worker::threadsperchild:   5
+apache::mod::worker::serverlimit:       4
+
+mysql::server::override_options:
+  'mysqld':
+    default_storage_engine:  'InnoDB'
+    max_allowed_packet:      '32M'
+    innodb_buffer_pool_size: '512M'
+    innodb_file_per_table:   '1'
+mysql::server::remove_default_accounts: true
+mysql::bindings::python_enable:    true
+mysql::bindings::ruby_enable:      true
+
+puppet::master::dashboard::allowed_ip_ranges: '10.0.0.0/16'
+
+puppetdb::listen_address:   0.0.0.0
+puppetdb::database:         embedded

@@ -1,7 +1,7 @@
 <%
   hn = scope.lookupvar( "::hostname" )
   fhn = scope.lookupvar( "::fqdn" )
-  domain = scope.lookupvar( "::domain" )
+  domain = scope.lookupvar( "common::domain" ) ? scope.lookupvar( "common::domain" ) : "plantlust.com"
 -%>
 # This file is controlled by puppet. Do NOT edit! #
 [main]
@@ -15,7 +15,11 @@
     user = <%= scope.lookupvar( "puppet::params::user" ) %>
     group = <%= scope.lookupvar( "puppet::params::group" ) %>
     archive_files = true
+<% if @is_master == true -%>
     archive_file_server = <%= fhn %>
+<% else -%>
+    archive_file_server = puppetmaster.<%= domain %>
+<% end -%>
     #prerun_command=/etc/puppet/etckeeper-commit-pre
     #postrun_command=/etc/puppet/etckeeper-commit-post
 
@@ -33,6 +37,10 @@
 <% else -%>
     reports = store
 <% end -%>
+<% if @do_puppetdb_config -%>
+    storeconfigs = true
+    storeconfigs_backend = puppetdb
+<% end -%>
 
 [testing]
     modulepath = <%= scope.lookupvar( "puppet::params::modulepath" )['testing'] %>:<%= scope.lookupvar( "puppet::params::modulepath" )['production'] %>
@@ -45,7 +53,11 @@
 <% end -%>
 [agent]
     certname = <%= fhn %>
+<% if @is_master == true -%>
     server = <%= fhn %>
+<% else -%>
+    server = puppetmaster.<%= domain %>
+<% end -%>
     report = true
     classfile = $vardir/classes.txt
     localconfig = $vardir/localconfig
