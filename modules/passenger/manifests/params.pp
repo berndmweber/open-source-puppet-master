@@ -11,10 +11,10 @@
 # Sample Usage:
 #
 class passenger::params {
-  $passenger_version  = '3.0.9' # '4.0.10'
+  $passenger_version  = '4.0.10'
   $passenger_ruby     = '/usr/bin/ruby'
   $passenger_provider = 'gem'
-  
+
   if versioncmp ($passenger_version, '4.0.0') > 0 {
     $builddir     = 'buildout'
   } else {
