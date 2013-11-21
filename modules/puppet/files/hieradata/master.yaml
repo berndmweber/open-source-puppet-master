@@ -28,7 +28,7 @@ mysql::server::remove_default_accounts: true
 mysql::bindings::python_enable:    true
 mysql::bindings::ruby_enable:      true
 
-puppet::master::dashboard::allowed_ip_ranges: '10.0.0.0/16'
+puppet::master::dashboard::allowed_ip_ranges: '192.168.0.0/16'
 
 puppetdb::listen_address:   0.0.0.0
 puppetdb::database:         embedded
