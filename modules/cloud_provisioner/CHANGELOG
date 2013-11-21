@@ -1,3 +1,68 @@
+Thu Sep 26 2013 Matthaus Owens 1.1.4
+* Make `zone` argument optional for listing GCE instances
+
+Thu Sep 26 2013 Matthaus Owens 1.1.3
+* Expand tildes in key path before testing for existence
+
+Tue Sep 24 2013 Moses Mendoza 1.1.1
+* Support `google_compute_engine` ssh key by default
+* Make GCE image search list comma separated
+
+Fri Sep 20 2013 Moses Mendoza 1.1.0
+ * Implement `ssh` action to help ssh in to instances
+ * Implement bootstrapping of nodes with the GCE face.
+ * Extract "payload" options from other CloudPack install options
+ * Extract common options into a procedural library
+ * Move create operation in the file
+ * Implement SSH key / account support at create time
+ * Implement `user` action to manage ssh key metadata
+ * Implement `delete` operation for instances
+ * Implement basic `create` operation for instances
+ * Implement `list` operation for instances
+ * Add initial GCE support: Google API authentication
+ * Add `google-api-client` to the Gemfile
+
+Thu Sep 12 2013 Melissa Stone 1.0.9
+ * PE-1178: --security-group option handling improvements
+ * PE-1504: drop ruby 1.8.7 and add ruby 2.0.0 to the projects's travis-ci matrix
+ * PE-838: default to installing PE during bootstrap
+ * PE-838: update rspec syntax to kill deprecation warnings
+ * PE-838: update tests for the change in the install script default
+ * PE-838: default to installing PE during bootstrap
+ * PE-1504: drop ruby 1.8.7 and add ruby 2.0.0 to the projects's travis-ci matrix
+ * PE-1178: updated tests for the --security-group option handling
+ * PE-1178: --security-group option handling improvements
+ * PE-830: update doc of puppet node install --installer-payload option
+
+Mon Aug 05 2013 Matthaus Owens 1.0.8
+ * PE-834, PE-424: remove extra whitespace
+ * PE-834, PE-424: remove unused test code pieces
+ * PE-834, PE-424: update tests for changes in Puppet::CloudPack.http_request
+ * PE-834, PE-424: fixes for Cloud Provisioner PE console interaction
+
+Thu May 30 2013 Matthaus Owens 1.0.7
+ * Config both 'main' and 'dependencies' apt repos
+ * PE-246: remove advice about security implications of environment variables
+ * PE-243: update copyright years in Cloud Provisioner
+ * PE-242: remove obsolete local AWS type validation
+ * PE-247: SSL for ENC communication is now on, and mandatory
+ * PE-239: Cloud Provisioner has unused, obsolete `--pe-version` option
+
+Tue May 07 2013 Moses Mendoza 1.0.6
+ * retry ssh when Errno::ENETUNREACH is encountered
+ * return stdout from executed scripts to install method
+ * Update options to Fog key mappings
+ * Rename option names to match existing convention
+ * Fix ProgressBar spec failure
+ * (#15165) Fix error --tags already defined in puppet
+ * Fixup rspec warning, s/should/to/
+ * Add Travis CI configuration
+ * Add Gemfile to make contributions easier
+ * allow retry_action to catch a list of exception names as strings (attached to #16020)
+ * allow retry_action to catch a list of exception names, not just exception classes (attached to #16020)
+ * fix failing retry_action tests, lower timeout in tests so they run faster (but still pass)
+ * added support for m1.medium
+
 Wed Jul 19 2012 Moses Mendoza 1.0.5
  * Update apt repository location.
  * (#13913) removing out of date content

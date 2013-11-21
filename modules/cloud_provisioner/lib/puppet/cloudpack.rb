@@ -11,6 +11,31 @@ require 'timeout'
 module Puppet::CloudPack
   class InstanceErrorState < Exception
   end
+
+  # This is a utility class to provide access to the methods defined
+  # in the +Net::HTTPHeader+ module (e.g. +set_content_type+,
+  # +basic_auth+, etc.).
+  # Additionally it overrides the +to_hash+ method to return a hash
+  # of simple (+String+) values rather than a hash of +Array+s so that
+  # the returned value is usable as input to +Net::HTTP.get+,
+  # +Net::HTTP.post+ etc. family of methods (and consequently the
+  # +Puppet::Network::HTTP::Connection.request+ method).
+  class HttpHeaders
+    include Net::HTTPHeader
+
+    def initialize(headers = nil)
+      initialize_http_header(headers)
+    end
+
+    def to_hash
+      hash = {}
+      each do |k, v|
+        hash[k] = v
+      end
+      hash
+    end
+  end
+
   require 'puppet/cloudpack/installer'
   class << self
 
@@ -88,11 +113,31 @@ module Puppet::CloudPack
         options[:security_group] = options[:security_group].split(File::PATH_SEPARATOR)
       end
 
-      known = Puppet::CloudPack.create_connection(options).security_groups
-      unknown = options[:security_group].select { |g| known.get(g).nil? }
+      known_by_id = {}
+      known_by_name = {}
+      Puppet::CloudPack.create_connection(options).security_groups.each do |g|
+        known_by_id[g.group_id] = g
+        known_by_name[g.name] = g
+      end
+      known = {}
+      unknown = []
+      options[:security_group].each do |g|
+        # look up the group by its ID first, if not found then by name
+        if sg = known_by_id[g] || sg = known_by_name[g]
+          # store the group_id as a key in a hash to eliminate duplicates
+          known[sg.group_id] = known.size unless known.include?(sg.group_id)
+        else
+          unknown << g
+        end
+      end
       unless unknown.empty?
         raise ArgumentError, "Unrecognized security groups: #{unknown.join(', ')}"
       end
+      # now rebuild the security_group option argument array from the 'known' hash
+      # so that every group in the array is specified by its ID, there are no
+      # duplicates and the order of the groups in the array is the same as the order
+      # in which the groups were specified on the command line
+      options[:security_group] = known.keys.sort { |l, r| known[l] <=> known[r] }
     end
 
     def add_create_options(action)
@@ -123,7 +168,7 @@ module Puppet::CloudPack
           ## A regex is needed that will allow us to escape ',' characters
           ## from the CLI
           begin
-            options[:tags] = Hash[ options[:tags].split(',').map do |tag| 
+            options[:instance_tags] = Hash[ options[:instance_tags].split(',').map do |tag|
               tag_array = tag.split('=',2)
               if tag_array.size != 2
                 raise ArgumentError, 'Could not parse tags given. Please check your format'
@@ -165,16 +210,11 @@ module Puppet::CloudPack
           Type of instance to be launched. The type specifies characteristics that
           a machine will have, such as architecture, memory, processing power, storage,
           and IO performance. The type selected will determine the cost of a machine instance.
-          Supported types are: 'm1.small','m1.large','m1.xlarge','t1.micro','m2.xlarge',
-          'm2.2xlarge','x2.4xlarge','c1.medium','c1.xlarge','cc1.4xlarge'.
+
+          All instance types available from EC2 are supported; see the EC2 documentation
+          online at http://aws.amazon.com/ec2/instance-types/ for details.
         EOT
         required
-        before_action do |action, args, options|
-          supported_types = ['m1.small','m1.large','m1.xlarge','t1.micro','m2.xlarge','m2.2xlarge','x2.4xlarge','c1.medium','c1.xlarge','cc1.4xlarge']
-          unless supported_types.include?(options[:type])
-            raise ArgumentError, "Type must be one of the following: #{supported_types.join(', ')}"
-          end
-        end
       end
     end
 
@@ -218,7 +258,8 @@ module Puppet::CloudPack
           security group determines the rules for both inbound and outbound
           connections.
 
-          Multiple groups can be specified as a colon-separated list.
+          Multiple groups can be specified as a colon-separated list. The
+          groups can be specified by names or IDs.
         EOT
         before_action do |action, args, options|
           Puppet::CloudPack.group_option_before_action(options)
@@ -264,7 +305,7 @@ module Puppet::CloudPack
         summary 'Set custom facts in format of fact1=value,fact2=value'
         description <<-'EOT'
           To install custom facts during install of a node, use the format
-          fact1=value,fact2=value. Currently, there is no way to escape 
+          fact1=value,fact2=value. Currently, there is no way to escape
           the ',' character so facts cannot contain this character.
 
           Requirements:
@@ -284,7 +325,7 @@ module Puppet::CloudPack
           ## A regex is needed that will allow us to escape ',' characters
           ## from the CLI
           begin
-            options[:facts] = Hash[ options[:facts].split(',').map do |fact| 
+            options[:facts] = Hash[ options[:facts].split(',').map do |fact|
               fact_array = fact.split('=',2)
               if fact_array.size != 2
                 raise ArgumentError, 'Could not parse facts given. Please check your format'
@@ -350,13 +391,21 @@ module Puppet::CloudPack
         end
       end
 
+      add_payload_options(action)
+    end
+
+    def add_payload_options(action)
       action.option '--installer-payload=' do
-        summary 'The location of the Puppet Enterprise universal gzipped tarball.'
+        summary 'The location of the gzipped Puppet Enterprise install tarball.'
         description <<-EOT
-          Location of the Puppet enterprise universal tarball to be used for
+          Location of the Puppet Enterprise install tarball to be used for
           the installation. Can be a local file path or a URL. This option is
           only required if Puppet should be installed on the machine. The
-          tarball specified must be gzipped.
+          specified tarball must be gzipped.
+          Note that the specified Puppet install tarball must support the
+          platform of the node on which the tarball is to be installed.
+          If you are unsure about the node platform, use the universal install
+          tarball. But be warned: it is huge.
         EOT
         before_action do |action, arguments, options|
           type = Puppet::CloudPack.payload_type(options[:installer_payload])
@@ -401,7 +450,7 @@ module Puppet::CloudPack
           This option allows you to specify an optional puppet agent
           certificate name to configure on the target system.  This option
           applies to the puppet-enterprise and puppet-enterprise-http
-          installation scripts.  If provided, this option will replace any
+          installer scripts.  If provided, this option will replace any
           puppet agent certificate name provided in the puppet enterprise
           answers file.  This certificate name will show up in the console (or
           Puppet Dashboard) when the agent checks in for the first time.
@@ -409,12 +458,35 @@ module Puppet::CloudPack
       end
 
       action.option '--install-script=' do
-        summary 'The method to use when installing Puppet.'
+        summary 'The script to use when installing Puppet.'
         description <<-EOT
-          Name of the installation template to use when installing Puppet. The current
-          list of supported templates is: gems, puppet-enterprise
+          Name of the installer script template to use when installing Puppet.
+          The current list of supported scripts is:
+            #{Puppet::CloudPack::Installer.find_builtin_templates.sort.join("\n            ")}
         EOT
-        default_to { 'puppet-community' }
+        default_to { 'puppet-enterprise' }
+        before_action do |action, arguments, options|
+          # Check that the we can find the install script template.
+          Puppet::CloudPack::Installer.find_template(options[:install_script])
+
+          # Check that we have all the necessary inputs depending on the
+          # install script specified.
+          if options[:install_script].start_with?('puppet-enterprise')
+            if options[:install_script].length == 'puppet-enterprise'.length
+              # The canonical PE install script ('puppet-enterprise') needs both:
+              # the installer payload and an answers file.
+              unless options[:installer_payload] and options[:installer_answers]
+                raise ArgumentError, 'Must specify installer payload and answers file if install script is puppet-enterprise'
+              end
+            elsif options[:install_script]['puppet-enterprise'.length, 1] == '-'
+              # Other PE install scripts (those starting with 'puppet-enterprise-'),
+              # need an answers file.
+              unless options[:installer_answers]
+                raise ArgumentError, "Must specify an answers file for install script #{options[:install_script]}"
+              end
+            end
+          end
+        end
       end
 
       action.option '--puppet-version=' do
@@ -426,19 +498,6 @@ module Puppet::CloudPack
         before_action do |action, arguments, options|
           unless options[:puppet_version] =~ /^(\d+)\.(\d+)(\.(\d+|x))?$|^(\d)+\.(\d)+\.(\d+)([a-zA-Z][a-zA-Z0-9-]*)|master$/
             raise ArgumentError, "Invaid Puppet version '#{options[:puppet_version]}'"
-          end
-        end
-      end
-
-      action.option '--pe-version=' do
-        summary 'Version of Puppet Enterprise to install.'
-        description <<-EOT
-          Version of Puppet Enterprise to be passed to the installer script.
-          Defaults to 1.1.
-        EOT
-        before_action do |action, arguments, options|
-          unless options[:pe_version] =~ /^(\d+)\.(\d+)(\.(\d+))?$|^(\d)+\.(\d)+\.(\d+)([a-zA-Z][a-zA-Z0-9-]*)$/
-            raise ArgumentError, "Invaid Puppet Enterprise version '#{options[:pe_version]}'"
           end
         end
       end
@@ -459,16 +518,6 @@ module Puppet::CloudPack
     end
 
     def add_classify_options(action)
-      action.option '--enc-ssl' do
-        summary 'Whether to use SSL when connecting to the ENC.'
-        description <<-'EOT'
-          By default, we do not connect to the ENC over SSL.  This option
-          configures all HTTP connections to the ENC to use SSL in order to
-          provide encryption. This option should be set when using Puppet
-          Enterprise 2.0 and higher.
-        EOT
-      end
-
       action.option '--enc-server=' do
         summary 'The external node classifier hostname.'
         description <<-EOT
@@ -499,9 +548,7 @@ module Puppet::CloudPack
           authentication, use this option to supply credentials for accessing it.
 
           Note: This option will default to the PUPPET_ENC_AUTH_USER
-          environment variable.  Please use this environment variable if you
-          are concerned about usernames and passwords being exposed via the
-          Unix process table.
+          environment variable.
         EOT
         default_to do ENV['PUPPET_ENC_AUTH_USER'] end
       end
@@ -514,9 +561,7 @@ module Puppet::CloudPack
           authentication, use this option to supply credentials for accessing it.
 
           Note: This option will default to the PUPPET_ENC_AUTH_PASSWD
-          environment variable.  Please use this environment variable if you
-          are concerned about usernames and passwords being exposed via the
-          Unix process table.
+          environment variable.
         EOT
         default_to do ENV['PUPPET_ENC_AUTH_PASSWD'] end
       end
@@ -529,6 +574,17 @@ module Puppet::CloudPack
           returned.  If the node has not been registered with the ENC, it will
           automatically be registered when assigning it to a group.
         EOT
+      end
+
+      action.option '--insecure' do
+        summary 'Don\'t perform ENC SSL certificate verification'
+        description <<-'EOT'
+          Don't verify the SSL certificate when connecting to an ENC.
+          When connecting to the Puppet Enterprise Console, verification can be
+          optionally skipped as older versions of the PE Console used to use
+          certificates with a hardcoded Common Name which cannot be verified.
+        EOT
+        default_to { false }
       end
     end
 
@@ -547,20 +603,10 @@ module Puppet::CloudPack
     end
 
     def dashboard_classify(certname, options)
-      # The Net::HTTP client instance
-      http = Puppet::Network::HttpPool.http_instance(options[:enc_server], options[:enc_port])
+      # The Puppet::Network::HTTP::Connection instance
+      http = Puppet::Network::HttpPool.http_instance(options[:enc_server], options[:enc_port], true, !options[:insecure])
 
-      if options[:enc_ssl] then
-        http.use_ssl = true
-        uri_scheme = 'https'
-        # We intentionally use SSL only for encryption and not authenticity checking
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      else
-        http.use_ssl = false
-        uri_scheme = 'http'
-      end
-
-      Puppet.notice "Contacting #{uri_scheme}://#{options[:enc_server]}:#{options[:enc_port]}/ to classify #{certname}"
+      Puppet.notice "Contacting https://#{options[:enc_server]}:#{options[:enc_port]}/ to classify #{certname}"
 
       # This block create the node and returns it to the caller
       notfound_register_the_node = lambda do
@@ -612,7 +658,7 @@ module Puppet::CloudPack
         when /401/
           Puppet.notice "A 401 response is the HTTP code for an Unauthorized request"
           Puppet.notice "This error likely means you need to supply the --enc-auth-user and --enc-auth-passwd options"
-          Puppet.notice "Alternatively set PUPPET_ENC_AUTH_PASSWD environment variable for increased security"
+          Puppet.notice "Alternatively, use the PUPPET_ENC_AUTH_PASSWD environment variable"
         end
         raise Puppet::Error, "Could not: #{action}, got #{response.code} expected #{expected_code}"
       end
@@ -630,13 +676,13 @@ module Puppet::CloudPack
 
       # TODO: Validate that the security groups permit SSH access from here.
       # TODO: Can this throw errors?
-      server     = create_server(connection.servers,
-        :image_id   => options[:image],
-        :key_name   => options[:keyname],
-        :groups     => options[:group],
-        :flavor_id  => options[:type],
-        :subnet_id     => options[:subnet],
-        :availability_zone => options[:availability_zone]
+      server = create_server(connection.servers,
+        :image_id           => options[:image],
+        :key_name           => options[:keyname],
+        :security_group_ids => options[:security_group],
+        :flavor_id          => options[:type],
+        :subnet_id          => options[:subnet],
+        :availability_zone  => options[:availability_zone]
       )
 
       # This is the earliest point we have knowledge of the instance ID
@@ -651,7 +697,7 @@ module Puppet::CloudPack
 
       unless (options[:tags_not_supported])
         tags = {'Created-By' => 'Puppet'}
-        tags.merge! options[:tags] if options[:tags]
+        tags.merge! options[:instance_tags] if options[:instance_tags]
 
         Puppet.notice('Creating tags for instance ... ')
         create_tags(connection.tags, server.id, tags)
@@ -833,7 +879,7 @@ module Puppet::CloudPack
       install_command = "#{cmd_prefix}bash -c 'chmod u+x #{remote_script_path}; #{remote_script_path}'"
       results = ssh_remote_execute(server, options[:login], install_command, options[:keyfile])
       if results[:exit_code] != 0 then
-        raise Puppet::Error, "The installation script exited with a non-zero exit status, indicating a failure.  It may help to run with --debug to see the script execution or to check the installation log file on the remote system in #{options[:tmp_dir]}."
+        raise Puppet::Error, "The installer script exited with a non-zero exit status, indicating a failure.  It may help to run with --debug to see the script execution or to check the installation log file on the remote system in #{options[:tmp_dir]}."
       end
 
       # At this point we may assume installation of Puppet succeeded since the
@@ -854,6 +900,7 @@ module Puppet::CloudPack
       {
         'status'               => 'success',
         'puppetagent_certname' => puppetagent_certname,
+        'stdout'               => results[:stdout],
       }
     end
 
@@ -918,7 +965,8 @@ module Puppet::CloudPack
           Errno::ECONNREFUSED            => "Failed to connect. This may be because the machine is booting.  Retrying the connection...",
           Errno::ETIMEDOUT               => "Failed to connect. This may be because the machine is booting.  Retrying the connection..",
           Errno::ECONNRESET              => "Connection reset. Retrying the connection...",
-          Timeout::Error                 => "Connection test timed-out. This may be because the machine is booting.  Retrying the connection..."
+          Timeout::Error                 => "Connection test timed-out. This may be because the machine is booting.  Retrying the connection...",
+          Errno::ENETUNREACH             => "Network unreachable.  Retrying the connection...",
       }
 
       Puppet::CloudPack::Utils.retry_action( :timeout => 250, :retry_exceptions => retry_exceptions ) do
@@ -945,20 +993,6 @@ module Puppet::CloudPack
     end
 
     def upload_payloads(scp, options)
-
-      if options[:install_script] == 'puppet-enterprise'
-        unless options[:installer_payload] and options[:installer_answers]
-          raise 'Must specify installer payload and answers file if install script if puppet-enterprise'
-        end
-      end
-
-      # Puppet enterprise install scripts, even those using S3, need and installer answers file.
-      if options[:install_script] =~ /^puppet-enterprise-/
-        unless options[:installer_answers]
-          raise "Must specify an answers file for install script #{options[:install_script]}"
-        end
-      end
-
       if options[:installer_payload] and payload_type(options[:installer_payload]) == :file_path
         Puppet.notice "Uploading Puppet Enterprise tarball ..."
         scp.upload(options[:installer_payload], "#{options[:tmp_dir]}/puppet.tar.gz")
@@ -978,7 +1012,7 @@ module Puppet::CloudPack
       options[:environment] = Puppet[:environment] || 'production'
 
       install_script = Puppet::CloudPack::Installer.build_installer_template(options[:install_script], options)
-      Puppet.debug("Compiled installation script:")
+      Puppet.debug("Compiled installer script:")
       Puppet.debug(install_script)
 
       # create a temp file to write compiled script
@@ -1077,19 +1111,22 @@ module Puppet::CloudPack
     # Method to make generic, SSL, Authenticated HTTP requests
     # and parse the JSON response.  Primarily for #10377 and #10197
     def http_request(http, path, options = {}, action = nil, expected_code = '200', data = nil)
-      action ||= path
-      # We need to POST data, otherwise we'll use GET
-      request = data ? Net::HTTP::Post.new(path) : Net::HTTP::Get.new(path)
-      # Set the form data
-      request.body = data.to_pson if data
+      headers = HttpHeaders.new
       # Authentication information
-      request.basic_auth(options[:enc_auth_user], options[:enc_auth_passwd]) if ! options[:enc_auth_user].nil?
+      headers.basic_auth(options[:enc_auth_user], options[:enc_auth_passwd]) unless options[:enc_auth_user].nil?
       # Content Type of the request
-      request.set_content_type('application/json')
+      headers.set_content_type('application/json')
+      # Convert the headers to a plain hash
+      headers = headers.to_hash
+
+      # Prepare the arguments of the request call
+      args = data.nil? \
+        ? [:get, path, headers] \
+        : [:post, path, data.to_pson, headers]
 
       # Wrap the request in an exception handler
       begin
-        response = http.start { |http| http.request(request) }
+        response = http.request(*args)
       rescue Errno::ECONNREFUSED => e
         Puppet.warning 'Registering node ... Error'
         Puppet.err "Could not connect to host #{options[:enc_server]} on port #{options[:enc_port]}"
@@ -1100,7 +1137,7 @@ module Puppet::CloudPack
         raise ex
       end
       # Return the parsed JSON response
-      handle_json_response(response, action, expected_code)
+      handle_json_response(response, action || path, expected_code)
     end
 
     # Take a block and a timeout and display a progress bar while we're doing our thing
