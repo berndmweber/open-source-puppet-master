@@ -27,7 +27,10 @@ if $hiera_gpg_check == 'N/A' {
 node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
-  class { 'passenger' : }
+  class { 'rvm' : }
+  class { 'passenger' :
+    require => Class [ 'rvm' ],
+  }
   class { 'puppet::master::dashboard' : }
   class { 'puppet::master::puppetdb' : }
   class { 'puppet::master::cloud_provisioner' : }
