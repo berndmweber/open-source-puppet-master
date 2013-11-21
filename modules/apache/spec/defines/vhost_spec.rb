@@ -156,6 +156,18 @@ describe 'apache::vhost', :type => :define do
           :match => /ErrorLog "| \/bin\/fake\/logging" combined$/,
         },
         {
+          :title => 'should accept syslog destination for access log',
+          :attr  => 'access_log_syslog',
+          :value => 'syslog:local1',
+          :match => /CustomLog syslog:local1 combined$/,
+        },
+        {
+          :title => 'should accept syslog destination for error log',
+          :attr  => 'error_log_syslog',
+          :value => 'syslog',
+          :match => /ErrorLog syslog$/,
+        },
+        {
           :title => 'should accept custom format for access logs',
           :attr  => 'access_log_format',
           :value => '%h %{X-Forwarded-For}i %l %u %t \"%r\" %s %b  \"%{Referer}i\" \"%{User-agent}i\" \"Host: %{Host}i\" %T %D',
@@ -198,6 +210,16 @@ describe 'apache::vhost', :type => :define do
           :match    => [
             '  ProxyPass        / http://fake.com/',
             '  ProxyPassReverse / http://fake.com/',
+          ],
+          :notmatch => /ProxyPass .+!$/,
+        },
+        {
+          :title    => 'should accept proxy_pass hash',
+          :attr     => 'proxy_pass',
+          :value    => { 'path' => '/path-a', 'url' => 'http://fake.com/a/' },
+          :match    => [
+            '  ProxyPass        /path-a http://fake.com/a/',
+            '  ProxyPassReverse /path-a http://fake.com/a/',
           ],
           :notmatch => /ProxyPass .+!$/,
         },
@@ -254,9 +276,15 @@ describe 'apache::vhost', :type => :define do
           ],
         },
         {
-          :title => 'should accept an alias',
+          :title => 'should accept an array of alias hashes',
           :attr  => 'aliases',
           :value => [ { 'alias' => '/', 'path' => '/var/www'} ],
+          :match => '  Alias / /var/www',
+        },
+        {
+          :title => 'should accept an alias hash',
+          :attr  => 'aliases',
+          :value => { 'alias' => '/', 'path' => '/var/www'},
           :match => '  Alias / /var/www',
         },
         {
@@ -274,9 +302,35 @@ describe 'apache::vhost', :type => :define do
           ],
         },
         {
+          :title => 'should accept a suPHP_Engine',
+          :attr  => 'suphp_engine',
+          :value => 'on',
+          :match => '  suPHP_Engine on',
+        },
+        {
+          :title => 'should accept a wsgi script alias',
+          :attr  => 'wsgi_script_aliases',
+          :value => { '/' => '/var/www/myapp.wsgi'},
+          :match => '  WSGIScriptAlias / /var/www/myapp.wsgi',
+        },
+        {
+          :title => 'should accept multiple wsgi aliases',
+          :attr  => 'wsgi_script_aliases',
+          :value => {
+            '/wiki' => '/usr/local/wsgi/scripts/mywiki.wsgi',
+            '/blog' => '/usr/local/wsgi/scripts/myblog.wsgi',
+            '/'     => '/usr/local/wsgi/scripts/myapp.wsgi',
+          },
+          :match => [
+            '  WSGIScriptAlias /wiki /usr/local/wsgi/scripts/mywiki.wsgi',
+            '  WSGIScriptAlias /blog /usr/local/wsgi/scripts/myblog.wsgi',
+            '  WSGIScriptAlias / /usr/local/wsgi/scripts/myapp.wsgi'
+          ],
+        },
+        {
           :title    => 'should accept a directory',
           :attr     => 'directories',
-          :value    => [ { 'path' => '/opt/app' }],
+          :value    => { 'path' => '/opt/app' },
           :notmatch => '  <Directory /rspec/docroot>',
           :match    => [
             '  <Directory /opt/app>',
@@ -287,21 +341,21 @@ describe 'apache::vhost', :type => :define do
           ],
         },
         {
-          :title    => 'should accept directory directives',
+          :title    => 'should accept directory directives hash',
           :attr     => 'directories',
-          :value    => [
-            {
-              'path'              => '/opt/app',
-              'allow'             => 'from rspec.org',
-              'allow_override'    => 'Lol',
-              'deny'              => 'from google.com',
-              'options'           => '-MultiViews',
-              'order'             => 'deny,yned',
-              'passenger_enabled' => 'onf',
-            },
-          ],
+          :value    => {
+            'path'              => '/opt/app',
+            'headers'           => 'Set X-Robots-Tag "noindex, noarchive, nosnippet"',
+            'allow'             => 'from rspec.org',
+            'allow_override'    => 'Lol',
+            'deny'              => 'from google.com',
+            'options'           => '-MultiViews',
+            'order'             => 'deny,yned',
+            'passenger_enabled' => 'onf',
+          },
           :match    => [
             '  <Directory /opt/app>',
+            '    Header Set X-Robots-Tag "noindex, noarchive, nosnippet"',
             '    Allow from rspec.org',
             '    AllowOverride Lol',
             '    Deny from google.com',
@@ -312,11 +366,11 @@ describe 'apache::vhost', :type => :define do
           ],
         },
         {
-          :title    => 'should accept directory directives with arrays',
+          :title    => 'should accept directory directives with arrays and hashes',
           :attr     => 'directories',
           :value    => [
             {
-              'path'              => '/opt/app',
+              'path'              => '/opt/app1',
               'allow'             => 'from rspec.org',
               'allow_override'    => ['AuthConfig','Indexes'],
               'deny'              => 'from google.com',
@@ -324,15 +378,28 @@ describe 'apache::vhost', :type => :define do
               'order'             => ['deny','yned'],
               'passenger_enabled' => 'onf',
             },
+            {
+              'path'        => '/opt/app2',
+              'addhandlers' => {
+                'handler'    => 'cgi-script',
+                'extensions' => '.cgi',
+              },
+            },
           ],
           :match    => [
-            '  <Directory /opt/app>',
+            '  <Directory /opt/app1>',
             '    Allow from rspec.org',
             '    AllowOverride AuthConfig Indexes',
             '    Deny from google.com',
             '    Options -MultiViews +MultiViews',
             '    Order deny,yned',
             '    PassengerEnabled onf',
+            '  </Directory>',
+            '  <Directory /opt/app2>',
+            '    AllowOverride None',
+            '    Order allow,deny',
+            '    Allow from all',
+            '    AddHandler cgi-script .cgi',
             '  </Directory>',
           ],
         },
@@ -365,7 +432,7 @@ describe 'apache::vhost', :type => :define do
           it { should contain_file("25-#{title}.conf").with_mode('0644') }
           it param[:title] do
             lines = subject.resource('file', "25-#{title}.conf").send(:parameters)[:content].split("\n")
-            (Array(param[:match]).collect { |x| lines.grep x }.flatten.length).should == Array(param[:match]).length
+            (Array(param[:match]).collect { |x| (lines.grep x).first }.length).should == Array(param[:match]).length
             (Array(param[:notmatch]).collect { |x| lines.grep x }.flatten).should be_empty
           end
         end
@@ -405,6 +472,18 @@ describe 'apache::vhost', :type => :define do
         end
       end
 
+      describe 'when wsgi_daemon_process and wsgi_daemon_process_options are specified' do
+        let :params do default_params.merge({
+          :wsgi_daemon_process         => 'example.org',
+          :wsgi_daemon_process_options => { 'processes' => '2', 'threads' => '15' },
+        }) end
+        it 'should set wsgi_daemon_process_options' do
+          should contain_file("25-#{title}.conf").with_content(
+            /^  WSGIDaemonProcess example.org processes=2 threads=15$/
+          )
+        end
+      end
+
       describe 'when rewrite_rule and rewrite_cond are specified' do
         let :params do default_params.merge({
           :rewrite_cond => '%{HTTPS} off',
@@ -413,6 +492,30 @@ describe 'apache::vhost', :type => :define do
         it 'should set RewriteCond' do
           should contain_file("25-#{title}.conf").with_content(
             /^  RewriteCond %\{HTTPS\} off$/
+          )
+        end
+      end
+
+      describe 'when suphp_engine is on and suphp_configpath is specified' do
+        let :params do default_params.merge({
+          :suphp_engine     => 'on',
+          :suphp_configpath => '/etc/php5/apache2',
+        }) end
+        it 'should set suphp_configpath' do
+          should contain_file("25-#{title}.conf").with_content(
+            /^  suPHP_ConfigPath \/etc\/php5\/apache2$/
+          )
+        end
+      end
+
+      describe 'when suphp_engine is on and suphp_addhandler is specified' do
+        let :params do default_params.merge({
+          :suphp_engine     => 'on',
+          :suphp_addhandler => 'x-httpd-php',
+        }) end
+        it 'should set suphp_addhandler' do
+          should contain_file("25-#{title}.conf").with_content(
+            /^  suPHP_AddHandler x-httpd-php/
           )
         end
       end

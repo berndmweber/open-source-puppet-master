@@ -4,7 +4,7 @@
 # ************************************
 
 <VirtualHost <%= @nvh_addr_port %>>
-  ServerName <%= @servername_real %>
+  ServerName <%= @servername %>
 <% if @serveradmin -%>
   ServerAdmin <%= @serveradmin %>
 <% end -%>
@@ -16,6 +16,8 @@
   DocumentRoot <%= @docroot %>
 <% end -%>
 <%= scope.function_template(['apache/vhost/_aliases.erb']) -%>
+
+<%= scope.function_template(['apache/vhost/_itk.erb']) -%>
 
   ## Directories, there should at least be a declaration for <%= @docroot %>
 <%= scope.function_template(['apache/vhost/_directories.erb']) -%>
@@ -38,6 +40,8 @@
 <%= scope.function_template(['apache/vhost/_serveralias.erb']) -%>
 <%= scope.function_template(['apache/vhost/_setenv.erb']) -%>
 <%= scope.function_template(['apache/vhost/_ssl.erb']) -%>
+<%= scope.function_template(['apache/vhost/_suphp.erb']) -%>
 <%= scope.function_template(['apache/vhost/_requestheader.erb']) -%>
+<%= scope.function_template(['apache/vhost/_wsgi.erb']) -%>
 <%= scope.function_template(['apache/vhost/_custom_fragment.erb']) -%>
 </VirtualHost>
