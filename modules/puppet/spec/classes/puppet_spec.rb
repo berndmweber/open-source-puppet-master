@@ -39,9 +39,9 @@ describe 'puppet', :type => :class do
         'modulepath = /etc/puppet/modules',
         'user = puppet',
         'group = puppet',
-        'archive_file_server = puppet.nvisionary.com',
+        'archive_file_server = puppetmaster.nvisionary.com',
         'certname = puppet.nvisionary.com',
-        'server = puppet.nvisionary.com',
+        'server = puppetmaster.nvisionary.com',
       ])
       verify_template_not(subject, '/etc/puppet/puppet.conf', [
         '\[master\]',
