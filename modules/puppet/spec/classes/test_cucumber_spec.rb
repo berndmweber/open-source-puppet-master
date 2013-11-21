@@ -12,6 +12,7 @@ describe 'puppet::test::cucumber', :type => :class do
   describe 'with operatingsystem specific facts' do
     {
       'Ubuntu-12.04' => {
+        :osfamily               => 'debian',
         :operatingsystem        => 'Ubuntu',
         :operatingsystemrelease => '12.04'
       },

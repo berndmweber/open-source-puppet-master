@@ -4,6 +4,7 @@ describe 'puppet::test', :type => :class do
   let :facts do
     {
       :environment            => 'production',
+      :osfamily               => 'debian',
       :operatingsystem        => 'Ubuntu',
       :operatingsystemrelease => '12.04'
     }
