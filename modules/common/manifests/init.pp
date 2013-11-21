@@ -60,7 +60,7 @@ class common::install {
   }
   ensure_packages($common::base_packages)
   if $common::addl_packages != 'UNSET' {
-    ensure_packages($common::addl_packages)
+    create_resources('package', $common::addl_packages)
   }
   package { $common::absent_packages :
     ensure => absent,
@@ -195,7 +195,6 @@ define common::configure::sudogroup () {
       "set spec[user = \"%${name}\"]/host_group/command/runas_user ALL",
       "set spec[user = \"%${name}\"]/host_group/command/tag NOPASSWD",
     ],
-    require => Package [ 'sudo' ],
   }
 }
 

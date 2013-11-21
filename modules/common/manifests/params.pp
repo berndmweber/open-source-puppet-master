@@ -28,25 +28,25 @@ class common::params {
   ]
   case $::operatingsystem {
     'CentOS' : {
-      $co_base_packages = [
+      $co_base_packages = flatten([
         $common_packages,
         'file',
         'openssh',
         'openssh-clients',
         'patch',
         'vim-enhanced',
-      ]
+      ])
       if versioncmp ($::operatingsystemrelease, '6.0') >= 0 {
-        $base_packages = [
+        $base_packages = flatten([
           $co_base_packages,
           'ntpdate',
           'yum-plugin-changelog',
-        ]
+        ])
       } else {
-        $base_packages = [
+        $base_packages = flatten([
           $co_base_packages,
           'yum-changelog',
-        ]
+        ])
       }
       $absent_packages = [
         'caching-nameserver',
@@ -59,14 +59,14 @@ class common::params {
       $sshd_svc     = 'sshd'
     }
     'Ubuntu' : {
-      $base_packages = [
+      $base_packages = flatten([
         $common_packages,
         'apt-listchanges',
         'language-pack-en-base',
         'ntpdate',
         'openssh-client',
         'procinfo',
-      ]
+      ])
       $absent_packages = [
         'bind9',
         'firefox-locale-en',
