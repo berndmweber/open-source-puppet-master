@@ -30,14 +30,12 @@ class puppet::master::cloud_provisioner::install {
   Package {
     ensure   => present,
   }
-  package { [
-    'libxslt1-dev',
-    'libxml2-dev',
-    ] : }
+  ensure_packages(['libxml2-dev'])
+  ensure_resource('package', 'libxslt1-dev', {'ensure' => 'present', 'alias' => 'libxslt-dev'})
   package { 'nokogiri' :
     ensure => '1.4.4',
     provider => 'gem',
-    require => Package [ 'libxml2-dev' ],
+    require => Package [ 'libxml2-dev', 'libxslt-dev' ],
   }
   package { 'mime-types' :
     ensure  => '1.25',

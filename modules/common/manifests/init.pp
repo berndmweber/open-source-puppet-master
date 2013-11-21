@@ -58,9 +58,10 @@ class common::install {
   Package {
     ensure => present,
   }
+  ensure_packages(['libxml2-dev'])
   package { $common::base_packages : }
   if $common::addl_packages != 'UNSET' {
-    create_resources('package', $common::addl_packages)
+    ensure_packages($common::addl_packages)
   }
   package { $common::absent_packages :
     ensure => absent,
