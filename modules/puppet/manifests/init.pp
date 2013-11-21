@@ -11,7 +11,10 @@
 #
 # Bernd Weber <mailto:bernd@nvisionary.com>
 #
-class puppet inherits puppet::params {
+class puppet (
+  $use_puppetdb = false,
+)
+inherits puppet::params {
   class { 'puppet::install' : }
   class { 'puppet::configure' :
     require => Class [ 'puppet::install' ],
@@ -50,18 +53,17 @@ class puppet::configure {
     group   => 'root',
     require => Class [ 'puppet::install' ]
   }
-  
+
   if tagged ( 'dashboard' ) {
     $do_dashboard_config = true
   } else {
     $do_dashboard_config = false
   }
-  #TODO: Need to circle back to this. Tag does not get picked up.
-#  if tagged ( 'puppetdb' ) {
-#    $do_puppetdb_config = true
-#  } else {
-#    $do_puppetdb_config = false
-#  }
+  if $puppet::use_puppetdb {
+    $do_puppetdb_config = true
+  } else {
+    $do_puppetdb_config = false
+  }
   file { $puppet::params::puppetconf :
     ensure  => file,
     content => template ( 'puppet/puppet.conf.erb' ),
