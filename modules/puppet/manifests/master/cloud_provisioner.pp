@@ -39,10 +39,15 @@ class puppet::master::cloud_provisioner::install {
     provider => 'gem',
     require => Package [ 'libxml2-dev' ],
   }
+  package { 'mime-types' :
+    ensure  => '1.25',
+    provider => 'gem',
+    require => Package [ 'nokogiri' ],
+  }
   package { 'fog' :
     ensure  => '0.7.2',
     provider => 'gem',
-    require => Package [ 'nokogiri' ],
+    require => Package [ 'mime-types' ],
   }
   package { 'guid' :
     provider => 'gem',
