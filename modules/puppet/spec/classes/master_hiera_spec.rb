@@ -40,7 +40,7 @@ describe 'puppet::master::hiera', :type => :class do
         }
         it 'should have a file hiera.yaml with the correct contents' do
           verify_template(subject, '/etc/puppet/hiera.yaml', [
-            ':datadir: /etc/puppet/environments/%\{environment\}/hieradata',
+            ':datadir: /etc/puppet/environments/%\{::environment\}/hieradata',
             ':key_dir: /var/lib/puppet/.gnupg'
             ])
         end
