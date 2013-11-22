@@ -41,6 +41,7 @@ class rvm::passenger::apache(
   class { 'apache::mod::passenger':
     passenger_root                => $gemroot,
     passenger_ruby                => "${rvm_prefix}/rvm/wrappers/${ruby_version}/ruby",
+    passenger_lib                 => "${gemroot}/buildout/apache2/mod_passenger.so",
     passenger_high_performance    => $high_performance,
     passenger_max_pool_size       => $maxpoolsize,
     passenger_pool_idle_time      => $poolidletime,
