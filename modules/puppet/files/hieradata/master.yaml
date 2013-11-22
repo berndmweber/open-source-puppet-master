@@ -33,3 +33,11 @@ puppet::master::dashboard::allowed_ip_ranges: '192.168.0.0/16'
 
 puppetdb::listen_address:   0.0.0.0
 puppetdb::database:         embedded
+
+rvm::ruby_versions:
+  'ruby-1.9.3-p448':
+    ensure:         present
+    default_use:    true
+  'ruby-2.0.0-p247:
+    ensure:         present
+    default_use:    false
