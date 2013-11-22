@@ -44,7 +44,7 @@ rvm::ruby_versions:
     default_use:    false
 rvm::passenger::apache::version:            4.0.25
 rvm::passenger::apache::ruby_version:       ruby-1.9.3-p448
-rvm::passenger::apache::high_performance:   on
+rvm::passenger::apache::high_performance:   'On'
 rvm::passenger::apache::poolidletime:       1500
 rvm::passenger::apache::stat_throttle_rate: 120
-rvm::passenger::apache::passenger_enabled:  on
+rvm::passenger::apache::passenger_enabled:  'On'
