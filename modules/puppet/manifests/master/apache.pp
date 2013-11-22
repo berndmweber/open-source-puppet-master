@@ -33,7 +33,7 @@ class puppet::master::apache inherits puppet::params {
 #  class { puppet::master::apache::configure : }
 #
 class puppet::master::apache::configure {
-  require ( 'apache', 'passenger' )
+  require ( 'apache', 'rvm::passenger::apache' )
   require apache::mod::headers
   require apache::mod::ssl
 

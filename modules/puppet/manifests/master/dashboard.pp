@@ -97,7 +97,7 @@ class puppet::master::dashboard::install {
 class puppet::master::dashboard::configure (
   $allowed_ip_ranges,
 ) {
-  require ( 'apache', 'passenger' )
+  require ( 'apache', 'rvm::passenger::apache' )
   require apache::mod::headers
   require apache::mod::ssl
 

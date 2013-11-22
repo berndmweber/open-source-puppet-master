@@ -41,3 +41,9 @@ rvm::ruby_versions:
   'ruby-2.0.0-p247':
     ensure:         present
     default_use:    false
+rvm::passenger::apache::version:            4.0.25
+rvm::passenger::apache::ruby_version:       ruby-1.9.3-p448
+rvm::passenger::apache::high_performance:   on
+rvm::passenger::apache::poolidletime:       1500
+rvm::passenger::apache::stat_throttle_rate: 120
+rvm::passenger::apache::passenger_enabled:  on

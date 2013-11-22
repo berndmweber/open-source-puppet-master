@@ -1,6 +1,9 @@
 class { 'apache' : }
 class { 'ruby' : }
-class { 'passenger' : }
+class { 'rvm' : }
+class { 'rvm::passenger::apache' :
+  require => Class [ 'rvm' ],
+}
 #class { "puppet::params" : }
 # This will install some basic modules we need
 #puppet::master::module { $puppet::params::puppet_modules[$type] :

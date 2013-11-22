@@ -1,12 +1,18 @@
 class rvm::passenger::apache(
   $ruby_version,
   $version,
-  $rvm_prefix = '/usr/local',
-  $mininstances = '1',
-  $maxpoolsize = '6',
-  $poolidletime = '300',
-  $maxinstancesperapp = '0',
-  $spawnmethod = 'smart-lv2'
+  $rvm_prefix           = '/usr/local',
+  $high_performance     = undef,
+  $mininstances         = '1',
+  $maxpoolsize          = '6',
+  $max_requests         = undef,
+  $poolidletime         = '300',
+  $maxinstancesperapp   = '0',
+  $stat_throttle_rate   = undef,
+  $rack_autodetect      = undef,
+  $rails_autodetect     = undef,
+  $passenger_enabled    = undef,
+  $spawnmethod          = 'smart-lv2'
 ) {
 
   class { 'rvm::passenger::gem':
@@ -33,11 +39,17 @@ class rvm::passenger::apache(
   }
 
   class { 'apache::mod::passenger':
-    passenger_root           => $gemroot,
-    passenger_ruby           => "${rvm_prefix}/rvm/wrappers/${ruby_version}/ruby",
-    passenger_max_pool_size  => $maxpoolsize,
-    passenger_pool_idle_time => $poolidletime,
-    require                  => Exec['passenger-install-apache2-module'],
-    subscribe                => Exec['passenger-install-apache2-module'],
+    passenger_root                => $gemroot,
+    passenger_ruby                => "${rvm_prefix}/rvm/wrappers/${ruby_version}/ruby",
+    passenger_high_performance    => $high_performance,
+    passenger_max_pool_size       => $maxpoolsize,
+    passenger_pool_idle_time      => $poolidletime,
+    passenger_max_requests        => $max_requests,
+    passenger_stat_throttle_rate  => $stat_throttle_rate,
+    rack_autodetect               => $rack_autodetect,
+    rails_autodetect              => $rails_autodetect,
+    passenger_enabled             => $passenger_enabled,
+    require                       => Exec['passenger-install-apache2-module'],
+    subscribe                     => Exec['passenger-install-apache2-module'],
   }
 }

@@ -28,7 +28,7 @@ node /<%= fhn %>/ {
   class { 'apache' : }
   class { 'ruby' : }
   class { 'rvm' : }
-  class { 'passenger' :
+  class { 'rvm::passenger::apache' :
     require => Class [ 'rvm' ],
   }
   class { 'puppet::master::dashboard' : }

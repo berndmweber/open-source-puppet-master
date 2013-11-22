@@ -8,6 +8,7 @@ class apache::mod::passenger (
   $passenger_root                 = $apache::params::passenger_root,
   $passenger_ruby                 = $apache::params::passenger_ruby,
   $passenger_max_pool_size        = undef,
+  $passenger_enabled              = undef,
 ) {
   apache::mod { 'passenger': }
   # Template uses:
@@ -19,6 +20,7 @@ class apache::mod::passenger (
   # - $passenger_stat_throttle_rate
   # - $rack_autodetect
   # - $rails_autodetect
+  # - $passenger_enabled
   file { 'passenger.conf':
     ensure  => file,
     path    => "${apache::mod_dir}/passenger.conf",
