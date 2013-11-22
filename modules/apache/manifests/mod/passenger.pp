@@ -9,10 +9,10 @@ class apache::mod::passenger (
   $rails_autodetect               = undef,
   $passenger_root                 = $apache::params::passenger_root,
   $passenger_ruby                 = $apache::params::passenger_ruby,
-  $passenger_lib                  = undef,
+  $passenger_lib_path             = undef,
 ) {
   apache::mod { 'passenger':
-    lib =>  $passenger_lib
+    lib_path =>  $passenger_lib_path
   }
   # Template uses:
   # - $passenger_root
