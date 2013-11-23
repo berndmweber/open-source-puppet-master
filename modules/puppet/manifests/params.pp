@@ -85,7 +85,7 @@ class puppet::params {
   }
   $dashboard_db_user        = 'pm_dashboard'
   $dashboard_db_encoding    = 'utf8'
-  $dashboard_db_adapter     = 'mysql'
+  $dashboard_db_adapter     = 'mysql2'
   $dashboard_report_port    = '3000'
   $dashboard_inventory_port = $masterport
   $dashboard_http_port      = $dashboard_report_port
