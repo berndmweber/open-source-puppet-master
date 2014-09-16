@@ -232,6 +232,9 @@ eval_osversion ()
       12.04)
       # good
       ;;
+      14.04)
+      # good
+      ;;
       *)
         return 0
       ;;
@@ -391,9 +394,20 @@ fi
 # Now some OS specific definitions
 case ${OS} in
   ubuntu)
+    case "${OSVERSION}" in
+      12.04)
+        OSCODENAME="precise"
+      ;;
+      14.04)
+        OSCODENAME="trusty"
+      ;;
+      *)
+        return 0
+      ;;
+    esac
     REPOPATH="apt.puppetlabs.com"
     REPOFILEBASE="puppetlabs-release"
-    REPOFILE="${REPOFILEBASE}-precise.deb"
+    REPOFILE="${REPOFILEBASE}-${OSCODENAME}.deb"
     REPOINSTALL="dpkg -i"
     REPOCHECK="dpkg --list"
     REPOINSTCHECK="ii  "
